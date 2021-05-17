@@ -1,12 +1,13 @@
 /**
- * User schema object with functions to interact with MongoDB
+ * User Object - schema & functions to interact with MongoDB
  * user password hashed with bcrypt
  * 
  * TODO: Improve error handling
  * TODO: Add validation and sanitisation
  * 
- * If there are Mongoose deprecation warnings, go to 
- * https://mongoosejs.com/docs/deprecations.html to rectify
+ * If Mongoose has deprecation warnings, rectify at https://mongoosejs.com/docs/deprecations.html  
+ * 
+ * Remember to use filter { isDeleted: false } to avoid changing deleted users
  */
 
 const mongoose = require("mongoose");
@@ -14,8 +15,6 @@ const { Schema } = mongoose;
 const { ObjectId } = mongoose.Types;
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-
-// const { AssignmentSchema } = require("./assignmentModel");
 
 // creating user object schema
 const UserSchema = new Schema({
@@ -27,53 +26,48 @@ const UserSchema = new Schema({
         type: String,
         required: "Please enter Last Name"
     },
-    username: {
+    email: {
         type: String,
-        required: "Please enter Username",
+        unique: true,
         index: true,
-        unique: true
+        lowercase: true,
+        required: "Please enter Email"
     },
     password: {
         type: String,
         required: "Please enter Password"
     },
-    email: {
-        type: String,
-        unique: true,
-        lowercase: true,
-        required: "Please enter Email"
-    },
     role: {
         type: String,
         lowercase: true,
         required: "Please enter Role",
-        enum: [ "student", "teacher", "parent", "admin" ]
-    },
-    isActive: {
-        type: Boolean,
-        default: true
-    },
-    created_date: {
-        type: Date,
-        default: Date.now
+        enum: ["student", "teacher", "parent", "admin"]
     },
     school: {
         type: String
-    },
-    age: {
-        type: Number
     },
     grade: {
         type: Number,
         min: 1,
         max: 6
     },
-    assignments: [],
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
+    created_at: {
+        type: Date,
+        default: Date.now
+    },
     exp_points: {
         type: Number,
         default: 0
     },
     rank_level: {
+        type: Number,
+        default: 0
+    },
+    token: {
         type: Number,
         default: 0
     }
@@ -83,10 +77,10 @@ const UserSchema = new Schema({
 UserSchema.pre('save', async function hashPassword(next) {
     try {
         const user = this;
-    
+
         // only hash the password if it has been modified (or is new)
         if (!user.isModified('password')) return next();
-    
+
         // hash the password along with our new salt
         const hash = await bcrypt.hash(user.password, saltRounds);
         console.log("Hashed password");
@@ -108,107 +102,118 @@ const User = mongoose.model("User", UserSchema);
 const userModel = {
     UserSchema: UserSchema,
     // signup
-    // TODO: check if email exists
-    addNewUser: async (req, res) => {
-        const { first_name, last_name, email, username, password, role, school, age, grade } = req.body;
+    addNewUser: (first_name, last_name, email, password, role, school, grade) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                //check if email or username exists
+                const emailExists = await User.findOne({ email: email }).exec();
 
-        try {
-            //check if email or username exists
-            const emailExists = await User.findOne({ email: email }).exec();
-            const usernameExists = await User.findOne({ username: username }).exec();
+                if (emailExists) throw "EMAIL_EXISTS";
 
-            if(emailExists) {
-                res.status(400).json({ message: "Email already exists" });
-            }
-            else if(usernameExists) {
-                res.status(400).json({ message: "Username already exists" });
-            }
-            else {
                 // save user if email is unique
-                const newUser = new User(req.body);
+                const newUser = new User({ first_name, last_name, email, password, role, school, grade });
                 const result = await newUser.save();
 
-                if(!result) {
-                    throw "Failed to create user";
-                }
-                res.status(201).json({ message: "User Created"});
-            }            
-        } catch(err) {
-            console.error(err);
-            res.status(500).send({ error: err });
-        }
+                if (!result) throw "UNEXPECTED_ERROR";
+                resolve(result);
+            } catch (err) {
+                console.error(err);
+                reject(err);
+            }
+        })
     },
     // login
-    verifyUser: async (req, res) => {
-        const { username, password } = req.body;
+    verifyUser: (email, password) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let user = await User.findOne({ email: email })
+                    .select("-__v")
+                    .exec();
+                if (!user) throw "INVALID_USER";
 
-        try {
-            const user = await User.findOne({ username: username }).exec();
+                const match = await bcrypt.compare(password, user.password);
+                if (!match) throw "INVALID_USER";
 
-            if(!user) 
-                res.status(400).send({ error: "The email or password is invalid" });
-            else if(!bcrypt.compare(password, user.password))
-                res.status(400).send({ error: "The email or password is invalid" });
-            else {
-                delete user.password;
-                delete user.__v;
-                delete user._id;
-
-                console.error(user);
-                res.status(200).json(user);
+                // remove password before saving
+                user.password = undefined;
+                resolve(user);
+            } catch (err) {
+                reject(err);
             }
-                
-
-        } catch(err) {
-            console.error(err);
-            res.status(500).send(err);
-        }
+        })
     },
     //get all users
-    // TODO: remove password before sending
-    getAllUsers: async (req, res) => {
-        try {
-            const result = await User.find();
+    getAllUsers: () => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const users = await User.find()
+                    .select("-password -__v"); //select attributes except for these 2
 
-            if(!result) {
-                throw "Failed to get user"
+                if (!users) throw "UNEXPECTED_ERROR";
+                resolve(users);
+            } catch (err) {
+                reject(err);
             }
-            res.status(200).send(result);
-        } catch(err) {
-            console.error(err);
-            res.status(500).send({ error: err });
-        }
+        })
+    },
+    //search (active) user by email
+    searchUserByEmail: (email) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const users = await User.find({
+                    $and: [
+                        { email: { $regex: email } },
+                        { isDeleted: false }
+                    ]
+                }).select("-password -__v -isDeleted");
+
+                resolve(users);
+            } catch (err) {
+                reject(err);
+            }
+        })
     },
     // returns total users, new users per week etc. discuss ltr
-    viewUserStats: async (req, res) => {
-        try {
-            const result = await User.countDocuments({});
+    viewUserStats: () => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const totalUsers = await User.countDocuments({});
+                const activeUsers = await User.countDocuments({ isDeleted: false });
 
-            res.status(200).send({ total_users: result });
-        } catch(err) {
-            console.error(err);
-            res.status(500).send({ error: err });
-        }
+                if (!totalUsers || !activeUsers) throw "UNEXPECTED_ERROR";
+                resolve({ totalUsers, activeUsers });
+            } catch (err) {
+                reject(err)
+            }
+        })
     },
-    updateProfile: async (req, res) => {
+    //updates user based on fields given
+    updateProfile: (userId, changedFields) => {
+        return new Promise(async (resolve, reject) => {
+            // remove id from changedFields
+            console.log(changedFields);
 
-        const changedFields = {...req.body};
-        const { userId } = req.body;
-
-        // remove id from changedFields
-        console.log(changedFields);
-
-        // delete userId from request
-        delete changedFields.userId;
-
-        try {
-            const result = await User.findByIdAndUpdate( ObjectId(userId), changedFields);
-            if(result) res.status(200).send({ message: "Updated" });
-            else throw "User could not be updated";
-        } catch(err) {
-            console.error(err);
-            res.status(500).send({ error: err });
-        }
+            try {
+                const result = await User.findByIdAndUpdate(ObjectId(userId), changedFields);
+                if (!result) throw "UNEXPECTED_ERROR";
+                resolve(result);
+            } catch (err) {
+                reject(err);
+            }
+        })
+    },
+    //deactivate user
+    deactivateUser: (userId) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                console.log("userid", userId);
+                const result = await User.findByIdAndUpdate(ObjectId(userId), { isDeleted: true });
+                if (!result) throw "UNEXPECTED_ERROR";
+                resolve(result);
+            } catch (err) {
+                reject(err);
+            }
+        })
     }
 }
 

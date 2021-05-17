@@ -3,6 +3,10 @@ const { Schema } = mongoose;
 
 // creating user object schema
 const QuestionSchema = new Schema({
+    skill_name: {
+        type: String,
+        required: "Skill required"
+    },
     question_number: {
         type: Number,
         min: 1,
@@ -19,7 +23,8 @@ const QuestionSchema = new Schema({
         type: Boolean
     },
     difficulty: {
-        type: String
+        type: String,
+        required: "Difficulty required"
     }
 });
 

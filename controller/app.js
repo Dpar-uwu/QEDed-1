@@ -1,7 +1,8 @@
+var connection;
 const mongoose = require("mongoose");
 const express = require("express");
 
-const userRoutes = require("../routes/userRoutes");
+const userController = require("./userController");
 const app = express();
 
 app.use(express.json()); // expect json in http req
@@ -24,27 +25,43 @@ const options = {
 // (func() {...})() is an Immediately Invoked Function Expression
 (async () => {
     try {
-        const connection = await mongoose.connect(localurl, options)
-        console.log("Connected to database");
+        connection = await mongoose.connect(localurl, options)
+        console.log("SUCCESS Connected to database");
     } catch(error) {
-        console.error(error);
+        console.error("ERROR Error connecting to database");
+        process.exit(1);
     }
 })();
 
 // handle any transaction error to mongodb
 mongoose.connection.on('error', err => {
-    console.error(err);
+    console.error("Database error");
 });
 
 
 
 /********** Routes **********/ 
-app.use("/user", userRoutes);
+app.use("/user", userController);
 
+// only for resetting database
+app.post('/reset', async (req, res) => {
+    try {
+        console.log("Deleting tables");
 
-// to handle paths that do not exist
+        //drop collections here
+        await connection.connection.db.dropCollection("users");
+        
+        res.status(200).send({message: "Reset OK"});
+    } catch(err) {
+        console.log(err);
+        res.status(500).send({error: err});
+    }
+    
+})
+
+// to handle 404 paths that do not exist
 app.all("*", (req, res) => {
-    res.status(404).send("Page not found");
+    res.status(404).send("404 Page not found");
 })
 
 

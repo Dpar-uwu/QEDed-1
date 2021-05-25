@@ -12,8 +12,7 @@ app.use(express.urlencoded({ extended: false }));
 // app.use('/static', express.static(path.join(__dirname, 'public')))
 
 /* Connect to MondoBD Instance */
-const url = process.env.CONNECTION_STRING;
-const localurl = "mongodb://localhost:27017/"+ process.env.DATABASE_CLUSTER;
+const localurl = process.env.CONNECTION_STRING || "mongodb://localhost:27017/"+ process.env.DATABASE_CLUSTER;
 
 const options = {
     useNewUrlParser: true, // avoid deprecation when connecting

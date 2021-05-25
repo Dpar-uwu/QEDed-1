@@ -10,49 +10,49 @@ const { Question } = require("./questionModel");
 
 // creating user object schema
 const QuizSchema = new Schema({
-    skill_code: {
+    topic_id: {
         type: Schema.Types.ObjectId,
-        required: "Skill ID is required"
-    },
-    skill_name: {
-        type: String,
-        required: "Skill Name required"
+        required: "Topic ID is required"
     },
     topic_name: {
         type: String,
         required: "Topic Name is required"
     },
-    done_by: {
-        type: Schema.Types.ObjectId,
-        required: "Done By is required"
-    },
     score: {
         type: Number
+    },
+    time_taken: {
+        type: Number
+    },
+    assigned_by: {
+        type: Schema.Types.ObjectId,
+        required: "Assigned By is required"
+    },
+    created_date: {
+        type: Date,
+        default: Date.now
+    },
+    deadline: {
+        type: Date,
+        min: Date.now
+    },
+    isCompleted: {
+        type: Boolean,
+        default: false
+    },
+    attempts: {
+        type: Number,
+        default: 0
     },
     quiz_questions: [ Question ],
     num_of_questions: {
         type: Number,
         required: "Number of questions is required"
     },
-    time_taken: {
-        type: Number
-    },
-    isCompleted: {
-        type: Boolean,
-        default: false
-    },
-    created_date: {
-        type: Date,
-        default: Date.now
-    },
-    // the following are only needed for assignments
-    assigned_by: {
-        type: Schema.Types.ObjectId,
-        required: "Assigned By is required"
-    },
-    deadline: {
-        type: Date,
-        min: Date.now
+    percentage_difficulty: {
+        easy: { type: Number, required: "Difficulty portion for easy questions is required" },
+        medium: { type: Number, required: "Difficulty portion for medium questions is required" },
+        hard: { type: Number, required: "Difficulty portion for hard questions is required" }
     }
 });
 

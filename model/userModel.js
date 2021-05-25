@@ -37,6 +37,11 @@ const UserSchema = new Schema({
         type: String,
         required: "Please enter Password"
     },
+    gender: {
+        type: String,
+        enum: ["F", "M"],
+        required: "Please specify Gender"
+    },
     role: {
         type: String,
         lowercase: true,
@@ -100,9 +105,9 @@ const User = mongoose.model("User", UserSchema);
 
 
 const userModel = {
-    UserSchema: UserSchema,
+    UserSchema,
     // signup
-    addNewUser: (first_name, last_name, email, password, role, school, grade) => {
+    addNewUser: (first_name, last_name, email, password, gender, role, school, grade) => {
         return new Promise(async (resolve, reject) => {
             try {
                 //check if email or username exists
@@ -111,7 +116,7 @@ const userModel = {
                 if (emailExists) throw "EMAIL_EXISTS";
 
                 // save user if email is unique
-                const newUser = new User({ first_name, last_name, email, password, role, school, grade });
+                const newUser = new User({ first_name, last_name, email, password, gender,role, school, grade });
                 const result = await newUser.save();
 
                 if (!result) throw "UNEXPECTED_ERROR";
@@ -127,7 +132,7 @@ const userModel = {
         return new Promise(async (resolve, reject) => {
             try {
                 let user = await User.findOne({ email: email })
-                    .select("-__v")
+                    .select("-__v") // exclude __v from result
                     .exec();
                 if (!user) throw "INVALID_USER";
 
@@ -157,6 +162,7 @@ const userModel = {
         })
     },
     //search (active) user by email
+    // TODO: Remove the isDeleted column
     searchUserByEmail: (email) => {
         return new Promise(async (resolve, reject) => {
             try {
@@ -174,6 +180,7 @@ const userModel = {
         })
     },
     // returns total users, new users per week etc. discuss ltr
+    // TODO: Remove active users since deactivation is removed
     viewUserStats: () => {
         return new Promise(async (resolve, reject) => {
             try {
@@ -203,6 +210,7 @@ const userModel = {
         })
     },
     //deactivate user
+    // TODO: Changed to DELETE user completely from database
     deactivateUser: (userId) => {
         return new Promise(async (resolve, reject) => {
             try {

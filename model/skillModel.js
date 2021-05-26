@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-const { NumParamSchema } = require("./numericalParamModel");
 
 const SkillSchema = new Schema({
     skill_code: {
@@ -23,16 +22,34 @@ const SkillSchema = new Schema({
         type: Number
     },
     easy_values: {
-        type: NumParamSchema,
-        required: "Easy values required"
+        min: {
+            type: Number,
+            required: "Minimum (easy) value required"
+        },
+        max: {
+            type: Number,
+            required: "Maximum (easy) value required"
+        }
     },
     medium_values: {
-        type: NumParamSchema,
-        required: "Intermediate values required"
+        min: {
+            type: Number,
+            required: "Minimum (medium) value required"
+        },
+        max: {
+            type: Number,
+            required: "Maximum (medium) value required"
+        }
     },
     difficult_values: {
-        type: NumParamSchema,
-        required: "Difficult values required"
+        min: {
+            type: Number,
+            required: "Minimum (difficult) value required"
+        },
+        max: {
+            type: Number,
+            required: "Maximum (difficult) value required"
+        }
     }
 });
 

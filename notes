@@ -1,3 +1,15 @@
+using AND to query
+
+const users = await User.find({
+                    $and: [
+                        { email: { $regex: email } },
+                        { isDeleted: false }
+                    ]
+                }).select("-password -__v -isDeleted");
+
+
+// TODO: DELETED num param documents and chg to nested path
+
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 

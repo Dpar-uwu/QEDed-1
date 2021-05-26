@@ -7,7 +7,6 @@
  * 
  * If Mongoose has deprecation warnings, rectify at https://mongoosejs.com/docs/deprecations.html  
  * 
- * Remember to use filter { isDeleted: false } to avoid changing deleted users
  */
 
 const mongoose = require("mongoose");
@@ -55,10 +54,6 @@ const UserSchema = new Schema({
         type: Number,
         min: 1,
         max: 6
-    },
-    isDeleted: {
-        type: Boolean,
-        default: false
     },
     created_at: {
         type: Date,
@@ -161,16 +156,12 @@ const userModel = {
             }
         })
     },
-    //search (active) user by email
-    // TODO: Remove the isDeleted column
+    //search user by email
     searchUserByEmail: (email) => {
         return new Promise(async (resolve, reject) => {
             try {
                 const users = await User.find({
-                    $and: [
-                        { email: { $regex: email } },
-                        { isDeleted: false }
-                    ]
+                    email: { $regex: email, $options: "i" } 
                 }).select("-password -__v -isDeleted");
 
                 resolve(users);
@@ -180,15 +171,13 @@ const userModel = {
         })
     },
     // returns total users, new users per week etc. discuss ltr
-    // TODO: Remove active users since deactivation is removed
     viewUserStats: () => {
         return new Promise(async (resolve, reject) => {
             try {
                 const totalUsers = await User.countDocuments({});
-                const activeUsers = await User.countDocuments({ isDeleted: false });
 
-                if (!totalUsers || !activeUsers) throw "UNEXPECTED_ERROR";
-                resolve({ totalUsers, activeUsers });
+                if (!totalUsers) throw "UNEXPECTED_ERROR";
+                resolve({ totalUsers });
             } catch (err) {
                 reject(err)
             }
@@ -197,7 +186,6 @@ const userModel = {
     //updates user based on fields given
     updateProfile: (userId, changedFields) => {
         return new Promise(async (resolve, reject) => {
-            // remove id from changedFields
             console.log(changedFields);
 
             try {
@@ -209,13 +197,12 @@ const userModel = {
             }
         })
     },
-    //deactivate user
-    // TODO: Changed to DELETE user completely from database
-    deactivateUser: (userId) => {
+    //delete user
+    // TODO: do we need to delete user from all existing groups too?
+    deleteUser: (userId) => {
         return new Promise(async (resolve, reject) => {
             try {
-                console.log("userid", userId);
-                const result = await User.findByIdAndUpdate(ObjectId(userId), { isDeleted: true });
+                const result = await User.findByIdAndDelete( ObjectId(userId) );
                 if (!result) throw "UNEXPECTED_ERROR";
                 resolve(result);
             } catch (err) {

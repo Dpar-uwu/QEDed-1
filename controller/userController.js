@@ -28,14 +28,14 @@ router.route("/")
 
 
 /**
- * GET /user/search?q=email - search user by email
+ * GET /user/search?query=email - search user by email
  */
 router.route("/search")
 .get(async (req, res) => {
     try {
         console.time("GET user by email");
-        const { q } = req.query;
-        const result = await user.searchUserByEmail(decodeURI(q));
+        const { query } = req.query;
+        const result = await user.searchUserByEmail(decodeURI(query));
 
         if(!result) throw "NO_MATCH";
         res.status(200).send(result);
@@ -117,7 +117,7 @@ router.route("/login")
 
 
 /**
- * PUT /user/updateProfile - update user by id
+ * PUT /user/updateProfile/:userId - update user by id
  */
 router.route("/updateProfile/:userId")
     .put(async (req, res) => {
@@ -140,23 +140,23 @@ router.route("/updateProfile/:userId")
 
 
 /**
- * PUT /user/deleteProfile - deactivate user by id
+ * DELETE /user/deleteAccount/:userId - delete user by id
  */
-router.route("/deactivateProfile/:userId")
-    .put(async (req, res) => {
+router.route("/deleteAccount/:userId")
+    .delete(async (req, res) => {
         try {
-            console.time("PUT deactivate user");
+            console.time("DELETE user");
             const { userId } = req.params;
 
-            const result = await user.deactivateUser(userId);
+            const result = await user.deleteUser(userId);
 
             console.log("SUCCESS! Result:", result);
-            res.status(200).send({user: "Deactivated User"});
+            res.status(200).send({result: "User Deleted"});
         } catch(err) {
-            console.error("ERROR! Failed to deactivate account");
-            res.status(500).send({error: "Could not deactivate account", code: "UNEXPECTED_ERROR"});
+            console.error("ERROR! Failed to delete user account");
+            res.status(500).send({error: "Could not delete account", code: "UNEXPECTED_ERROR"});
         } finally {
-            console.timeEnd("PUT deactivate user");
+            console.timeEnd("DELETE user");
         }
     });
 

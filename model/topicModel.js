@@ -73,6 +73,102 @@ const topicModel = {
             }
         })
     },
+    deleteTopicByd: (topicId) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const result = await Topic.findByIdAndUpdate(ObjectId(topicId));
+                if (!result) throw "UNEXPECTED_ERROR";
+                resolve(result);
+            } catch(err) {
+                console.error(err);
+                reject(err);
+            }
+        })
+    },
+    resetDefault: () => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const result = await Topic.deleteMany({});
+                if (!result) throw "UNEXPECTED_ERROR";
+                console.log("OK deleted topics", result);
+
+                const defaultTopics = 
+                {
+                    "level": 5,
+                    "topic_name": "Fractions",
+                    "skills": [
+                        {
+                            "skill_code": "FRAC_SIMPLIFY",
+                            "skill_name": "Simplifying Fractions",
+                            "num_of_qn": 10,
+                            "percent_difficulty": "30-50-20",
+                            "duration": 20,
+                            "easy_values": {
+                                "min": 1,
+                                "max": 10
+                            },
+                            "medium_values": {
+                                "min": 10,
+                                "max": 20
+                            },
+                            "difficult_values": {
+                                "min": 20,
+                                "max": 30
+                            }
+                        },
+                        {
+                            "skill_code": "FRAC_ADD",
+                            "skill_name": "Addition of Fractions",
+                            "num_of_qn": 10,
+                            "percent_difficulty": "30-50-20",
+                            "duration": 20,
+                            "easy_values": {
+                                "min": 1,
+                                "max": 10
+                            },
+                            "medium_values": {
+                                "min": 10,
+                                "max": 20
+                            },
+                            "difficult_values": {
+                                "min": 20,
+                                "max": 30
+                            }
+                        },
+                        {
+                            "skill_code": "FRAC_MULTIPLY",
+                            "skill_name": "Multiplication of Fractions",
+                            "num_of_qn": 10,
+                            "percent_difficulty": "30-50-20",
+                            "duration": 20,
+                            "easy_values": {
+                                "min": 1,
+                                "max": 10
+                            },
+                            "medium_values": {
+                                "min": 10,
+                                "max": 20
+                            },
+                            "difficult_values": {
+                                "min": 20,
+                                "max": 30
+                            }
+                        }
+                    ]
+                };
+
+                const newTopics = new Topic(defaultTopics);
+                const result2 = newTopics.save();
+                console.log("res 2:", result2);
+                if (!result2) throw "UNEXPECTED_ERROR";
+                console.log("OK added default topics", result2);
+                resolve(result);
+            } catch(err) {
+                console.error(err);
+                reject(err);
+            }
+        })
+    }
 }
 
 module.exports = topicModel;

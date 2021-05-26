@@ -27,7 +27,7 @@ const options = {
     try {
         connection = await mongoose.connect(localurl, options);
         console.log("SUCCESS Connected to database");
-    } catch(error) {
+    } catch (error) {
         console.error("ERROR Error connecting to database");
         process.exit(1);
     }
@@ -40,7 +40,7 @@ mongoose.connection.on('error', err => {
 
 
 
-/********** Routes **********/ 
+/********** Routes **********/
 app.use("/user", userController);
 app.use("/topic", topicController);
 
@@ -52,19 +52,39 @@ app.post('/reset', async (req, res) => {
         //drop collections here
         await connection.connection.db.dropCollection("users");
         await connection.connection.db.dropCollection("topics");
-        
-        res.status(200).send({message: "Reset OK"});
-    } catch(err) {
+
+        res.status(200).send({ message: "Reset OK" });
+    } catch (err) {
         console.log(err);
-        res.status(500).send({error: err});
+        res.status(500).send({ error: err });
     }
 });
+
+// error handling
+app.use(function (error, req, res, next) {
+    // Any request to this server will get here, and will send an HTTP
+    // response with the error message 'woops'
+    res.status(500).send({ error: "An error occured", code: "UNEXPECTED_ERROR" });
+});
+
 
 // to handle 404 paths that do not exist
 app.all("*", (req, res) => {
     res.status(404).send("404 Page not found");
 });
 
+process.on('unhandledRejection', error => {
+    console.log('unhandledRejection', error);
+});
 
+// app.use(function handleDatabaseError(error, req, res, next) {
+//     if (error instanceof MongoError) {
+//         return res.status(503).json({
+//             type: 'MongoError',
+//             message: error.message
+//         });
+//     }
+//     next(error);
+// });
 
 module.exports = app;

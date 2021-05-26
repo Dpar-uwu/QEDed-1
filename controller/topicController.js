@@ -56,18 +56,60 @@ router.route("/:topicId")
         try {
             console.time("PUT topic by id");
             const { topicId } = req.params;
-            const changedFields = {...req.body};
+            const changedFields = { ...req.body };
 
             const result = topic.updateTopicById(topicId, changedFields);
             console.log("SUCCESS! Result:", result);
 
-            res.status(200).send({message: "Updated Topic"});
-        } catch(err) {
+            res.status(200).send({ message: "Topic Updated" });
+        } catch (err) {
             console.error(`ERROR! Could not update topic with id ${topicId}: ${err}`);
             res.status(500).send({ error: "Error updating topic", code: "UNEXPECTED_ERROR" });
         } finally {
             console.timeEnd("PUT topic by id");
         }
-    })
+    });
 
+
+
+/**
+ * DELETE /topic/:topicId - delete topic by id
+ */
+router.route("/:topicId")
+    .delete(async (req, res) => {
+        try {
+            console.time("DELETE topic by id");
+            const { topicId } = req.params;
+
+            const result = topic.deleteTopicByd(topicId);
+            console.log("SUCCESS! Result:", result);
+
+            res.status(200).send({ message: "Topic Deleted" });
+        } catch (err) {
+            console.error(`ERROR! Could not delete topic with id ${topicId}: ${err}`);
+            res.status(500).send({ error: "Error deleting topic", code: "UNEXPECTED_ERROR" });
+        } finally {
+            console.timeEnd("DELETE topic by id");
+        }
+    });
+
+/**
+ * PUT /topic/resetDefault - delete all topics and create the default ones
+ */
+router.route("/resetDefault")
+    .get(async (req, res) => {
+        try {
+            console.time("GET reset default topics");
+
+            const result = topic.resetDefault();
+            console.log("SUCCESS! Result:", result);
+
+            res.status(200).send({ message: "Default Topics Resetted" });
+        } catch (err) {
+            console.error(`ERROR! Could not reset topics to its default: ${err}`);
+            res.status(500).send({ error: "Error reseting to default topic", code: "UNEXPECTED_ERROR" });
+        } finally {
+            console.timeEnd("GET reset default topics");
+        }
+    });
 module.exports = router;

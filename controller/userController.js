@@ -131,7 +131,7 @@ router.route("/updateProfile/:userId")
             console.log("SUCCESS! Result:", result);
             res.status(200).send({user: "Updated User"});
         } catch(err) {
-            console.error("ERROR! Failed to update user with email");
+            console.error(`ERROR! Failed to update user with id ${userId}`);
             res.status(500).send({error: "Could not update profile", code: "UNEXPECTED_ERROR"});
         } finally {
             console.timeEnd("PUT user");
@@ -153,7 +153,7 @@ router.route("/deleteAccount/:userId")
             console.log("SUCCESS! Result:", result);
             res.status(200).send({result: "User Deleted"});
         } catch(err) {
-            console.error("ERROR! Failed to delete user account");
+            console.error(`ERROR! Failed to delete user account with id ${userId}`);
             res.status(500).send({error: "Could not delete account", code: "UNEXPECTED_ERROR"});
         } finally {
             console.timeEnd("DELETE user");

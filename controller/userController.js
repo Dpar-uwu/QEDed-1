@@ -78,9 +78,9 @@ router.route("/signup")
     .post(async (req, res) => {
         try {
             console.time("POST new User");
-            const { first_name, last_name, email, password, role, school, grade } = req.body;
+            const { first_name, last_name, email, password, gender, role, school, grade } = req.body;
 
-            const result = await user.addNewUser(first_name, last_name, email, password, role, school, grade);
+            const result = await user.addNewUser(first_name, last_name, email, password, gender, role, school, grade);
             
             console.log("SUCCESS! Result:", result);
             res.status(201).send({ message: "User Created"});

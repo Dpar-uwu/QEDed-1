@@ -58,7 +58,7 @@ router.route("/:topicId")
             const { topicId } = req.params;
             const changedFields = { ...req.body };
 
-            const result = topic.updateTopicById(topicId, changedFields);
+            const result = await topic.updateTopicById(topicId, changedFields);
             console.log("SUCCESS! Result:", result);
 
             res.status(200).send({ message: "Topic Updated" });
@@ -81,7 +81,7 @@ router.route("/:topicId")
             console.time("DELETE topic by id");
             const { topicId } = req.params;
 
-            const result = topic.deleteTopicByd(topicId);
+            const result = await topic.deleteTopicById(topicId);
             console.log("SUCCESS! Result:", result);
 
             res.status(200).send({ message: "Topic Deleted" });
@@ -101,7 +101,7 @@ router.route("/resetDefault")
         try {
             console.time("GET reset default topics");
 
-            const result = topic.resetDefault();
+            const result = await topic.resetDefault();
             console.log("SUCCESS! Result:", result);
 
             res.status(200).send({ message: "Default Topics Resetted" });

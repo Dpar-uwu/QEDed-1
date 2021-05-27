@@ -5,9 +5,13 @@ const express = require("express");
 const userController = require("./userController.js");
 const topicController = require("./topicController.js");
 const app = express();
+var cors = require('cors');
+app.options('*',cors());
+app.use(cors());
 
 app.use(express.json()); // expect json in http req
 app.use(express.urlencoded({ extended: false }));
+
 
 // host web pages
 app.use(express.static('public'));

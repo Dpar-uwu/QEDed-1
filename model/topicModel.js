@@ -73,10 +73,10 @@ const topicModel = {
             }
         })
     },
-    deleteTopicByd: (topicId) => {
+    deleteTopicById: (topicId) => {
         return new Promise(async (resolve, reject) => {
             try {
-                const result = await Topic.findByIdAndUpdate(ObjectId(topicId));
+                const result = await Topic.findByIdAndDelete(ObjectId(topicId));
                 if (!result) throw "UNEXPECTED_ERROR";
                 resolve(result);
             } catch(err) {
@@ -157,8 +157,8 @@ const topicModel = {
                     ]
                 };
 
-                const newTopics = new Topic(defaultTopics);
-                const result2 = newTopics.save();
+                const newTopics = await new Topic(defaultTopics);
+                const result2 = await newTopics.save();
                 console.log("res 2:", result2);
                 if (!result2) throw "UNEXPECTED_ERROR";
                 console.log("OK added default topics", result2);

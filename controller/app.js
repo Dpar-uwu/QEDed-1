@@ -3,7 +3,10 @@ const mongoose = require("mongoose");
 const express = require("express");
 
 const userController = require("./userController.js");
+const levelController = require("./levelController.js");
 const topicController = require("./topicController.js");
+const skillController = require("./skillController.js");
+
 const app = express();
 
 app.use(express.json()); // expect json in http req
@@ -40,9 +43,14 @@ mongoose.connection.on('error', err => {
 
 
 
-/********** Routes **********/
+/**
+ * Routes
+ */
 app.use("/user", userController);
+app.use("/level", levelController);
 app.use("/topic", topicController);
+app.use("/skill", skillController);
+
 
 // only for resetting database
 app.post('/reset', async (req, res) => {
@@ -51,7 +59,7 @@ app.post('/reset', async (req, res) => {
 
         //drop collections here
         await connection.connection.db.dropCollection("users");
-        await connection.connection.db.dropCollection("topics");
+        await connection.connection.db.dropCollection("levels");
 
         res.status(200).send({ message: "Reset OK" });
     } catch (err) {
@@ -74,17 +82,8 @@ app.all("*", (req, res) => {
 });
 
 process.on('unhandledRejection', error => {
-    console.log('unhandledRejection', error);
+    console.log('WARNING! unhandledRejection', error);
 });
 
-// app.use(function handleDatabaseError(error, req, res, next) {
-//     if (error instanceof MongoError) {
-//         return res.status(503).json({
-//             type: 'MongoError',
-//             message: error.message
-//         });
-//     }
-//     next(error);
-// });
 
 module.exports = app;

@@ -51,9 +51,7 @@ const UserSchema = new Schema({
         type: String
     },
     grade: {
-        type: Number,
-        min: 1,
-        max: 6
+        type: Number
     },
     created_at: {
         type: Date,
@@ -83,7 +81,7 @@ UserSchema.pre('save', async function hashPassword(next) {
 
         // hash the password along with our new salt
         const hash = await bcrypt.hash(user.password, saltRounds);
-        console.log("Hashed password");
+        
         // override the cleartext password with the hashed one
         user.password = hash;
         return next();
@@ -101,57 +99,33 @@ const User = mongoose.model("User", UserSchema);
 
 const userModel = {
     UserSchema,
-    // signup
-    addNewUser: (first_name, last_name, email, password, gender, role, school, grade) => {
-        return new Promise(async (resolve, reject) => {
-            try {
-                //check if email or username exists
-                const emailExists = await User.findOne({ email: email }).exec();
-
-                if (emailExists) throw "EMAIL_EXISTS";
-
-                // save user if email is unique
-                const newUser = new User({ first_name, last_name, email, password, gender,role, school, grade });
-                const result = await newUser.save();
-
-                if (!result) throw "UNEXPECTED_ERROR";
-                resolve(result);
-            } catch (err) {
-                console.error(err);
-                reject(err);
-            }
-        })
-    },
-    // login
-    verifyUser: (email, password) => {
-        return new Promise(async (resolve, reject) => {
-            try {
-                let user = await User.findOne({ email: email })
-                    .select("-__v") // exclude __v from result
-                    .exec();
-                if (!user) throw "INVALID_USER";
-
-                const match = await bcrypt.compare(password, user.password);
-                if (!match) throw "INVALID_USER";
-
-                // remove password before saving
-                user.password = undefined;
-                resolve(user);
-            } catch (err) {
-                reject(err);
-            }
-        })
-    },
     //get all users
     getAllUsers: () => {
         return new Promise(async (resolve, reject) => {
             try {
                 const users = await User.find()
                     .select("-password -__v"); //select attributes except for these 2
-
-                if (!users) throw "UNEXPECTED_ERROR";
+                
+                console.log("SUCCESS! Result", users);
                 resolve(users);
             } catch (err) {
+                console.error("ERROR! Could not get all users:", err);
+                reject(err);
+            }
+        })
+    },
+    // get user by id
+    getUserById: (userId) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const result = await User.findOne({ _id: ObjectId(userId) }).select("-__v");
+                
+                if (!result) throw "NOT_FOUND";
+                
+                console.log("SUCCESS! Result", result);
+                resolve(result);
+            } catch(err) {
+                console.error("ERROR! Could not get user by id:", err);
                 reject(err);
             }
         })
@@ -161,11 +135,13 @@ const userModel = {
         return new Promise(async (resolve, reject) => {
             try {
                 const users = await User.find({
-                    email: { $regex: email, $options: "i" } 
+                    email: { $regex: email, $options: "i" }
                 }).select("-password -__v -isDeleted");
 
+                console.log("SUCCESS! Result", users);
                 resolve(users);
             } catch (err) {
+                console.error("ERROR! Could not search user by email:", err);
                 reject(err);
             }
         })
@@ -175,24 +151,79 @@ const userModel = {
         return new Promise(async (resolve, reject) => {
             try {
                 const totalUsers = await User.countDocuments({});
+                // const totalUsers = await User.aggregate.count("email");
 
                 if (!totalUsers) throw "UNEXPECTED_ERROR";
+                
+                console.log("SUCCESS! Result", totalUsers);
                 resolve({ totalUsers });
             } catch (err) {
+                console.error("ERROR! Could not get user stats:", err);
                 reject(err)
+            }
+        })
+    },
+    // signup
+    addNewUser: (first_name, last_name, email, password, gender, role, school, grade) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                //check if email or username exists
+                const emailExists = await User.findOne({ email }).exec();
+                if (emailExists) throw "EMAIL_EXISTS";
+
+                // save user if email is unique
+                const newUser = new User({ first_name, last_name, email, password, gender, role, school, grade });
+                const result = await newUser.save();
+
+                console.log("SUCCESS! Result", result);
+                resolve(result);
+            } catch (err) {
+                console.error("ERROR! Could not add new user:", err);
+                reject(err);
+            }
+        })
+    },
+    // login
+    verifyUser: (email, password) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let user = await User.findOne({ email })
+                    .select("-__v") // exclude __v from result
+                    .exec();
+                if (!user) throw "NO_MATCH";
+
+                const match = await bcrypt.compare(password, user.password);
+                if (!match) throw "NO_MATCH";
+
+                // remove password before returning
+                user.password = undefined;
+
+                console.log("SUCCESS! Result", user);
+                resolve(user);
+            } catch (err) {
+                console.error("ERROR! Failed to verify user:", err);
+                reject(err);
             }
         })
     },
     //updates user based on fields given
     updateProfile: (userId, changedFields) => {
         return new Promise(async (resolve, reject) => {
-            console.log(changedFields);
 
             try {
-                const result = await User.findByIdAndUpdate(ObjectId(userId), changedFields);
-                if (!result) throw "UNEXPECTED_ERROR";
+                // const result = await User.findByIdAndUpdate(ObjectId(userId), changedFields);
+                const result = await User.findOneAndUpdate(
+                    { _id: ObjectId(userId)}, 
+                    { $set: changedFields }, 
+                    { new: true } 
+                ).select("-__v");
+
+                if (!result) throw "NOT_FOUND";
+
+                console.log("SUCCESS! Result", result);
                 resolve(result);
             } catch (err) {
+                console.error(`ERROR! Failed to update user with id ${userId}`);
                 reject(err);
             }
         })
@@ -202,10 +233,14 @@ const userModel = {
     deleteUser: (userId) => {
         return new Promise(async (resolve, reject) => {
             try {
-                const result = await User.findByIdAndDelete( ObjectId(userId) );
-                if (!result) throw "UNEXPECTED_ERROR";
+                const result = await User.findByIdAndDelete(ObjectId(userId));
+
+                if (!result) throw "NOT_FOUND";
+                
+                console.log("SUCCESS! Result", result);
                 resolve(result);
             } catch (err) {
+                console.error(`ERROR! Failed to delete user account with id ${userId}`);
                 reject(err);
             }
         })

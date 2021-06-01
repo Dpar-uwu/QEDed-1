@@ -19,7 +19,9 @@ const SkillSchema = new Schema({
         required: "Percentage difficulty required for easy, medium and difficult"
     },
     duration: {
-        type: Number
+        type: Number,
+        required: "Percentage difficulty required for easy, medium and difficult",
+        default: 20
     },
     easy_values: {
         min: {
@@ -52,11 +54,12 @@ const SkillSchema = new Schema({
         }
     }
 });
-
 const Skill = mongoose.model("Skill", SkillSchema);
 
+// TODO: Create api to update skill by id?
 const skillModel = {
     SkillSchema
+    // go to levelModel for skill functions
 }
 
 module.exports = skillModel;

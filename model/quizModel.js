@@ -10,7 +10,7 @@ const { Question } = require("./questionModel");
 
 // creating user object schema
 const QuizSchema = new Schema({
-    skill_code: {
+    skill_id: {
         type: Schema.Types.ObjectId,
         required: "Skill ID is required"
     },
@@ -29,8 +29,8 @@ const QuizSchema = new Schema({
     score: {
         type: Number
     },
-    quiz_questions: [ Question ],
-    num_of_questions: {
+    questions: [ Question ],
+    num_of_qn: {
         type: Number,
         required: "Number of questions is required"
     },

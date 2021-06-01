@@ -1,3 +1,149 @@
+function getAllUsers(){
+    $.ajax({
+        url: 'http://localhost:3000/user',
+        type: 'GET',
+        dataType: "json",
+        success: function(data, textStatus, xhr){
+            console.log("Success in getting all users")
+        },
+        error: function(xhr, textStatus, errorThrown){
+            console.log("Error in getting all users")
+        }
+    })
+}
+
+function searchUserByEmail(email){
+    $.ajax({
+        url: `http://localhost:3000/user/search?query=${email}`,
+        type: 'GET',
+        dataType: "json",
+        success: function(data, textStatus, xhr){
+            console.log("Success in searching user by email")
+        },
+        error: function(xhr, textStatus, errorThrown){
+            console.log("Error in searching user by email")
+        }
+    })
+}
+
+function addNewUser(data){
+    $.ajax({
+        url: 'http://localhost:3000/user/signup',
+        type: 'POST',
+        data: data,
+        dataType: "json",
+        success: function(data, textStatus, xhr){
+            console.log("Success in adding new user")
+        },
+        error: function(xhr, textStatus, errorThrown){
+            console.log("Error in adding new user");
+        }
+    })
+}
+
+function login(data){
+    $.ajax({
+        url: 'http://localhost:3000/user/login',
+        type: 'POST',
+        data: data,
+        dataType: "json",
+        success: function(data, textStatus, xhr){
+            console.log("Success in login")
+        },
+        error: function(xhr, textStatus, errorThrown){
+            console.log("Error in login");
+        }
+    })
+}
+
+function updateProfileById(id,data){
+    $.ajax({
+        url: `http://localhost:3000/user/updateProfile/${id}`,
+        type: 'PUT',
+        data: data,
+        dataType: "json",
+        success: function(data, textStatus, xhr){
+            console.log("Success in updating profile by id")
+        },
+        error: function(xhr, textStatus, errorThrown){
+            console.log("Error in updating profile by id")
+        }
+    })
+}
+
+function deleteUserById(id){
+    $.ajax({
+        url: `http://localhost:3000/user/deleteAccount/${id}`,
+        type: 'DELETE',
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function(data, textStatus, xhr){
+            console.log("Success in deleting user by id")
+        },
+        error: function(xhr, textStatus, errorThrown){
+            console.log("Error in deleting user by id")
+        }
+    })
+}
+
+function getAllTopics(){
+    $.ajax({
+        url: 'http://localhost:3000/topic',
+        type: 'GET',
+        dataType: "json",
+        success: function(data, textStatus, xhr){
+            console.log("Success in getting all topics")
+        },
+        error: function(xhr, textStatus, errorThrown){
+            console.log("Error in getting all topics")
+        }
+    })
+}
+
+function updateTopicById(id,data){
+    $.ajax({
+        url: `http://localhost:3000/topic/${id}`,
+        type: 'PUT',
+        data: data,
+        dataType: "json",
+        success: function(data, textStatus, xhr){
+            console.log("Success in updating topic by id")
+        },
+        error: function(xhr, textStatus, errorThrown){
+            console.log("Error in updating topic by id")
+        }
+    })
+}
+
+function deleteTopicById(id){
+    $.ajax({
+        url: `http://localhost:3000/topic/${id}`,
+        type: 'DELETE',
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function(data, textStatus, xhr){
+            console.log("Success in deleting topic by id")
+        },
+        error: function(xhr, textStatus, errorThrown){
+            console.log("Error in deleting topic by id")
+        }
+    })
+}
+
+function resetDefaultTopic(){
+    $.ajax({
+        url: 'http://localhost:3000/topic/resetDefault',
+        type: 'GET',
+        dataType: "json",
+        success: function(data, textStatus, xhr){
+            console.log("Success in resetting topic")
+        },
+        error: function(xhr, textStatus, errorThrown){
+            console.log("Error in resetting topic")
+        }
+    })
+}
+
 // Function to generate number between min and max (both included)
 function generateRandomNumber(){
     var min = 2, max = 20;

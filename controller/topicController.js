@@ -111,6 +111,4 @@ router.route("/:topicId")
         }
     });
 
-
-
 module.exports = router;

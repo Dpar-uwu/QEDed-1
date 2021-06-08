@@ -237,8 +237,8 @@ const levelModel = {
             try {
                 const result = await Level.aggregate([
                     { $unwind: '$topics'},
-                    { $match: { "topics.skills._id": ObjectId(skillId)}},
                     { $unwind: '$topics.skills'},
+                    { $match: { "topics.skills._id": ObjectId(skillId)}},
                     { $project: 
                         { _id: 0, "levelId": "$_id", "level": 1, 
                         "topicId": "$topics._id", "topic_name": "$topics.topic_name", 

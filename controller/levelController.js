@@ -10,7 +10,6 @@ const levelModel = require("../model/levelModel");
 
 // validation
 const { validate } = require("../validation/levelValidation");
-const { errorHandler } = require("../validation/userValidation");
 
 // error handler modules
 const { MongoError } = require("mongodb");
@@ -43,8 +42,7 @@ router.route("/")
  */
 router.route("/:levelId")
     .get(
-        validate("params.levelId"),
-        errorHandler,
+        validate("levelId"),
         async (req, res) => {
             const { levelId } = req.params;
             try {
@@ -71,7 +69,6 @@ router.route("/:levelId")
 router.route("/")
     .post(
         validate("createLevel"),
-        errorHandler,
         async (req, res) => {
             const { level, topics } = req.body;
             try {
@@ -97,15 +94,12 @@ router.route("/")
  */
 router.route("/:levelId")
     .put(
-        validate("params.levelId"),
-        validate("createLevel"),
-        errorHandler,
+        validate("updateLevel"),
         async (req, res) => {
             const { levelId } = req.params;
             const changedFields = { ...req.body };
             try {
                 console.time("PUT level by id");
-
                 const result = await levelModel.updateLevelById(levelId, changedFields);
 
                 res.status(200).send({ message: "Level Updated" });
@@ -127,8 +121,7 @@ router.route("/:levelId")
 */
 router.route("/:levelId")
     .delete(
-        validate("params.levelId"),
-        errorHandler,
+        validate("levelId"),
         async (req, res) => {
             const { levelId } = req.params;
             try {

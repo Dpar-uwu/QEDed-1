@@ -63,7 +63,8 @@ app.post('/reset', async (req, res) => {
 
         //drop collections here
         await connection.connection.db.dropCollection("users");
-        await connection.connection.db.dropCollection("levels");
+        // await connection.connection.db.dropCollection("levels");
+        
 
         res.status(200).send({ message: "Reset OK" });
     } catch (err) {
@@ -85,6 +86,7 @@ app.all("*", (req, res) => {
     res.status(404).send("404 Page not found");
 });
 
+// handle unhandledrejection to prevent program from breaking
 process.on('unhandledRejection', error => {
     console.log('WARNING! unhandledRejection', error);
 });

@@ -8,13 +8,11 @@ const router = express.Router();
 const user = require("../model/userModel");
 
 // validation
-const userValidator = require("../validation/userValidation");
-const { validate, errorHandler } = require("../validation/userValidation");
+const { validate } = require("../validation/userValidation");
 
 // error handler modules
 const { MongoError } = require("mongodb");
 const { Error } = require("mongoose");
-
 /**
  * GET /user - gets all users
  */
@@ -37,7 +35,6 @@ router.route("/")
     });
 
 
-
 /**
  * GET /user/search?query=email - search user by email
  */
@@ -45,7 +42,6 @@ router.route("/search")
     .get(
         // validation middleware
         validate("searchUser"),
-        errorHandler,
         async (req, res) => {
             const { query } = req.query;
             try {
@@ -89,8 +85,7 @@ router.route("/stats")
  */
 router.route("/:userId")
     .get(
-        validate("params.userId"),
-        errorHandler,
+        validate("userId"),
         async (req, res) => {
             const { userId } = req.params;
             try {
@@ -119,7 +114,6 @@ router.route("/:userId")
 router.route("/")
     .post(
         validate("createUser"),
-        errorHandler,
         async (req, res) => {
             const { first_name, last_name, email, password, gender, role, school, grade } = req.body;
             try {
@@ -147,7 +141,6 @@ router.route("/")
 router.route("/login")
     .post(
         validate("loginUser"),
-        errorHandler,
         async (req, res) => {
             const { email, password } = req.body;
             try {
@@ -173,9 +166,7 @@ router.route("/login")
  */
 router.route("/:userId")
     .put(
-        validate("params.userId"),
         validate("updateUser"),
-        errorHandler,
         async (req, res) => {
             const changedFields = { ...req.body };
             const { userId } = req.params;
@@ -184,14 +175,18 @@ router.route("/:userId")
                 console.time("PUT user");
                 const result = await user.updateProfile(userId, changedFields);
 
-                res.status(200).send({ message: "Updated User" });
+                res.status(200).send({ message: "User Updated" });
             } catch (err) {
                 if (err == "NOT_FOUND")
                     res.status(404).send({ error: "User ID not found", code: err });
+                else if(err == "INVALID_REQUEST") {
+                    console.log('GAD LUCCKKK')
+                    res.status(422).send({ error: "School and grade is required to successfully switch to student role", code: err });
+                }
                 else if (err instanceof Error || err instanceof MongoError)
                     res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
                 else
-                    res.status(500).send({ error: "Could not update user", code: "UNEXPECTED_ERROR" });
+                    res.status(500).send({ error: "Error updating user by id", code: "UNEXPECTED_ERROR" });
             } finally {
                 console.timeEnd("PUT user");
             }
@@ -203,8 +198,7 @@ router.route("/:userId")
  */
 router.route("/:userId")
     .delete(
-        validate("params.userId"),
-        errorHandler,
+        validate("userId"),
         async (req, res) => {
             const { userId } = req.params;
             try {
@@ -218,13 +212,32 @@ router.route("/:userId")
                 else if (err instanceof Error || err instanceof MongoError)
                     res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
                 else
-                    res.status(500).send({ error: "Could not delete user", code: "UNEXPECTED_ERROR" });
+                    res.status(500).send({ error: "Error deleting user by id", code: "UNEXPECTED_ERROR" });
             } finally {
                 console.timeEnd("DELETE user");
             }
         });
 
 
+/**
+ * POST /user/populate
+ */
+router.route("/populate")
+    .post(
+        async (req, res) => {
+            try {
+                console.time("POST populate user");
+                const result = await user.populateUsers();
 
+                res.status(200).send({ message: "Users Populated" });
+            } catch (err) {
+                if (err instanceof Error || err instanceof MongoError)
+                    res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+                else
+                    res.status(500).send({ error: "Could not populate user", code: "UNEXPECTED_ERROR" });
+            } finally {
+                console.timeEnd("POST populate user");
+            }
+        });
 
 module.exports = router;

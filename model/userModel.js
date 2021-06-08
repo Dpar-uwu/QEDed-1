@@ -53,23 +53,22 @@ const UserSchema = new Schema({
     grade: {
         type: Number
     },
+    exp_points: {
+        type: Number
+    },
+    rank_level: {
+        type: Number
+    },
+    token: {
+        type: Number
+    },
     created_at: {
         type: Date,
         default: Date.now
     },
-    exp_points: {
-        type: Number,
-        default: 0
-    },
-    rank_level: {
-        type: Number,
-        default: 0
-    },
-    token: {
-        type: Number,
-        default: 0
-    }
 });
+
+const studentExclusive = ["school", "grade", "exp_points", "rank_level", "token"];
 
 // middleware for hashing password upon "saving" a user
 UserSchema.pre('save', async function hashPassword(next) {
@@ -118,7 +117,7 @@ const userModel = {
     getUserById: (userId) => {
         return new Promise(async (resolve, reject) => {
             try {
-                const result = await User.findOne({ _id: ObjectId(userId) }).select("-__v");
+                const result = await User.findOne({ _id: ObjectId(userId) }).select("-__v -password");
                 
                 if (!result) throw "NOT_FOUND";
                 
@@ -164,15 +163,21 @@ const userModel = {
         })
     },
     // signup
-    addNewUser: (first_name, last_name, email, password, gender, role, school, grade) => {
+    // exp_points, rank_level, token optional
+    addNewUser: (first_name, last_name, email, password, gender, role, school, grade, exp_points = 0, rank_level = 0, token = 0) => {
         return new Promise(async (resolve, reject) => {
             try {
                 //check if email or username exists
                 const emailExists = await User.findOne({ email }).exec();
                 if (emailExists) throw "EMAIL_EXISTS";
 
+                let newUser;
+
                 // save user if email is unique
-                const newUser = new User({ first_name, last_name, email, password, gender, role, school, grade });
+                if(role == "student")
+                    newUser = new User({ first_name, last_name, email, password, gender, role, school, grade, exp_points, rank_level, token });
+                else
+                    newUser = new User({ first_name, last_name, email, password, gender, role, school, grade });
                 const result = await newUser.save();
 
                 console.log("SUCCESS! Result", result);
@@ -211,19 +216,66 @@ const userModel = {
         return new Promise(async (resolve, reject) => {
 
             try {
-                // const result = await User.findByIdAndUpdate(ObjectId(userId), changedFields);
-                const result = await User.findOneAndUpdate(
-                    { _id: ObjectId(userId)}, 
-                    { $set: changedFields }, 
-                    { new: true } 
-                ).select("-__v");
+                // const result = await User.findOneAndUpdate(
+                //     { _id: ObjectId(userId)}, 
+                //     { $set: changedFields }, 
+                //     { new: true } 
+                // ).select("-__v");
 
-                if (!result) throw "NOT_FOUND";
+                let user = await User.findOne({ _id: ObjectId(userId) });
+
+                if (!user) throw "NOT_FOUND";
+
+                // if role is not specified and original role is student,
+                // rm all student attributes from db
+                // & reject any user attributes in the changes
+                if(!changedFields.role && user.role != "student") {
+                    studentExclusive.forEach(property => {
+                        // remove student attributes
+                        changedFields[property] = undefined;
+                        user[property] = undefined;
+                    });
+                }
+                // if role is specified in the changes and does not match db
+                else if(changedFields.role && (changedFields.role != user.role)) {
+                    // if role changing from student to smt else
+                    if(changedFields.role != "student") {
+                        // remove student attributes
+                        studentExclusive.forEach(property => {
+                            changedFields[property] = undefined;
+                            user[property] = undefined;
+                        });
+                    }
+                    // if role is changing to student
+                    else {
+                        studentExclusive.forEach(property => {
+                            const fieldExists = changedFields[property];
+
+                            // throws error if required student attributes not defined
+                            if(!fieldExists && (property == "school" || property == "grade"))
+                                throw "INVALID_REQUEST";
+                            
+                            else if(!fieldExists && (property == "exp_points" || property == "rank_level" || property == "token")) {
+                                changedFields[property] = 0; // set default value of exp/rank/tokens to 0
+                            }
+                        });
+                    }
+                }
+                
+                console.log("Updating:", changedFields)
+
+                // updating changed user fields
+                for(property in changedFields) {
+                    user[property] = changedFields[property];
+                };
+
+                const result = await user.save();
+                if(!user) throw "UNEXPECTED_ERROR";
 
                 console.log("SUCCESS! Result", result);
                 resolve(result);
             } catch (err) {
-                console.error(`ERROR! Failed to update user with id ${userId}`);
+                console.error(`ERROR! Failed to update user with id ${userId}: ${err}`);
                 reject(err);
             }
         })
@@ -244,7 +296,32 @@ const userModel = {
                 reject(err);
             }
         })
-    }
+    },
+    // populate user db with sample data
+    populateUsers: () => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const result = await User.deleteMany({});
+
+                if (!result) throw "UNEXPECTED_ERROR";
+                console.log("SUCESS! Result", result);
+
+                const addUsers = require('../datasheets/users.json');
+                console.log(addUsers)
+                addUsers.forEach(async user => {
+                    const newUser = new User(user);
+                    await newUser.save();
+                })
+                // const result2 = await User.insertMany(addUsers);
+
+                console.log("SUCCESS! Result", addUsers);
+                resolve(addUsers);
+            } catch (err) {
+                console.error(`ERROR! Could not populate users to its default: ${err}`);
+                reject(err);
+            }
+        })
+    },
 }
 
 

@@ -9,8 +9,8 @@ const router = express.Router();
 const levelModel = require("../model/levelModel");
 
 // validation
-const { validate } = require("../validation/levelValidation");
-const { errorHandler } = require("../validation/userValidation");
+const { validate } = require("../validation/skillValidation");
+const { errorHandler } = require("../validation/errorHandler");
 
 // error handler modules
 const { MongoError } = require("mongodb");
@@ -18,26 +18,30 @@ const { Error } = require("mongoose");
 
 
 /**
- * GET /skill - get skill by id
+ * GET /skill/:skillId - get skill by id
  */
 router.route("/:skillId")
-    .get(async (req, res) => {
-        const { skillId } = req.params;
-        try {
-            console.time("GET skill by id");
-            const result = await levelModel.getSkillById(skillId);
+    .get(
+        validate("skillId"),
+        async (req, res) => {
+            const { skillId } = req.params;
+            try {
+                console.time("GET skill by id");
+                const result = await levelModel.getSkillById(skillId);
 
-            res.status(200).json(result);
-        } catch (err) {
-            if (err instanceof Error || err instanceof MongoError)
-                res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
-            else
-                res.status(500).send({ error: "Error getting skill by id", code: "UNEXPECTED_ERROR" });
-        } finally {
-            // timing the function
-            console.timeEnd("GET skill by id");
-        }
-    });
+                res.status(200).json(result);
+            } catch (err) {
+                if (err == "NOT_FOUND")
+                    res.status(404).send({ error: "Skill ID not found", code: err });
+                else if (err instanceof Error || err instanceof MongoError)
+                    res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+                else
+                    res.status(500).send({ error: "Error getting skill by id", code: "UNEXPECTED_ERROR" });
+            } finally {
+                // timing the function
+                console.timeEnd("GET skill by id");
+            }
+        });
 
 
 /**
@@ -45,6 +49,7 @@ router.route("/:skillId")
  */
 router.route("/:topicId")
     .post(
+        validate("createSkill"),
         async (req, res) => {
             const { topicId } = req.params;
             const { skill_code, skill_name, num_of_qn, percent_difficulty, duration, easy_values, medium_values, difficult_values } = req.body;
@@ -67,10 +72,10 @@ router.route("/:topicId")
 
 /**
  * PUT /skill/:skillId - update skill
- * TODO: NOT WORKING AS EXPECTED
  */
 router.route("/:skillId")
     .put(
+        validate("updateSkill"),
         async (req, res) => {
             const { skillId } = req.params;
             const changedFields = { ...req.body };
@@ -94,26 +99,27 @@ router.route("/:skillId")
 
 /**
 * DELETE /topic/:skillId - delete skill by id
-* TODO: NOT WORKING AS EXPECTED
 */
 router.route("/:skillId")
-    .delete(async (req, res) => {
-        const { skillId } = req.params;
-        try {
-            console.time("DELETE skill by id");
-            const result = await levelModel.deleteSkillById(skillId);
+    .delete(
+        validate("skillId"),
+        async (req, res) => {
+            const { skillId } = req.params;
+            try {
+                console.time("DELETE skill by id");
+                const result = await levelModel.deleteSkillById(skillId);
 
-            res.status(200).send({ message: "Skill Deleted" });
-        } catch (err) {
-            if (err == "NOT_FOUND")
-                res.status(404).send({ error: "Skill ID not found", code: err });
-            else if (err instanceof Error || err instanceof MongoError)
-                res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
-            else
-                res.status(500).send({ error: "Error deleting topic", code: "UNEXPECTED_ERROR" });
-        } finally {
-            console.timeEnd("DELETE skill by id");
-        }
-    });
+                res.status(200).send({ message: "Skill Deleted" });
+            } catch (err) {
+                if (err == "NOT_FOUND")
+                    res.status(404).send({ error: "Skill ID not found", code: err });
+                else if (err instanceof Error || err instanceof MongoError)
+                    res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+                else
+                    res.status(500).send({ error: "Error deleting topic", code: "UNEXPECTED_ERROR" });
+            } finally {
+                console.timeEnd("DELETE skill by id");
+            }
+        });
 
 module.exports = router;

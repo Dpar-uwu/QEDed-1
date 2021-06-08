@@ -1,0 +1,131 @@
+[
+    {
+        "first_name": "Riley",
+        "last_name": "Jin",
+        "email": "rileyjin26@gmail.com",
+        "password": "Aa123456%",
+        "gender": "F",
+        "role": "admin"
+    },
+    {
+        "first_name": "Alvin",
+        "last_name": "Loo",
+        "email": "alvinloo@gmail.com",
+        "password": "Aa123456%",
+        "gender": "M",
+        "role": "admin"
+    },
+    {
+        "first_name": "Genevienve",
+        "last_name": "Sim",
+        "email": "ginniesim23@gmail.com",
+        "password": "Aa123456%",
+        "gender": "F",
+        "role": "teacher"
+    },
+    {
+        "first_name": "Annie",
+        "last_name": "Wong",
+        "email": "aw1235@gmail.com",
+        "password": "Aa123456%",
+        "gender": "F",
+        "role": "teacher"
+    },
+    {
+        "first_name": "Hao Jun",
+        "last_name": "Quek",
+        "email": "quekhaojun@gmail.com",
+        "password": "Aa123456%",
+        "gender": "M",
+        "role": "teacher"
+    },
+    {
+        "first_name": "Matthew",
+        "last_name": "Tay",
+        "email": "matttay@gmail.com",
+        "password": "Aa123456%",
+        "gender": "M",
+        "role": "parent"
+    },
+    {
+        "first_name": "Warren",
+        "last_name": "Peace",
+        "email": "warrenpeaceandlove@gmail.com",
+        "password": "Aa123456%",
+        "gender": "F",
+        "role": "parent"
+    },
+    {
+        "first_name": "Mona",
+        "last_name": "Litt",
+        "email": "monalita@gmail.com",
+        "password": "Aa123456%",
+        "gender": "F",
+        "role": "parent"
+    },
+    {
+        "first_name": "Adam",
+        "last_name": "Joo",
+        "email": "adammjoooo@gmail.com",
+        "password": "Aa123456%",
+        "gender": "M",
+        "role": "student",
+        "school": "Tech Whye Primary School",
+        "grade": 5,
+        "exp_points": 0,
+        "rank_level": 0,
+        "token": 0
+    },
+    {
+        "first_name": "Charity",
+        "last_name": "Leow",
+        "email": "charityleow@gmail.com",
+        "password": "Aa123456%",
+        "gender": "F",
+        "role": "student",
+        "school": "LianHua Primary School",
+        "grade": 5,
+        "exp_points": 0,
+        "rank_level": 0,
+        "token": 0
+    },
+    {
+        "first_name": "JoJo",
+        "last_name": "Adventures",
+        "email": "jojobizzareadventures@gmail.com",
+        "password": "Aa123456%",
+        "gender": "M",
+        "role": "student",
+        "school": "NanHua Primary School",
+        "grade": 5,
+        "exp_points": 0,
+        "rank_level": 0,
+        "token": 0
+    },
+    {
+        "first_name": "Zapel",
+        "last_name": "Hong",
+        "email": "zapelhong@gmail.com",
+        "password": "Aa123456%",
+        "gender": "M",
+        "role": "student",
+        "school": "NanHua Primary School",
+        "grade": 5,
+        "exp_points": 0,
+        "rank_level": 0,
+        "token": 0
+    },
+    {
+        "first_name": "Earl",
+        "last_name": "Chua",
+        "email": "earlchua@gmail.com",
+        "password": "Aa123456%",
+        "gender": "M",
+        "role": "student",
+        "school": "NanHua Primary School",
+        "grade": 5,
+        "exp_points": 0,
+        "rank_level": 0,
+        "token": 0
+    }
+]

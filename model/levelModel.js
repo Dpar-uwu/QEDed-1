@@ -126,7 +126,7 @@ const levelModel = {
                 if (!result2) throw "UNEXPECTED_ERROR";
 
                 console.log("SUCCESS! Result", result2);
-                resolve(result);
+                resolve(result2);
             } catch (err) {
                 console.error(`ERROR! Could not reset levels to its default: ${err}`);
                 reject(err);
@@ -148,11 +148,11 @@ const levelModel = {
                     { $project: { _id: 0, "levelId": "$_id", "level": 1, 
                         "topicId": "$topics._id", "topic_name": "$topics.topic_name", "skills": "$topics.skills" } }
                 ]);
-
-                if (!result) throw "NOT_FOUND";
+                
+                if (!result || result.length == 0) throw "NOT_FOUND";
                 
                 console.log("SUCCESS! Result", result);
-                resolve(result[0]);
+                resolve(result[0]); //result will be an array with only 1 object
             } catch(err) {
                 console.error(`ERROR! Could not get topic with id ${topicId}: ${err}`);
                 reject(err);
@@ -253,8 +253,7 @@ const levelModel = {
                         "difficult_values":  "$topics.skills.difficult_values",
                     }}
                 ]);
-
-                if (!result) throw "NOT_FOUND";
+                if (!result || result.length == 0) throw "NOT_FOUND";
                 
                 console.log("SUCCESS! Result", result);
                 resolve(result[0]);
@@ -292,16 +291,26 @@ const levelModel = {
         return new Promise(async (resolve, reject) => {
             try {
                 const level = await Level.findOne({ "topics.skills._id": skillId });
-
+                console.log(level)
                 if (!level) throw "NOT_FOUND";
 
                 // find the skill in the array that matches the id
-                const found = level.topics[0].skills.find(element => element._id == skillId );
+                // const found = level.topics[0].skills.find(element => element._id == skillId );
 
+                let found;
+                let temp;
+                level.topics.forEach(topic => {
+                    temp = topic.skills.find(element => element._id == skillId );
+                    if(temp) found = temp;
+                })
+                console.log("Skill found:", found)
+                if(!found) throw "NOT_FOUND";
+                
                 // update changed fields to level
                 for(property in changedFields) {
                     found[property] = changedFields[property];
                 }
+                console.log("Updated skill:", found)
                 const result = level.save();
 
                 console.log("SUCCESS! Result", result);
@@ -318,17 +327,30 @@ const levelModel = {
             try {
                 const level = await Level.findOne({ "topics.skills._id": skillId });
 
-                console.log(level)
+                if (!level) throw "NOT_FOUND";
+
                 // find index of the skill in the array that matches the id
-                const foundIndex = level.topics.findIndex(element => {
-                    element.skills._id == skillId
-                    console.log(element.skills);
+                let topicIndex;
+                let count = 0;
+                let foundIndex;
+                let tempIndex;
+                level.topics.forEach(topic => {
+                    // console.log(topic.skills)
+                    tempIndex = topic.skills.findIndex(element => element._id == skillId );
+                    if(tempIndex != -1) {
+                        foundIndex = tempIndex;
+                        topicIndex = count;
+                    }
+                    count++
                 })
-                level.topics[0].skills.pull(level.topics[0].skills[foundIndex]); // delete skill from topics array
 
-                console.log(level.topics[0].skills)
-                console.log(level.topics[0].skills[foundIndex])
+                if(tempIndex == -1) throw "NOT_FOUND";
 
+                console.log("Skill found:", level.topics[topicIndex].skills[foundIndex])
+                // deleting from skill array
+                level.topics[topicIndex].skills.pull(level.topics[topicIndex].skills[foundIndex]); // delete skill from topics array
+
+                console.log("Skill post-deleted:", level.topics[topicIndex].skills)
                 const result = await level.save(); // save changes
 
                 console.log("SUCCESS! Result", result);

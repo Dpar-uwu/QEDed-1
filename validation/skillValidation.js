@@ -93,34 +93,32 @@ exports.validate = (method) => {
                 attribute.difficult_values_max("difficult_values.max").optional(),
                 attribute.difficult_min_max("difficult_values").optional(),
 
+                // catches error if params has extra unexpected parameters
                 param()
                     .custom(param => {
                         const keys = ["skillId"];
                         return Object.keys(param).every(key => keys.includes(key));
                     })
                     .withMessage("Some extra parameters are sent"),
-                // catches error if skills array has extra unexpected parameters
+                // catches error if body has extra unexpected parameters
                 body()
                     .optional()
                     .custom(val => {
                         const skillKeys = ["skill_code", "skill_name", "num_of_qn", "percent_difficulty", "duration", "easy_values", "medium_values", "difficult_values"];
                         return Object.keys(val).every(key => skillKeys.includes(key));
                     }).withMessage("Some extra parameters are sent"),
-                // catches error if easy_values in skills array has extra unexpected parameters
                 body("easy_values")
                     .optional()
                     .custom(val => {
                         const numParamKeys = ["min", "max"];
                         return Object.keys(val).every(key => numParamKeys.includes(key));
                     }).withMessage("Some extra parameters are sent in the easy numerical values"),
-                // catches error if medium_values in skills array has extra unexpected parameters
                 body("medium_values")
                     .optional()
                     .custom(val => {
                         const numParamKeys = ["min", "max"];
                         return Object.keys(val).every(key => numParamKeys.includes(key));
                     }).withMessage("Some extra parameters are sent in the medium numerical values"),
-                // catches error if difficult_values in skills array has extra unexpected parameters
                 body("difficult_values")
                     .optional()
                     .custom(val => {

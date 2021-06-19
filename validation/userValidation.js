@@ -40,14 +40,10 @@ let attribute = {
             .notEmpty()
             .bail()
             .isEmail()
-            .bail()
-            .normalizeEmail()
     },
 
     password: () => {
         return body("password", "Password must conatin at least 1 uppercase, 1 lowercase, 1 digit, 1 special char, at least 8 chars long and have no whitespaces")
-            .stripLow()
-            .escape()
             .notEmpty()
             .bail()
             .matches(/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&])([a-zA-Z0-9@$!%*?&]{8,})$/)

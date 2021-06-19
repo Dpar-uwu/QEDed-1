@@ -1,5 +1,9 @@
+var skillId;
+var skillName;
 var skill;
+var topic;
 var numOfQ;
+var percentDifficulty;
 var intervalId;
 var fractionArray = [];
 $(document).ready(function(){
@@ -79,6 +83,7 @@ $(document).on("click",".skill",function(){
 $(document).on("click",".submitBtn",function(){
     var container = document.getElementById('quizContainer');
     var score = 0;
+    // mark question
     for(var i=0; i<numOfQ; i++){
         // content += `<div class='col-12 text-center'>Q${i+1} <sup>${fractionArray[i].n}</sup>&frasl;<sub>${fractionArray[i].d}</sub>`
         var sN = $(`#inputN${i}`).val();
@@ -86,6 +91,22 @@ $(document).on("click",".submitBtn",function(){
         if(sN == fractionArray[i].aN && sD == fractionArray[i].aD){
             score ++;
         }
+    }
+    // add quiz
+    const data = {
+        "skill_id": skillId, 
+        "skill_name": skillName, 
+        "topic_name": topic, 
+        "done_by": userId,
+        "score": score, 
+        questions,
+        "num_of_qn": numOfQ,
+        "percent_difficulty": percentDifficulty, 
+        time_taken,
+        "isCompleted": true, 
+        "created_at": Date.now, 
+        // assigned_by, 
+        // deadline
     }
     container.innerHTML = `<div class='text-center'>You have scored ${score}/${numOfQ}</div>` //+ `<canvas  style="width: 512px; height: 256px" id="myChart"></canvas>` // + `<button type="button" class="btn btn-info col-4 mt-4 beginQuiz" id="${choosenTopic}">Next</button><button type="button" class="btn btn-info col-4 mt-4 showTopic" >Return</button>`;;
     // displayChart([score,0,0]);
@@ -108,9 +129,12 @@ function displayCard(data,name){
 function generateQuestion(data){
     var value;
     time = data.duration;
+    skillId = data.skillId;
+    skillName = data.skillName;
     skill = data.skill_code;
+    topic = data.topic_name;
     numOfQ = data.num_of_qn;
-    var percentDifficulty = data.percent_difficulty.split("-");
+    percentDifficulty = data.percent_difficulty.split("-");
     var easy = numOfQ*(percentDifficulty[0]/100)
     var medium = numOfQ*(percentDifficulty[1]/100)
 
@@ -278,3 +302,19 @@ function startCountdown() {
 
     }, 1000);
 }
+
+function submitQuiz(data) {
+    $ajax({
+        url: `http://localhost:3000/quiz`,
+        type: 'POST',
+        data: data,
+        dataType: 'JSON',
+        success: function(data, textStatus, xhr){
+            // window.location.href = './quiz.html';
+        },
+        error: function(xhr, textStatus, errorThrown){
+            // var message =  JSON.parse(xhr.responseText);
+            // document.getElementById("errorMessage").innerHTML = message.error[0];
+        }
+    })
+};

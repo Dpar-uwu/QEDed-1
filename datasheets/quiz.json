@@ -1,0 +1,240 @@
+[
+    {
+        "skill_id": "60bded37a8c85409c465d104", 
+        "skill_name": "Multiplication of Fractions", 
+        "topic_name": "Fractions", 
+        "done_by": "60b8793ed5ac325824e3c5c8",
+        "score": {
+            "easy": 100,
+            "medium": 80,
+            "difficult": 50,
+            "total": 80
+        },
+        "num_of_qn": 20,
+        "percent_difficulty": "30-50-20", 
+        "time_taken": 16.42,
+        "isCompleted": true,
+        "created_at": "2021-06-17T15:33:22.094Z"
+    },
+    {
+        "score": {
+            "easy": 33,
+            "medium": 40,
+            "difficult": 50,
+            "total": 40
+        },
+        "isCompleted": true,
+        "skill_id": "60bded37a8c85409c465d104",
+        "skill_name": "Multiplication of Fractions",
+        "topic_name": "Fractions",
+        "done_by": "60b8793ed5ac325824e3c5ca",
+        "num_of_qn": 20,
+        "percent_difficulty": "30-50-20",
+        "time_taken": 17.23,
+        "created_at": "2021-06-18T06:39:58.564Z"
+    },
+    {
+        "score": {
+            "easy": 66,
+            "medium": 80,
+            "difficult": 100,
+            "total": 80
+        },
+        "isCompleted": true,
+        "skill_id": "60bded37a8c85409c465d104",
+        "skill_name": "Multiplication of Fractions",
+        "topic_name": "Fractions",
+        "done_by": "60b8793ed5ac325824e3c5cb",
+        "num_of_qn": 20,
+        "percent_difficulty": "30-50-20",
+        "time_taken": 19.09,
+        "created_at": "2021-06-17T06:39:58.094Z"
+    },
+    {
+        "score": {
+            "easy": 100,
+            "medium": 100,
+            "difficult": 100,
+            "total": 100
+        },
+        "isCompleted": true,
+        "skill_id": "60bded37a8c85409c465d104",
+        "skill_name": "Multiplication of Fractions",
+        "topic_name": "Fractions",
+        "done_by": "60b8793ed5ac325824e3c5cb",
+        "num_of_qn": 20,
+        "percent_difficulty": "20-70-10",
+        "time_taken": 16.4,
+        "created_at": "2021-06-18T18:39:58.094Z"
+    },
+    {
+        "score": {
+            "easy": 100,
+            "medium": 60,
+            "difficult": 0,
+            "total": 60
+        },
+        "isCompleted": true,
+        "skill_id": "60bded37a8c85409c465d104",
+        "skill_name": "Multiplication of Fractions",
+        "topic_name": "Fractions",
+        "done_by": "60b8793ed5ac325824e3c5c8",
+        "num_of_qn": 20,
+        "percent_difficulty": "30-50-20",
+        "time_taken": 12.07,
+        "created_at": "2021-06-17T18:39:58.094Z"
+    },
+    {
+        "score": {
+            "easy": 100,
+            "medium": 80,
+            "difficult": 50,
+            "total": 80
+        },
+        "isCompleted": true,
+        "skill_id": "60bded37a8c85409c465d104",
+        "skill_name": "Multiplication of Fractions",
+        "topic_name": "Fractions",
+        "done_by": "60b8793ed5ac325824e3c5c8",
+        "num_of_qn": 20,
+        "percent_difficulty": "30-50-20",
+        "time_taken": 12.07,
+        "created_at": "2021-06-17T12:47:52.094Z"
+    },
+    {
+        "score": {
+            "easy": 100,
+            "medium": 60,
+            "difficult": 100,
+            "total": 80
+        },
+        "isCompleted": true,
+        "skill_id": "60bded37a8c85409c465d104",
+        "skill_name": "Multiplication of Fractions",
+        "topic_name": "Fractions",
+        "done_by": "60b8793ed5ac325824e3c5c8",
+        "num_of_qn": 20,
+        "percent_difficulty": "30-50-20",
+        "time_taken": 16.42,
+        "created_at": "2021-06-17T15:33:22.094Z"
+    },
+    {
+        "score": {
+            "easy": 100,
+            "medium": 80,
+            "difficult": 0,
+            "total": 70
+        },
+        "isCompleted": true,
+        "skill_id": "60bded37a8c85409c465d104",
+        "skill_name": "Multiplication of Fractions",
+        "topic_name": "Fractions",
+        "done_by": "60b8793ed5ac325824e3c5c8",
+        "num_of_qn": 20,
+        "percent_difficulty": "30-50-20",
+        "time_taken": 16.42,
+        "created_at": "2021-06-17T15:33:22.094Z"
+    },
+    {
+        "score": {
+            "easy": 66,
+            "medium": 40,
+            "difficult": 100,
+            "total": 60
+        },
+        "isCompleted": true,
+        "skill_id": "60bded37a8c85409c465d104",
+        "skill_name": "Multiplication of Fractions",
+        "topic_name": "Fractions",
+        "done_by": "60b8793ed5ac325824e3c5c8",
+        "num_of_qn": 20,
+        "percent_difficulty": "30-50-20",
+        "time_taken": 16.42,
+        "created_at": "2021-06-17T15:33:22.094Z"
+    },
+    {
+        "score": {
+            "easy": 66,
+            "medium": 80,
+            "difficult": 50,
+            "total": 70
+        },
+        "isCompleted": true,
+        "skill_id": "60bded37a8c85409c465d102",
+        "skill_name": "Simplifying Fractions",
+        "topic_name": "Fractions",
+        "done_by": "60b8793ed5ac325824e3c5c8",
+        "num_of_qn": 10,
+        "percent_difficulty": "30-50-20",
+        "time_taken": 16.32,
+        "created_at": "2021-06-18T15:56:52.094Z"
+    },
+    {
+        "score": {
+            "easy": 100,
+            "medium": 80,
+            "difficult": 50,
+            "total": 80
+        },
+        "isCompleted": true,
+        "skill_id": "60bded37a8c85409c465d102",
+        "skill_name": "Simplifying Fractions",
+        "topic_name": "Fractions",
+        "done_by": "60b8793ed5ac325824e3c5c9",
+        "num_of_qn": 10,
+        "percent_difficulty": "30-50-20",
+        "time_taken": 13.28,
+        "created_at": "2021-06-17T13:42:31.094Z"
+    },
+    {
+        "score": {
+            "easy": 66,
+            "medium": 80,
+            "difficult": 50,
+            "total": 70
+        },
+        "isCompleted": true,
+        "skill_id": "60bded37a8c85409c465d104",
+        "skill_name": "Multiplication of Fractions",
+        "topic_name": "Fractions",
+        "done_by": "60b8793ed5ac325824e3c5c9",
+        "num_of_qn": 20,
+        "percent_difficulty": "30-50-20",
+        "time_taken": 15.28,
+        "created_at": "2021-06-17T13:42:31.094Z"
+    },
+    {
+        "score": {
+            "easy": 100,
+            "medium": 100,
+            "difficult": 50,
+            "total": 90
+        },
+        "isCompleted": true,
+        "skill_id": "60bded37a8c85409c465d104",
+        "skill_name": "Multiplication of Fractions",
+        "topic_name": "Fractions",
+        "done_by": "60b8793ed5ac325824e3c5c9",
+        "num_of_qn": 20,
+        "percent_difficulty": "30-50-20",
+        "time_taken": 15.28,
+        "created_at": "2021-06-17T14:32:17.064Z"
+    },
+    {
+        "score": {
+            "easy": 100,
+            "medium": 100,
+            "difficult": 50,
+            "total": 90
+        },
+        "isCompleted": true,
+        "skill_id": "60bded37a8c85409c465d102",
+        "skill_name": "Simplifying Fractions",
+        "topic_name": "Fractions",
+        "done_by": "60b8793ed5ac325824e3c5cc",
+        "num_of_qn": 10,
+        "percent_difficulty": "30-50-20",
+        "time_taken": 14.19,
+        "created_at": "2021-06-17T13:26:30.023Z"
+    }
+]

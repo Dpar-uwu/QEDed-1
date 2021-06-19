@@ -45,7 +45,7 @@ exports.validate = (method) => {
                         return Object.keys(param).every(key => keys.includes(key));
                     })
                     .withMessage("Some extra parameters are sent"),
-                // catches error if topics array has extra unexpected parameters
+                // catches error if body has extra unexpected parameters
                 body()
                     .optional()
                     .custom(val => {
@@ -59,7 +59,6 @@ exports.validate = (method) => {
                         });
                         return noExtra;
                     }).withMessage("Some extra parameters are sent in the topics array"),
-                // catches error if skills array has extra unexpected parameters
                 body("skills")
                     .optional()
                     .custom(val => {
@@ -75,7 +74,6 @@ exports.validate = (method) => {
                         })
                         return noExtra;
                     }).withMessage("Some extra parameters are sent in one of the skill array(s)"),
-                // catches error if easy_values in skills array has extra unexpected parameters
                 body("skills.*.easy_values")
                     .optional()
                     .custom(val => {
@@ -89,7 +87,6 @@ exports.validate = (method) => {
                         })
                         return noExtra;
                     }).withMessage("Some extra parameters are sent in one of the easy numerical values"),
-                // catches error if medium_values in skills array has extra unexpected parameters
                 body("skills.*.medium_values")
                     .optional()
                     .custom(val => {
@@ -103,7 +100,6 @@ exports.validate = (method) => {
                         })
                         return noExtra;
                     }).withMessage("Some extra parameters are sent in one of the medium numerical values"),
-                // catches error if difficult_values in skills array has extra unexpected parameters
                 body("skills.*.difficult_values")
                     .optional()
                     .custom(val => {
@@ -145,7 +141,7 @@ exports.validate = (method) => {
                         return Object.keys(param).every(key => keys.includes(key));
                     })
                     .withMessage("Some extra parameters are sent"),
-                // catches error if topics array has extra unexpected parameters
+                // catches error if body has extra unexpected parameters
                 body()
                     .optional()
                     .custom(val => {
@@ -159,7 +155,6 @@ exports.validate = (method) => {
                         });
                         return noExtra;
                     }).withMessage("Some extra parameters are sent in the topics array"),
-                // catches error if skills array has extra unexpected parameters
                 body("skills")
                     .optional()
                     .custom(val => {
@@ -173,7 +168,6 @@ exports.validate = (method) => {
                         })
                         return noExtra;
                     }).withMessage("Some extra parameters are sent in one of the skill array(s)"),
-                // catches error if easy_values in skills array has extra unexpected parameters
                 body("skills.*.easy_values")
                     .optional()
                     .custom(val => {
@@ -187,7 +181,6 @@ exports.validate = (method) => {
                         })
                         return noExtra;
                     }).withMessage("Some extra parameters are sent in one of the easy numerical values"),
-                // catches error if medium_values in skills array has extra unexpected parameters
                 body("skills.*.medium_values")
                     .optional()
                     .custom(val => {
@@ -201,7 +194,6 @@ exports.validate = (method) => {
                         })
                         return noExtra;
                     }).withMessage("Some extra parameters are sent in one of the medium numerical values"),
-                // catches error if difficult_values in skills array has extra unexpected parameters
                 body("skills.*.difficult_values")
                     .optional()
                     .custom(val => {

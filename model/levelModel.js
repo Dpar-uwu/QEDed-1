@@ -13,7 +13,6 @@ const LevelSchema = new Schema({
 
 
 const Level = mongoose.model("Level", LevelSchema);
-const Topic = mongoose.model("Topic", TopicSchema);
 
 const levelModel = {
     LevelSchema,
@@ -159,6 +158,7 @@ const levelModel = {
             }
         })
     },
+    // TODO: CREATE MULTPLIE TOPICS IN LEVEL
     // add topic to existing level
     createTopicByLevelId: (levelId, topic) => {
         return new Promise(async (resolve, reject) => {

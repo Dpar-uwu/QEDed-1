@@ -2,8 +2,6 @@
  * User Object - schema & functions to interact with MongoDB
  * user password hashed with bcrypt
  * 
- * TODO: Improve error handling
- * TODO: Add validation and sanitisation
  * 
  * If Mongoose has deprecation warnings, rectify at https://mongoosejs.com/docs/deprecations.html  
  * 

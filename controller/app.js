@@ -6,15 +6,32 @@ const userController = require("./userController.js");
 const levelController = require("./levelController.js");
 const topicController = require("./topicController.js");
 const skillController = require("./skillController.js");
+const quizController = require("./quizController.js");
+const questionController = require("./questionController.js");
 
 const app = express();
+
+// cors middleware
 var cors = require('cors');
 app.options('*',cors());
 app.use(cors());
 
-app.use(express.json()); // expect json in http req
+// json middleware
+// app.use(express.json()); // expect json in http req
+app.use(express.json({
+    verify : (_req, res, buf, _encoding) => {
+      try {
+        JSON.parse(buf);
+      } catch(e) {
+        return res.status(400).send({ error:"Invalid Request Body", code: "INVALID_JSON_BODY" });
+      }
+    }
+  }));
 app.use(express.urlencoded({ extended: false }));
 
+// cookie parser middleware
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
 
 // host web pages
 app.use(express.static('public'));
@@ -50,11 +67,17 @@ mongoose.connection.on('error', err => {
 /**
  * Routes
  */
+// user routes
 app.use("/user", userController);
+
+// syllabus routes
 app.use("/level", levelController);
 app.use("/topic", topicController);
 app.use("/skill", skillController);
 
+// quiz routes
+app.use("/quiz", quizController);
+app.use("/question", questionController);
 
 // only for resetting database
 app.post('/reset', async (req, res) => {
@@ -74,7 +97,7 @@ app.post('/reset', async (req, res) => {
 });
 
 // error handling
-app.use(function (error, req, res, next) {
+app.use((_error, _req, res, _next) => {
     // Any request to this server will get here, and will send an HTTP
     // response with the error message 'woops'
     res.status(500).send({ error: "An error occured", code: "UNEXPECTED_ERROR" });
@@ -82,8 +105,8 @@ app.use(function (error, req, res, next) {
 
 
 // to handle 404 paths that do not exist
-app.all("*", (req, res) => {
-    res.status(404).send("404 Page not found");
+app.all("*", (_req, res) => {
+    res.status(404).send({ error: "Page not found", code: "NOT_FOUND" });
 });
 
 // handle unhandledrejection to prevent program from breaking

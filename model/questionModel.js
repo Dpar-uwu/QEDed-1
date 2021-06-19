@@ -3,9 +3,9 @@ const { Schema } = mongoose;
 
 // creating user object schema
 const QuestionSchema = new Schema({
-    skill_name: {
+    skill_id: {
         type: String,
-        required: "Skill required"
+        required: "Skill ID required"
     },
     question_number: {
         type: Number,
@@ -31,7 +31,11 @@ const QuestionSchema = new Schema({
 const Question = mongoose.model("Question", QuestionSchema)
 
 const questionModel = {
-    QuestionSchema
+    QuestionSchema,
+    /**
+     * Question Functions
+     */
+    // get all questions
 }
 
 module.exports = questionModel;

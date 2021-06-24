@@ -173,7 +173,7 @@ router.post("/login",
         } catch (err) {
             console.log(err)
             if (err == "NO_MATCH")
-                res.status(400).send({ error: ["Email or password is incorrect"], code: err });
+                res.status(400).send({ error: "Email or password is incorrect", code: err });
             else if (err instanceof Error || err instanceof MongoError)
                 res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
             else

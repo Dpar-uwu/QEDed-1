@@ -4,20 +4,18 @@ const { errorHandler } = require("../validation/errorHandler");
 let attribute = {
     levelId: () => {
         return param("levelId", "Level ID is required")
-            .stripLow().trim().escape()
-            .notEmpty().withMessage("Level  ID cannot be empty")
-            .isMongoId().withMessage("Level ID given is not a Mongo ID")
-
+            .notEmpty().withMessage("Level  ID cannot be empty").bail()
+            .isMongoId().withMessage("Level ID given is not a valid ID")
+            .stripLow()
     },
     /**
      * level
      */
     level: (location = "level") => {
         return body(location, "Level is required")
-            .stripLow().trim().escape()
-            .notEmpty().withMessage("Level cannot be empty")
-            .bail()
-            .isInt().withMessage("Level required, must be an integer")
+            .notEmpty().withMessage("Level cannot be empty").bail()
+            .isInt().withMessage("Level required, must be an integer").bail()
+            .stripLow()
             .toInt()
     },
 
@@ -30,9 +28,9 @@ let attribute = {
     // topic ID
     topicId: () => {
         return param("topicId", "Topic ID is required")
-            .stripLow().trim().escape()
             .notEmpty().withMessage("Topic ID cannot be empty")
-            .isMongoId().withMessage("Topic ID given is not a Mongo ID")
+            .isMongoId().withMessage("Topic ID given is not a valid ID")
+            .stripLow()
     },
 
     /**
@@ -40,17 +38,16 @@ let attribute = {
      */
     topic_name: (location = "topics.*.topic_name") => {
         return body(location)
-            .stripLow().trim().escape()
-            .notEmpty().withMessage("Topic name cannot be empty")
-            .bail()
-            .matches(/^(?=.*[a-zA-Z])([a-zA-Z0-9_\-, ]+)$/).withMessage("Topic name should contain letters, numbers, _, -, \, and whitespaces only")
+            .notEmpty().withMessage("Topic name cannot be empty").bail()
+            .matches(/^(?=.*[a-zA-Z])([a-zA-Z0-9_\-,' ]+)$/).withMessage("Topic name should contain letters, numbers, _, -, ', commas and whitespaces only").bail()
+            .stripLow().trim()
     },
     // skill ID
     skillId: () => {
         return param("skillId", "Skill ID is required")
-            .stripLow().trim().escape()
-            .notEmpty().withMessage("Skill ID cannot be empty")
-            .isMongoId().withMessage("Skill ID given is not a Mongo ID")
+            .notEmpty().withMessage("Skill ID cannot be empty").bail()
+            .isMongoId().withMessage("Skill ID given is not a valid ID").bail()
+            .stripLow()
     },
     skills: (location = "topics.*.skills") => {
         return body(location)
@@ -60,33 +57,26 @@ let attribute = {
     // level > topics > skills
     skill_code: (location = "topics.*.skills.*.skill_code") => {
         return body(location)
-            .stripLow().trim().escape()
-            .notEmpty().withMessage("Skill code cannot be empty")
-            .bail()
-            .matches(/^(?=.*[A-Z])([A-Z0-9_\-]+)$/).withMessage("Topic name should letters, numbers, _, -, \, and whitespaces only")
+            .notEmpty().withMessage("Skill code cannot be empty").bail()
+            .matches(/^(?=.*[A-Z])([A-Z0-9_-]+)$/).withMessage("Topic name should letters, numbers, _, -, \, and whitespaces only").bail()
+            .stripLow().trim()
     },
     skill_name: (location = "topics.*.skills.*.skill_name") => {
         return body(location)
-            .stripLow().trim().escape()
-            .notEmpty().withMessage("Skill name cannot be empty")
-            .bail()
-            .matches(/^(?=.*[a-zA-Z])([a-zA-Z0-9_\-, ]+)$/).withMessage("Skill name should contain letters, numbers, _, -, \, and whitespaces only")
+            .notEmpty().withMessage("Skill name cannot be empty").bail()
+            .matches(/^(?=.*[a-zA-Z])([a-zA-Z0-9_\-,' ]+)$/).withMessage("Skill name should contain letters, numbers, _, -, \, and whitespaces only").bail()
+            .stripLow().trim()
     },
     num_of_qn: (location = "topics.*.skills.*.num_of_qn") => {
         return body(location)
-            .stripLow().trim().escape()
-            .notEmpty().withMessage("Skill name cannot be empty")
-            .bail()
+            .notEmpty().withMessage("Skill name cannot be empty").bail()
             .isInt({ min: 1 }).withMessage("Number of questions must be an integer")
             .toInt()
     },
     percent_difficult: (location = "topics.*.skills.*.percent_difficulty") => {
         return body(location)
-            .stripLow().trim().escape()
-            .notEmpty().withMessage("Percent difficulty cannot be empty")
-            .bail()
-            .matches(/^\d{1}0-\d{1}0-\d{1}0$/).withMessage("Percent difficulty should contain numbers in multiples of 10 separated by - e.g. 20-50-30")
-            .bail()
+            .notEmpty().withMessage("Percent difficulty cannot be empty").bail()
+            .matches(/^\d{1}0-\d{1}0-\d{1}0$/).withMessage("Percent difficulty should contain numbers in multiples of 10 separated by - e.g. 20-50-30").bail()
             .custom((val, { req }) => {
                 let percentages = val.split("-");
                 let total = 0;
@@ -97,14 +87,13 @@ let attribute = {
                     else return false
                 });
                 return total == 100;
-            }).withMessage("Percent difficulty must be a multiple of 10 and add up to 100%")
+            }).withMessage("Percent difficulty must be a multiple of 10 and add up to 100%").bail()
+            .stripLow()
     },
     duration: (location = "topics.*.skills.*.duration") => {
         return body(location)
-            .stripLow().trim().escape()
-            .notEmpty().withMessage("Duration cannot be empty")
-            .bail()
-            .isInt({ min: 1 }).withMessage("Duration must be an integer that is at least 1")
+            .notEmpty().withMessage("Duration cannot be empty").bail()
+            .isInt({ min: 1 }).withMessage("Duration must be an integer that is at least 1").bail()
             .toInt()
     },
 
@@ -113,19 +102,15 @@ let attribute = {
      */
     easy_values_min: (location = "topics.*.skills.*.easy_values.min") => {
         return body(location)
-            .stripLow().trim().escape()
-            .notEmpty().withMessage("Easy values minimum cannot be empty")
-            .bail()
-            .isInt().withMessage("Minimun value (easy) must be an integer")
+            .notEmpty().withMessage("Easy values minimum cannot be empty").bail()
+            .isInt().withMessage("Minimun value (easy) must be an integer").bail()
             .toInt()
     },
 
     easy_values_max: (location = "topics.*.skills.*.easy_values.max") => {
         return body(location)
-            .stripLow().trim().escape()
-            .notEmpty().withMessage("Easy values maximum cannot be empty")
-            .bail()
-            .isInt().withMessage("Maximum value (easy) must be an integer")
+            .notEmpty().withMessage("Easy values maximum cannot be empty").bail()
+            .isInt().withMessage("Maximum value (easy) must be an integer").bail()
             .toInt()
     },
 
@@ -140,19 +125,15 @@ let attribute = {
     // level > topics > skills > medium_values
     medium_values_min: (location = "topics.*.skills.*.medium_values.min") => {
         return body(location)
-            .stripLow().trim().escape()
-            .notEmpty().withMessage("Medium values minimum cannot be empty")
-            .bail()
-            .isInt().withMessage("Minimun value (medium) must be an integer")
+            .notEmpty().withMessage("Medium values minimum cannot be empty").bail()
+            .isInt().withMessage("Minimun value (medium) must be an integer").bail()
             .toInt()
     },
 
     medium_values_max: (location = "topics.*.skills.*.medium_values.max") => {
         return body(location)
-            .stripLow().trim().escape()
-            .notEmpty().withMessage("Medium values maximum cannot be empty")
-            .bail()
-            .isInt().withMessage("Maximum value (medium) must be an integer")
+            .notEmpty().withMessage("Medium values maximum cannot be empty").bail()
+            .isInt().withMessage("Maximum value (medium) must be an integer").bail()
             .toInt()
     },
 
@@ -167,19 +148,15 @@ let attribute = {
     // level > topics > skills > difficult_values
     difficult_values_min: (location = "topics.*.skills.*.difficult_values.min") => {
         return body(location)
-            .stripLow().trim().escape()
-            .notEmpty().withMessage("Difficult values minimum cannot be empty")
-            .bail()
-            .isInt().withMessage("Minimun value (difficult) must be an integer")
+            .notEmpty().withMessage("Difficult values minimum cannot be empty").bail()
+            .isInt().withMessage("Minimun value (difficult) must be an integer").bail()
             .toInt()
     },
 
     difficult_values_max: (location = "topics.*.skills.*.difficult_values.max") => {
         return body(location)
-            .stripLow().trim().escape()
-            .notEmpty().withMessage("Difficult values maximum cannot be empty")
-            .bail()
-            .isInt().withMessage("Maximum value (difficult) must be an integer")
+            .notEmpty().withMessage("Difficult values maximum cannot be empty").bail()
+            .isInt().withMessage("Maximum value (difficult) must be an integer").bail()
             .toInt()
     },
 

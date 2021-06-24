@@ -5,132 +5,101 @@ const { errorHandler } = require("../validation/errorHandler");
 // store attribute validation here
 let attribute = {
     userId: () => {
-        return param("userId", "userId is required")
-            .stripLow()
-            .trim()
-            .escape()
-            .isMongoId().withMessage("User ID given is not a mongo id")
+        return param("userId")
+            .notEmpty().withMessage("User ID cannot be empty").bail()
+            .isMongoId().withMessage("User ID given is not a valid ID")
     },
     
     first_name: () => {
-        return body("first_name", "First Name must only contain alphabets, spaces and -")
-            .stripLow() // sanitisation before validation
-            .trim()
-            .escape()
-            .notEmpty()
-            .bail() // stop checking if previous is invalid, fn can be repeated
-            .matches(/^(?=.*[a-zA-Z])([a-zA-Z -]+)$/)
-    }, // ignore spaces and -
+        return body("first_name")
+            .notEmpty().withMessage("First Name cannot be empty").bail()
+            .matches(/^(?=.*[a-zA-Z])([a-zA-Z -']+)$/).withMessage("First Name must only contain alphabets, spaces and -").bail()
+            .stripLow().trim().escape()
+    },
 
     last_name: () => {
-        return body("last_name", "Last Name must only contain alphabets, spaces and -")
-            .stripLow()
-            .trim()
-            .escape()
-            .notEmpty()
-            .bail()
-            .matches(/^(?=.*[a-zA-Z])([a-zA-Z -]+)$/)
+        return body("last_name")
+            .notEmpty().withMessage("Last Name cannot be empty").bail()
+            .matches(/^(?=.*[a-zA-Z])([a-zA-Z -']+)$/).withMessage("Last Name must only contain alphabets, spaces and -").bail()   
+            .stripLow().trim().escape()
     },
 
     email: () => {
-        return body("email", "Email must be a valid format")
-            .stripLow()
-            .trim()
-            .escape()
-            .notEmpty()
-            .bail()
-            .isEmail()
+        return body("email")
+            .notEmpty().withMessage("Email cannot be empty").bail()
+            .isEmail().withMessage("Email must be a valid format")
     },
 
     password: () => {
-        return body("password", "Password must conatin at least 1 uppercase, 1 lowercase, 1 digit, 1 special char, at least 8 chars long and have no whitespaces")
-            .notEmpty()
-            .bail()
+        return body("password")
+            .notEmpty().withMessage("Password cannot be empty").bail()
             .matches(/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&])([a-zA-Z0-9@$!%*?&]{8,})$/)
+            .withMessage("Password must conatin at least 1 uppercase, 1 lowercase, 1 digit, 1 special char, at least 8 chars long and have no whitespaces")
     },
 
     gender: () => {
-        return body("gender", "Gender must be F or M")
-            .stripLow()
-            .escape()
-            .notEmpty()
-            .bail()
-            .isIn(["F", "M"])
+        return body("gender")
+            .notEmpty().withMessage("Gender cannot be empty").bail()
+            .isIn(["F", "M"]).withMessage("Gender must be F or M").bail()
+            .stripLow().escape()
     },
 
     role: () => {
-        return body("role", "Role must be parent, teacher or student")
-            .stripLow()
-            .escape()
-            .notEmpty()
-            .bail()
-            .isIn(["parent", "teacher", "student", "admin"])
-            .bail()
+        return body("role", )
+            .notEmpty().withMessage("Role cannot be empty").bail()
+            .isIn(["parent", "teacher", "student", "admin"]).withMessage("Role must be parent, teacher or student").bail()
             .custom((val, { req }) => {
                 //checks that school and role is not empty if role is student
                 if (val == "student")
                     return (req.body.grade != undefined && req.body.school != undefined);
-                else if (val == "parent" || val == "teacher" || val == "admin")
+                return true;
+            }).withMessage("School and Grade are required for student users only")
+            .custom((val, { req }) => {
+                //checks that school and role is empty for non-student
+                if (val == "parent" || val == "teacher" || val == "admin")
                     return (req.body.grade == undefined && req.body.school == undefined);
-                return false;
-            }).withMessage("School and Grade is required for student users only")
+                return true;
+            }).withMessage("School and Grade cannot exist for non-student users").bail()
+            .stripLow().escape()
     },
 
     school: () => {
-        return body("school", "School must only contain alphabets, spaces and -, required if role is student")
-            .stripLow()
-            .escape()
+        return body("school")
             .optional()
-            .matches(/^(?=.*[a-zA-Z])([a-zA-Z -]+)$/)
-            .trim()
+            .matches(/^(?=.*[a-zA-Z])([a-zA-Z -']+)$/)
+            .withMessage("School must only contain alphabets, spaces, ' and -").bail()
+            .trim().stripLow()
     },
 
 
     grade: () => {
-        return body("grade", "Grade must be a number min 1 and max 6, required if role is student")
-            .stripLow()
-            .escape()
+        return body("grade")
             .optional()
-            .bail()
-            .isInt({ min: 1, max: 6 })
-            .trim()
+            .isInt({ min: 1, max: 6 }).withMessage("Grade must be a number from 1 to 6").bail()
             .toInt()
     },
 
     exp_points: () => {
-        return body("exp_points", "EXP must be a integer")
-            .stripLow()
-            .escape()
+        return body("exp_points")
             .optional()
-            .bail()
-            .isInt()
-            .trim()
+            .isInt().withMessage("EXP must be a integer").bail()
             .toInt()
     },
 
     rank_level: () => {
-        return body("exp_points", "Rank Level must be a integer")
-            .stripLow()
-            .escape()
+        return body("exp_points")
             .optional()
-            .bail()
-            .isInt()
-            .trim()
+            .isInt().withMessage("Rank Level must be a integer").bail()
             .toInt()
     },
 
     token: () => {
-        return body("token", "Token must be a integer")
-            .stripLow()
-            .escape()
+        return body("token")
             .optional()
-            .bail()
-            .isInt()
-            .trim()
+            .isInt().withMessage("Token must be a integer").bail()
             .toInt()
     }
 }
-
 
 
 // validation methods reusing attribute functions + adding new rules
@@ -160,7 +129,7 @@ exports.validate = (method) => {
         case "loginUser": {
             return [
                 attribute.email(),
-                body("password", "Password required")
+                body("password", "Password cannot be empty")
                     .stripLow()
                     .escape()
                     .notEmpty(),

@@ -17,7 +17,14 @@ $(document).on("submit",function(event){
         },
         error: function(xhr, textStatus, errorThrown){
             var message =  JSON.parse(xhr.responseText);
-            document.getElementById("errorMessage").innerHTML = message.error[0];
+            var result = "";
+            if(message.code == "INVALID_REQUEST") { //invalid_req code err returns array
+                message.error.forEach(err => {
+                    result += err + "<br>";
+                })
+            }
+            else result =  message.error;
+            document.getElementById("errorMessage").innerHTML = result;
         }
     })
     event.preventDefault();

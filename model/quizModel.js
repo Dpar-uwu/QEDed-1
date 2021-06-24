@@ -106,7 +106,7 @@ const quizModel = {
                 console.log("SUCCESS! Result", result);
                 resolve(result);
             } catch (err) {
-                console.error("ERROR! Could not get all quiz by id:", err);
+                console.error("ERROR! Could not get quiz by id:", err);
                 reject(err);
             }
         })
@@ -116,7 +116,7 @@ const quizModel = {
     getQuizByUserId: (userId) => {
         return new Promise(async (resolve, reject) => {
             try {
-                const result = await Quiz.findOne({ "done_by": userId }).select("-__v");
+                const result = await Quiz.find({ "done_by": ObjectId(userId) }).select("-__v");
                 if (!result) throw "NOT_FOUND";
 
                 console.log("SUCCESS! Result", result);
@@ -251,21 +251,25 @@ const quizModel = {
     getGlobalBenchmark: (userId, currentQuiz) => {
         return new Promise(async (resolve, reject) => {
             try {
+                let recent_match_opt = {
+                    "done_by": ObjectId(userId), //get all from user
+                }
+
+                if(currentQuiz && currentQuiz != "") {
+                    recent_match_opt._id = { $ne: ObjectId(currentQuiz) }
+                }
                 // recent 10
                 const recent = await Quiz.aggregate([
                     {
-                        $match: {
-                            "done_by": ObjectId(userId), //get all from user
-                            "_id": { $ne: ObjectId(currentQuiz) }
-                        }
+                        $match: recent_match_opt
                     },
                     {
                         $group: {
                             "_id": null,
-                            "total_average_score": { $avg: "$score.total" },
                             "easy_average_score": { $avg: "$score.easy" },
                             "medium_average_score": { $avg: "$score.medium" },
                             "difficult_average_score": { $avg: "$score.difficult" },
+                            "total_average_score": { $avg: "$score.total" },
                             "average_time_taken": { $avg: "$time_taken" }
                         }
                     },
@@ -280,28 +284,29 @@ const quizModel = {
                     {
                         $group: {
                             "_id": null,
-                            "total_average_score": { $avg: "$score.total" },
                             "easy_average_score": { $avg: "$score.easy" },
                             "medium_average_score": { $avg: "$score.medium" },
                             "difficult_average_score": { $avg: "$score.difficult" },
+                            "total_average_score": { $avg: "$score.total" },
                             "average_time_taken": { $avg: "$time_taken" }
                         }
                     },
                     { $project: { _id: 0 }}
                 ]);
 
-                const current = await Quiz.findOne({ _id: currentQuiz }).select("id score time_taken");
-
-                const result = {
+                let result = {
                     "recent": recent[0],
-                    "global": global[0],
-                    "current": {
-                        "total_average_score": current.score.total,
-                        "easy_average_score": current.score.easy,
-                        "medium_average_score": current.score.medium,
-                        "difficult_average_score": current.score.difficult,
-                        "average_time_taken": current.time_taken
-                    }
+                    "global": global[0]
+                }
+
+                if(currentQuiz && currentQuiz != "") {
+                    const current = await Quiz.findOne({ _id: (currentQuiz) }).select("id score time_taken");
+                    result.current = {}
+                    result.current.easy_average_score = current.score.easy,
+                    result.current.medium_average_score = current.score.medium,
+                    result.current.difficult_average_score = current.score.difficult,
+                    result.current.total_average_score = current.score.total,
+                    result.current.average_time_taken = current.time_taken
                 }
 
                 console.log("SUCESS! Result", result);

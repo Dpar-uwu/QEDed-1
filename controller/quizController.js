@@ -9,7 +9,7 @@ const router = express.Router();
 const quizModel = require("../model/quizModel");
 
 // validation
-//  const { validate } = require("../validation/levelValidation");
+const { validate } = require("../validation/quizValidation");
 
 // error handler modules
 const { MongoError } = require("mongodb");
@@ -37,9 +37,33 @@ router.get("/",
     });
 
 /**
+ * GET /quiz/user?userId=
+ */
+router.get("/user",
+    validate("userId"),
+    async (req, res) => {
+        const { userId } = req.query;
+        try {
+            console.time("GET quiz by user id");
+            const result = await quizModel.getQuizByUserId(userId);
+            res.status(200).send(result);
+        } catch (err) {
+            if (err == "NOT_FOUND")
+                res.status(404).send({ error: "User ID not found", code: err });
+            else if (err instanceof Error || err instanceof MongoError)
+                res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+            else
+                res.status(500).send({ error: "Error getting quiz by user id", code: "UNEXPECTED_ERROR" });
+        } finally {
+            console.timeEnd("GET quiz by user id");
+        }
+    });
+
+/**
  * GET /quiz/:quizId - get quiz by id
  */
 router.get("/:quizId",
+    validate("quizId"),
     async (req, res) => {
         const { quizId } = req.params;
         try {
@@ -59,47 +83,27 @@ router.get("/:quizId",
         }
     });
 
-/**
- * GET /quiz/:userId
- */
-router.get("/:userId",
-    async (req, res) => {
-        const { userId } = req.params;
-        try {
-            console.time("GET quiz by user id");
-            const result = await quizModel.getQuizByUserId(userId);
-            res.status(200).send(result);
-        } catch (err) {
-            if (err == "NOT_FOUND")
-                res.status(404).send({ error: "User ID not found", code: err });
-            else if (err instanceof Error || err instanceof MongoError)
-                res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
-            else
-                res.status(500).send({ error: "Error getting quiz by user id", code: "UNEXPECTED_ERROR" });
-        } finally {
-            console.timeEnd("GET quiz by user id");
-        }
-    });
-
 
 /**
  * POST /quiz
  */
 router.post("/",
+    validate("createQuiz"),
     async (req, res) => {
         const { skill_id, skill_name, topic_name, done_by,
             score, questions, num_of_qn, percent_difficulty, time_taken,
-            isCompleted, created_at, assigned_by, deadline } = req.body;
+            isCompleted, assigned_by, deadline } = req.body;
         try {
             console.time("POST quiz");
             const result = await quizModel.createQuiz({
                 skill_id, skill_name, topic_name, done_by,
                 score, questions, num_of_qn, percent_difficulty, time_taken,
-                isCompleted, created_at, assigned_by, deadline
+                isCompleted, assigned_by, deadline
             });
 
             res.status(201).send({ new_id: result._id });
         } catch (err) {
+            g
             if (err instanceof Error || err instanceof MongoError)
                 res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
             else
@@ -114,6 +118,7 @@ router.post("/",
  * PUT /quiz/:quizId - update existing quiz by id
  */
 router.put("/:quizId",
+    validate("updateQuiz"),
     async (req, res) => {
         const { quizId } = req.params;
         const changedFields = { ...req.body };
@@ -139,6 +144,7 @@ router.put("/:quizId",
 * DELETE /quiz/:quizId - delete level by id
 */
 router.delete("/:quizId",
+    validate("quizId"),
     async (req, res) => {
         const { quizId } = req.params;
         try {
@@ -161,16 +167,20 @@ router.delete("/:quizId",
 
 
 /**
- * POST /quiz/leaderboard?scope=global OR <GroupID>
+ * POST /quiz/leaderboard?scope=groupId
  */
 router.post("/leaderboard",
+    validate("scope"),
     async (req, res) => {
         const { scope } = req.query;
         try {
             console.time("POST leaderboard");
-            if (scope == "global") {
+            if (scope == "" || scope == undefined) {
                 const result = await quizModel.getGlobalLeaderboard();
                 res.status(200).send(result);
+            }
+            else {
+                res.status(500).send({ error: "Sorry this feature is still yet to be built", code: "LAZINESS"});
             }
             // do get leaderboard by group id
         } catch (err) {
@@ -190,6 +200,7 @@ router.post("/leaderboard",
  * used after student completes quiz
  */
 router.post("/benchmark",
+    validate("benchmark"),
     async (req, res) => {
         const { user, currentQuiz } = req.query;
         try {

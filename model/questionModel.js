@@ -17,14 +17,18 @@ const QuestionSchema = new Schema({
         required: "Question is required"
     },
     answer: {
-        type: Number
+        type: String
+    },
+    correct_answer: {
+        type: String
     },
     isCorrect: {
         type: Boolean
     },
     difficulty: {
         type: String,
-        required: "Difficulty required"
+        required: "Difficulty required",
+        enum: ["easy", "medium", "difficult"]
     }
 });
 

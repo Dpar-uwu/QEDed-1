@@ -9,7 +9,7 @@ const router = express.Router();
 const quizModel = require("../model/quizModel");
 
 // validation
-//  const { validate } = require("../validation/levelValidation");
+ const { validate } = require("../validation/questionValidation");
 
 // error handler modules
 const { MongoError } = require("mongodb");
@@ -19,6 +19,7 @@ const { Error } = require("mongoose");
  * GET /question/:questionId
  */
 router.get("/:questionId",
+    validate("questionId"),
     async (req, res) => {
         const { questionId } = req.params;
         try {
@@ -44,6 +45,7 @@ router.get("/:questionId",
  * adds all questions belonging to a quiz
  */
 router.post("/:quizId",
+    validate("createQuestions"),
     async (req, res) => {
         const { quizId } = req.params;
         const questions = req.body;
@@ -66,6 +68,7 @@ router.post("/:quizId",
  * deletes all questions belonging to a quiz
  */
 router.delete("/:quizId",
+    validate("quizId"),
     async (req, res) => {
         const { quizId } = req.params;
         try {

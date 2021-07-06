@@ -86,6 +86,11 @@ let attribute = {
             .notEmpty().withMessage("Assigned By cannot be empty").bail()
             .isMongoId().withMessage("Assigned By is not a valid ID");
     },
+    group_id: () => {
+        return body("group_id")
+            .notEmpty().withMessage("Group ID cannot be empty").bail()
+            .isMongoId().withMessage("Group ID is not a valid ID");
+    },
     deadline: () => {
         return body("deadline")
             .notEmpty().withMessage("Deadline cannot be empty").bail()
@@ -112,6 +117,7 @@ exports.validate = (method) => {
                 attribute.time_taken().optional(),
                 attribute.isCompleted().optional(),
                 attribute.assigned_by().optional(),
+                attribute.group_id().optional(),
                 attribute.deadline().optional(),
                 errorHandler
             ]
@@ -140,6 +146,7 @@ exports.validate = (method) => {
                 attribute.isCompleted().optional(),
                 attribute.assigned_by().optional(),
                 attribute.deadline().optional(),
+                
                 errorHandler
             ]
         }

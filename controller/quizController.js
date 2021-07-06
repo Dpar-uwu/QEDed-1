@@ -92,13 +92,13 @@ router.post("/",
     async (req, res) => {
         const { skill_id, skill_name, topic_name, done_by,
             score, questions, num_of_qn, percent_difficulty, time_taken,
-            isCompleted, assigned_by, deadline } = req.body;
+            isCompleted, assigned_by, group_id, deadline } = req.body;
         try {
             console.time("POST quiz");
             const result = await quizModel.createQuiz({
                 skill_id, skill_name, topic_name, done_by,
                 score, questions, num_of_qn, percent_difficulty, time_taken,
-                isCompleted, assigned_by, deadline
+                isCompleted, assigned_by, group_id, deadline
             });
 
             res.status(201).send({ new_id: result._id });

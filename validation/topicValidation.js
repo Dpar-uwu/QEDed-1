@@ -147,7 +147,7 @@ exports.validate = (method) => {
                     .custom(val => {
                         let noExtra = true;
                         const topicKeys = ["topic_name", "skills"];
-                        Object.keys(topic).forEach(property => {
+                        Object.keys(val).forEach(property => {
                             if (!topicKeys.includes(property)) {
                                 noExtra = false;
                                 return;
@@ -155,7 +155,7 @@ exports.validate = (method) => {
                         });
                         return noExtra;
                     }).withMessage("Some extra parameters are sent in the topics array"),
-                body("skills")
+                body("skills.*")
                     .optional()
                     .custom(val => {
                         let noExtra = true;

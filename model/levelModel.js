@@ -182,19 +182,21 @@ const levelModel = {
     // update topic by id
     updateTopicById: (topicId, changedFields) => {
         return new Promise(async (resolve, reject) => {
-            try {            
+            try {
                 const level = await Level.findOne({ "topics._id": topicId });
 
                 if(!level) throw "NOT_FOUND";
                 
                 // find the topic in the array that matches the id
                 const found = level.topics.find(element => element._id == topicId);
+                const foundIndex = level.topics.findIndex(element => element._id == topicId);
 
                 // update changed fields to level
                 for(property in changedFields) {
                     found[property] = changedFields[property];
+                    console.log(property, found[property])
                 }
-                
+                level[foundIndex] = changedFields;
                 // save changes to db
                 const result = await level.save();
 

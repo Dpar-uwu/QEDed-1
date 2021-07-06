@@ -67,13 +67,16 @@ const QuizSchema = new Schema({
     assigned_by: {
         type: ObjectId
     },
+    group_id: {
+        type: ObjectId
+    },
     deadline: {
         type: Date
     }
 });
 // skill_id, skill_name, topic_name, done_by, 
 // score, questions, num_of_qn, percent_difficulty, time_taken, 
-// isCompleted, created_at, assigned_by, deadline
+// isCompleted, created_at, group_id, assigned_by, deadline
 
 const Quiz = mongoose.model("Quiz", QuizSchema);
 
@@ -116,7 +119,7 @@ const quizModel = {
     getQuizByUserId: (userId) => {
         return new Promise(async (resolve, reject) => {
             try {
-                const result = await Quiz.find({ "done_by": ObjectId(userId) }).select("-__v");
+                const result = await Quiz.find({ "done_by": ObjectId(userId) }).select("-__v -questions");
                 if (!result) throw "NOT_FOUND";
 
                 console.log("SUCCESS! Result", result);

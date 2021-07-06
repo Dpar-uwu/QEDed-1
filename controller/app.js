@@ -13,7 +13,7 @@ const app = express();
 
 // cors middleware
 var cors = require('cors');
-app.options('*',cors());
+app.options('*', cors());
 app.use(cors());
 
 // json middleware
@@ -52,17 +52,25 @@ const options = {
         connection = await mongoose.connect(localurl, options);
         console.log("SUCCESS Connected to database");
     } catch (error) {
-        console.error("ERROR Error connecting to database");
+        console.error("\x1b[31mERROR Error connecting to database\x1b[0m");
         process.exit(1);
     }
 })();
 
 // handle any transaction error to mongodb
 mongoose.connection.on('error', err => {
-    console.error("Database error");
+    console.error("\x1b[31mDatabase error:", err, "\x1b[0m");
 });
 
-
+// logging middleware
+app.use((req, _res, next) => {
+    // go to for console.log font color
+    // https://stackoverflow.com/questions/9781218/how-to-change-node-jss-console-font-color
+    console.log("\x1b[43m\x1b[30m", req.method, "\x1b[0m\x1b[1m", req.path,"\x1b[0m");
+    if(Object.keys(req.query).length !== 0) console.log("\x1b[34mquery:\x1b[0m", req.query);
+    if(Object.keys(req.body).length !== 0) console.log("\x1b[34mbody:\x1b[0m", req.body);
+    next();
+});
 
 /**
  * Routes
@@ -79,39 +87,22 @@ app.use("/skill", skillController);
 app.use("/quiz", quizController);
 app.use("/question", questionController);
 
-// only for resetting database
-app.post('/reset', async (req, res) => {
-    try {
-        console.log("Deleting tables");
-
-        //drop collections here
-        await connection.connection.db.dropCollection("users");
-        // await connection.connection.db.dropCollection("levels");
-        
-
-        res.status(200).send({ message: "Reset OK" });
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({ error: err });
-    }
-});
 
 // error handling
 app.use((_error, _req, res, _next) => {
     // Any request to this server will get here, and will send an HTTP
-    // response with the error message 'woops'
     res.status(500).send({ error: "An error occured", code: "UNEXPECTED_ERROR" });
 });
 
 
-// to handle 404 paths that do not exist
+// to handle paths that do not exist
 app.all("*", (_req, res) => {
     res.status(404).send({ error: "Page not found", code: "NOT_FOUND" });
 });
 
 // handle unhandledrejection to prevent program from breaking
 process.on('unhandledRejection', error => {
-    console.log('WARNING! unhandledRejection', error);
+    console.log('\x1b[31mWARNING! unhandledRejection\x1b[0m', error);
 });
 
 

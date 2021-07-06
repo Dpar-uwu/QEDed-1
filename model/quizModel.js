@@ -190,18 +190,18 @@ const quizModel = {
         return new Promise(async (resolve, reject) => {
             try {
                 const result = await Quiz.aggregate([
-                    {
-                        $group: {
-                            "_id": "$done_by",
-                            "average_score": { $avg: "$score.total" },
-                            "num_of_quiz": { $sum: 1 },
-                            "average_time_taken": { $avg: "$time_taken" }
-                        }
-                    },
+                    // {
+                    //     $group: {
+                    //         "_id": "$done_by",
+                    //         "average_score": { $avg: "$score.total" },
+                    //         "num_of_quiz": { $sum: 1 },
+                    //         "average_time_taken": { $avg: "$time_taken" }
+                    //     }
+                    // },
                     {
                         $lookup: {
                             from: "users",
-                            localField: "_id",
+                            localField: "done_by",
                             foreignField: "_id",//<field from the documents of the "from" collection>
                             as: "user" //<output array field>
                         }

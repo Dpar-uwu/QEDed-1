@@ -58,13 +58,13 @@ let attribute = {
     skill_code: (location = "topics.*.skills.*.skill_code") => {
         return body(location)
             .notEmpty().withMessage("Skill code cannot be empty").bail()
-            .matches(/^(?=.*[A-Z])([A-Z0-9_-]+)$/).withMessage("Topic name should letters, numbers, _, -, \, and whitespaces only").bail()
+            .matches(/^(?=.*[A-Z])([A-Z0-9_-]+)$/).withMessage("Topic name should contain letters, numbers, _, -, commas and whitespaces only").bail()
             .stripLow().trim()
     },
     skill_name: (location = "topics.*.skills.*.skill_name") => {
         return body(location)
             .notEmpty().withMessage("Skill name cannot be empty").bail()
-            .matches(/^(?=.*[a-zA-Z])([a-zA-Z0-9_\-,' ]+)$/).withMessage("Skill name should contain letters, numbers, _, -, \, and whitespaces only").bail()
+            .matches(/^(?=.*[a-zA-Z])([a-zA-Z0-9_\-,' ]+)$/).withMessage("Skill name should contain letters, numbers, _, -, commas and whitespaces only").bail()
             .stripLow().trim()
     },
     num_of_qn: (location = "topics.*.skills.*.num_of_qn") => {

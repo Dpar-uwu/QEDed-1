@@ -180,7 +180,6 @@ exports.validate = (method) => {
                 attribute.email().optional(),
                 attribute.password().optional(),
                 attribute.gender().optional(),
-                attribute.role().optional(),
                 attribute.school(),
                 attribute.grade(),
                 attribute.exp_points(),

@@ -307,6 +307,8 @@ const userModel = {
                 const addUsers = require('../datasheets/users.json');
                 console.log(addUsers)
                 addUsers.forEach(async user => {
+                    user._id = ObjectId(user._id)
+                    user.created_at = Date(user.created_at)
                     const newUser = new User(user);
                     await newUser.save();
                 })

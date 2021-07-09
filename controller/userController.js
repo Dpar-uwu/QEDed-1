@@ -28,7 +28,7 @@ const { Error } = require("mongoose");
  * GET /user - gets all users
  */
 router.get("/",
-    // isAuth,
+    isAuth,
     async (_req, res) => {
         try {
             console.time("GET all users");
@@ -165,7 +165,7 @@ router.post("/login",
             console.log(refreshTK)
             // send refresh token as cookie & access token in body
             res.cookie("refreshTK", refreshTK, {
-                // httpOnly: true,
+                httpOnly: true,
                 path: "/refresh_token" // endpoint to get new access token using refresh token
             });
             res.send({ accessTK, "user": result });
@@ -218,7 +218,7 @@ router.post("/refresh_token",
 
             // send refresh token as cookie & access token in body
             res.cookie("refreshTK", refreshTK, {
-                // httpOnly: true,
+                httpOnly: true,
                 path: "/refresh_token" // endpoint to get new access token using refresh token
             });
             res.send({ "accessToken": accessTK });

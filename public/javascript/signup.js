@@ -24,16 +24,17 @@ function getSchool(){
         }
     });
 }
+
 $(document).on("change","#role",function(){
-    var content = ''
+    var content = '';
     var role = $('#role').val();
-    var container = document.getElementById('container');
-    container.innerHTML = '';
+    var container = document.getElementById('studentContainer');
 
     if(role == 'student'){
+        container.style.display = "block"
         content += `            
-            <div class="form-group">
-                <select class="form-control" required id="grade">
+            <div>
+                <select class="form-select rounded-pill" required id="grade">
                     <option value="1">Primary 1</option>
                     <option value="2">Primary 2</option>
                     <option value="3">Primary 3</option>
@@ -42,15 +43,37 @@ $(document).on("change","#role",function(){
                     <option value="6">Primary 6</option>
                 </select>
             </div>
-            <div class="form-group">
-                <select class="form-control" required id="school">
+            <div class="mt-2">
+                <select class="form-select rounded-pill" required id="school">
                     ${schoolOption}                
                 </select>
             </div>`;
             container.innerHTML = content;
     }
+    else{
+        container.style.display = "none"
+    }
 })
-$(document).on("submit",function(event){
+
+$(document).on('click',".showPassword",function(){
+    var id = this.id;
+    var input = document.getElementById(id.slice(0, -3));
+    var icon = document.getElementById(id);
+
+    var type = "password";
+    var icon =  `<i class="fas fa-eye"></i>`;
+
+    if (input.type === "password") {
+      type = "text";
+      icon = `<i class="fas fa-eye-slash"></i>`
+    } 
+
+    input.type = type;
+    icon.innerHTML = icon
+    
+})
+
+$(document).on('click','#signupBtn',function(event){
     var data = {
         "first_name": '',
         "last_name": '',
@@ -65,7 +88,21 @@ $(document).on("submit",function(event){
             data[key] = $('input:radio:checked').val();
         }else{
             data[key] = $('#'+ key).val();
+            if(data[key] == ""){
+                showError("Field is required", key)
+                return false;
+            }
         }
+    }
+
+    if($('#confirmPassword').val() == "" || $('#confirmPassword').val() == null){
+        showError("Field is required", "confirmPassword");
+        return false;
+    }
+
+    if($('input:checkbox:checked').val() == null){
+        showError("Please agree to QEDed's Terms of Service and Privacy Policy", "agreement");
+        return false;
     }
 
     if(data.role == 'student'){
@@ -80,16 +117,85 @@ $(document).on("submit",function(event){
             data: data,
             dataType: "json",
             success: function(data, textStatus, xhr){
-                window.location.href = './quiz.html';
+                window.location.href = './login.html';
             },
             error: function(xhr, textStatus, errorThrown){
-                var message =  JSON.parse(xhr.responseText);
-                document.getElementById("errorMessage").innerHTML = message.error[0];
+                var key;
+                var error = JSON.parse(xhr.responseText).error[0];
+
+                switch(error.split(" ")[0]){
+                    case 'First' : key = "first_name"; break;
+                    case 'Last' : key = "last_name"; break;
+                    case 'Email': key = "email"; break;
+                    case 'Role' : key = "role"; break;
+                    case 'Gender' : key = "gender"; break;
+                    case 'Password': key = "password"; break;
+                    case 'Grade': key = "grade"; break;
+                }
+                showError(error, key);
             }
         })
     }
     else{
-        document.getElementById("errorMessage").innerHTML = 'Passwords does not match!';
+        showError("Passwords does not match!", "password")
     }
     event.preventDefault();
 })
+
+function showError(message, key){
+    var errorBox =  document.getElementById("alertBox");
+    var errorText = document.getElementById("errorMessage");
+
+    $('#' + key).focus();
+
+    errorText.innerHTML = message
+    errorBox.style.display = "block";
+}
+
+$(document).on("click", "#loginBtn", function(event){
+    var email = $('#email').val();
+    var password = $('#password').val();
+
+    var data = {
+        "email": email,
+        "password": password,
+    }
+
+    $.ajax({
+        url: 'http://localhost:3000/user/login',
+        type: 'POST',
+        data: data,
+        dataType: "json",
+        success: function(data, textStatus, xhr){
+            var remember = $('input:checkbox:checked');
+            // if(remember != null){
+            //     rememberMe() 
+            // 
+            localStorage.setItem('token', data.accessTK);
+            localStorage.setItem('userInfo', JSON.stringify(data.user));
+            window.location.href = './overview.html';
+        },
+        error: function(xhr, textStatus, errorThrown){
+            var error, key;
+            var message = JSON.parse(xhr.responseText);
+            
+            if(message.code == "INVALID_REQUEST") { //invalid_req code err returns array
+                error = JSON.parse(xhr.responseText).error[0];
+                switch(error.split(" ")[0]){
+                    case 'Email': key = "email"; break;
+                    case 'Password': key = "password"; break;
+                }
+            }
+            else{
+                error =  message.error;
+            }
+            showError(error, key);
+        }
+    })
+    event.preventDefault();
+})
+
+// TODO: Remember me 
+function rememberMe(){
+    console.log("hi")
+}

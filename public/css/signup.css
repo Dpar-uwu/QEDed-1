@@ -1,0 +1,12 @@
+html, body{
+    height: 100%;
+}
+.rounded-pills{
+    border-radius: 30px;
+}
+#studentContainer, #alertBox{
+    display: none;
+}
+hr{
+    width: 100%;
+}

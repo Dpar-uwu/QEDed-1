@@ -6,28 +6,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PSLEOnline</title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!--Bootstrap-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href="./css/index.css">
+    <!--Fontawesome-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!--JQuery-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
+    <!--CSS-->
+    <link rel="stylesheet" href="./css/signup.css">
+
+    <!--Javascript-->
     <script src="./javascript/signup.js"></script>
 </head>
-<body>
-    <div class="text-danger col-6 mx-auto" id="errorMessage"></div>
-    <div class="d-flex h-100 align-items-center justify-content-center">
-        <form action="signup.js" >
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <input type="text" class="form-control" id="first_name" placeholder="First Name" required>
-                </div>
-                <div class="form-group col-md-6">
-                    <input type="text" class="form-control " id="last_name" placeholder="Last Name" required>
-                </div>
+<body class="d-flex align-items-center">
+    <div class="d-flex container flex-column col-sm-4 align-items-center justify-content-center mt-4">
+        <div>
+            <img src="./images/QEDed.jpg" alt="QEDed">
+        </div>
+        <h5 class="mb-4">Sign Up</h5>
+        <form class="row g-2">
+            <div class="alert alert-dismissible fade show rounded-pill p-2 m-0" role="alert" id="alertBox">
+                <small id="errorMessage" class="text-danger"></small>
             </div>
-            <div class="form-group">
+            <div class="col-md-6">
+                <input type="text" class="form-control rounded-pill" id="first_name" placeholder="First Name" required>
+            </div>
+            <div class="col-md-6">
+                <input type="text" class="form-control rounded-pill " id="last_name" placeholder="Last Name" required>
+            </div>
+            <div>
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="M" checked>
                     <label class="form-check-label" for="inlineRadio1">M</label>
@@ -37,26 +49,45 @@
                     <label class="form-check-label" for="inlineRadio2">F</label>
                 </div>
             </div>
-            <div class="form-group">
-                <select class="form-control" id="role" required>
+            <div>
+                <select class="form-select rounded-pill" id="role">
                     <option value="parent">Parent</option>
                     <option value="teacher">Teacher</option>
                     <option value="student">Student</option>
                 </select>
             </div>
-            <div id="container"></div>
-            <div class="form-group">
-                <input type="email" class="form-control" id="email" placeholder="Email" required>
+            <div id="studentContainer"></div>
+            <div>
+                <input type="email" class="form-control rounded-pill" id="email" placeholder="Email" required>
             </div>
-            <div class="form-group">
-                <input type="password" class="form-control" id="password" placeholder="Password" required>
-                </div>
-            <div class="form-group">
-                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password"required>
-                </div>
-            <button class="btn btn-primary" type="submit">Sign Up</button>
-
+            <div class="input-group">
+                <input type="password" class="form-control rounded-pill border-end-0 rounded-end" id="password" placeholder="Password" required>
+                <span class="input-group-append">
+                    <button class="btn rounded-pill border border-start-0 rounded-start showPassword" type="button" id="passwordBtn">
+                          <i class="fas fa-eye"></i>
+                    </button>
+                </span>
+            </div>
+            <div class="input-group">
+                <input type="password" class="form-control rounded-pill border-end-0 rounded-end"  id="confirmPassword" placeholder="Confirm Password" required>
+                <span class="input-group-append">
+                    <button class="btn rounded-pill border border-start-0 rounded-start showPassword" type="button" id="confirmPasswordBtn">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </span>
+            </div>
+            <div class="ms-2">
+                <div class="form-check align-items-center">
+                    <input class="form-check-input" type="checkbox" id="agreement" required>
+                    <label class="form-check-label small" for="agreement">
+                        I agree with QEDed's <a href="login.html">Terms of Service and Privacy Policy</a>
+                    </label>
+                  </div>
+            </div>  
+            <button class="form-control rounded-pill mt-3" type="submit" id="signupBtn">Sign Up</button>
         </form>
+        <hr class="border">
+        <p class="small">Already have an account? <a href="login.html">Sign In</a></p>
     </div>
 </body>
 </html>

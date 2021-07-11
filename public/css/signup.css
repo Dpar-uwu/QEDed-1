@@ -1,8 +1,11 @@
 html, body{
     height: 100%;
+    background-color: rgb(254,250,224); 
+    font-family: "cambria";   
+    font-size: 15px;
 }
 .rounded-pills{
-    border-radius: 30px;
+    border-radius: 40px;
 }
 #studentContainer, #alertBox{
     display: none;
@@ -10,3 +13,83 @@ html, body{
 hr{
     width: 100%;
 }
+.input-group .btn {
+    position: relative;
+    z-index: 2;
+    background-color: white;
+}
+.google {
+    background-color: #dd4b39;
+    color: white;
+    border-radius: 40px;
+
+}
+.btn-primary:hover {
+    color: #fff;
+    background-color: #63bbf2;
+    border-color: #63bbf2;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #24a0ed ;
+    border-color:#24a0ed ;
+}
+.form-control, .btn {
+    min-height: 8px;
+    border-radius: 20px;
+    padding: 10px;
+    width: 100%;
+}
+
+.h5{
+    text-align: center;
+}
+
+.text{
+    min-height: 8px;
+    border-radius: 20px;
+    padding: 10px;
+    width: 100%;
+}
+
+.w3-sidebar {
+    height: 100%;
+    width: 220px;
+    background-color: #98C5FF;
+    position: fixed!important;
+    z-index: 1;
+    overflow: auto;
+    padding-top: 10px;
+}
+
+.w3-button:hover {
+    color: #000!important;
+    background-color: #EF798A!important;
+}
+
+.w3-bar-block .w3-bar-item {
+    width: 100%;
+    display: block;
+    padding: 20px 20px;
+    text-align: left;
+    border: none;
+    white-space: normal;
+    float: none;
+    outline: 0;
+}
+
+.button {
+  
+    border: none;
+    color: black;
+    /* padding: 20px;
+    margin-left: -100px; */
+    text-decoration: none;
+    font-size: 16px;
+    margin: 40px 20px;
+    cursor: pointer;
+    height: 100px;
+    width:120px;
+    border-radius: 12px;
+  }

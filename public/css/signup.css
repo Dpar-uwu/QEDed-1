@@ -35,7 +35,7 @@ hr{
     background-color: #24a0ed ;
     border-color:#24a0ed ;
 }
-.form-control, .btn {
+.form-control, .form-select, .btn {
     min-height: 8px;
     border-radius: 20px;
     padding: 10px;
@@ -80,7 +80,6 @@ hr{
 }
 
 .button {
-  
     border: none;
     color: black;
     /* padding: 20px;

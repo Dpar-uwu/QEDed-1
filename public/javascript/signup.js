@@ -58,18 +58,14 @@ $(document).on("change","#role",function(){
 $(document).on('click',".showPassword",function(){
     var id = this.id;
     var input = document.getElementById(id.slice(0, -3));
-    var icon = document.getElementById(id);
-
     var type = "password";
-    var icon =  `<i class="fas fa-eye"></i>`;
 
     if (input.type === "password") {
       type = "text";
-      icon = `<i class="fas fa-eye-slash"></i>`
-    } 
-
+    }   
+    
     input.type = type;
-    icon.innerHTML = icon
+    $(this).children().toggleClass("fas fa-eye-slash fas fa-eye");
     
 })
 
@@ -121,17 +117,24 @@ $(document).on('click','#signupBtn',function(event){
             },
             error: function(xhr, textStatus, errorThrown){
                 var key;
-                var error = JSON.parse(xhr.responseText).error[0];
-
-                switch(error.split(" ")[0]){
-                    case 'First' : key = "first_name"; break;
-                    case 'Last' : key = "last_name"; break;
-                    case 'Email': key = "email"; break;
-                    case 'Role' : key = "role"; break;
-                    case 'Gender' : key = "gender"; break;
-                    case 'Password': key = "password"; break;
-                    case 'Grade': key = "grade"; break;
+                if(JSON.parse(xhr.responseText).code == "INVALID_REQUEST"){
+                    var error = JSON.parse(xhr.responseText).error[0];
+    
+                    switch(error.split(" ")[0]){
+                        case 'First' : key = "first_name"; break;
+                        case 'Last' : key = "last_name"; break;
+                        case 'Email': key = "email"; break;
+                        case 'Role' : key = "role"; break;
+                        case 'Gender' : key = "gender"; break;
+                        case 'Password': key = "password"; break;
+                        case 'Grade': key = "grade"; break;
+                    }
                 }
+                else {
+                    error = JSON.parse(xhr.responseText).error;
+                }
+
+            
                 showError(error, key);
             }
         })

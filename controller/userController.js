@@ -53,9 +53,9 @@ router.get("/",
 router.get("/search",
     // validation middleware
     validate("searchUser"),
-    isAuth,
     async (req, res) => {
         const { query } = req.query;
+        console.log(query)
         try {
             console.time("GET search user by email");
             const result = await user.searchUserByEmail(query);
@@ -151,6 +151,7 @@ router.post("/login",
     validate("loginUser"),
     async (req, res) => {
         const { email, password } = req.body;
+        const {cookies} = req;
         try {
             console.time("GET verify user");
             const result = await user.verifyUser(email, password);
@@ -161,14 +162,13 @@ router.post("/login",
             const accessTK = createAccessToken(result._id, result.role);
             const refreshTK = createRefreshToken(result._id, result.role);
 
-            console.log(accessTK)
-            console.log(refreshTK)
             // send refresh token as cookie & access token in body
             res.cookie("refreshTK", refreshTK, {
+                maxAge: 14 * 24 * 60 * 60 * 1000, //expires in 14 days
                 httpOnly: true,
-                path: "/refresh_token" // endpoint to get new access token using refresh token
+                // path: "/user" // endpoint to get new access token using refresh token
             });
-            res.send({ accessTK, "user": result });
+            res.send({ accessTK, "user": result, "cookie": cookies });
 
         } catch (err) {
             console.log(err)
@@ -189,7 +189,7 @@ router.post("/login",
 router.post("/logout",
     (req, res) => {
         console.log(req.cookies)
-        res.clearCookie("refreshTK", { path: "/refresh_token" });
+        res.clearCookie("refreshTK", { path: "/" });
         res.send({ message: "Logged out successfully" });
     });
 
@@ -199,7 +199,8 @@ router.post("/logout",
 router.post("/refresh_token",
     async (req, res) => {
         const token = req.cookies.refreshTK;
-
+        console.log("cookies", req.cookies);
+        
         try {
             console.time("POST get access token using refresh token");
             // check if token is valid
@@ -218,8 +219,10 @@ router.post("/refresh_token",
 
             // send refresh token as cookie & access token in body
             res.cookie("refreshTK", refreshTK, {
+                maxAge: 14 * 24 * 60 * 60 * 1000, //expires in 14 days
                 httpOnly: true,
-                path: "/refresh_token" // endpoint to get new access token using refresh token
+                sameSite: 'strict',
+                // path: "/user" // endpoint to get new access token using refresh token
             });
             res.send({ "accessToken": accessTK });
         } catch (err) {

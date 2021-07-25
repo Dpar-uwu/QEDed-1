@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PSLEOnline</title>
+
+  <!--Bootstrap-->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+    integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+    integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+    crossorigin="anonymous"></script>
+
+  <!--Fontawesome-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!--JQuery-->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/ui-lightness/jquery-ui.css">
+  </link>
+
+  <!--Javascript-->
+  <script src="./javascript/sidebar.js"></script>
+  <script src="./javascript/auth.js"></script>
+  <script src="./javascript/control.js"></script>
+  <link rel="stylesheet" href="./css/control.css">
+</head>
+
+<body class="container-fluid">
+  <div class="row flex-nowrap">
+    <div class="sidebar col-auto col-sm-4 col-md-3 col-xl-2 px-sm-2 px-0 border-end"></div>
+    <div class="rightbar col py-3 content">
+      <a href="" id="back"><i class="fas fa-chevron-left"></i></a>
+      <h1 class="title">Quiz Control Panel</h1>
+      <h4 id="levelTag" class="title"></h4>
+      <div id="syllabusContainer">
+        <div id="levelContainer">
+          <div class="d-flex flex-column justify-content-center" style="min-height: 40vh;">
+            <span class="h5 pt-4 text-center" style="color:#003844">No Levels Available</span>
+            <button id="setDefault" class="btn btn-warning mt-2 text-center" style="border-radius:15px;">Set Default Levels and Topics</button>
+        </div>
+        </div>
+        <div id="topicContainer"></div>
+      </div>
+    </div>
+    <!-- Settings Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel"><span id="level"></span>
+              <span id="topic_name"></span>: <span id="skill_name"></span>
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <input type="text" id="skill_id" style="display: none;" />
+              <div class="mb-2">
+                <label for="num_of_qn" class="col-form-label">Number of Questions in a Quiz</label>
+                <input type="number" class="form-control" id="num_of_qn" step="10">
+                <small class="mt-2" id="num-error" style="display: none; color:red;">Must be a multiple of 10</small>
+              </div>
+              <div class="mb-3">
+                <label for="duration" class="col-form-label">Quiz Duration</label>
+                <div class="input-group">
+                  <input type="number" class="form-control" id="duration">
+                  <span class="input-group-text" id="basic-addon1">minutes</span>
+                </div>
+              </div>
+              <div class="mb-4">
+                <label for="percentage_easy" class="col-form-label"><strong>Percentage Difficulty of Quiz</strong>
+                  <i class="fas fa-info-circle" data-bs-toggle="tooltip" data-bs-placement="right"
+                    title="The number of questions for each difficulty in percentage"></i>
+                </label>
+                <div class="row">
+                  <div class="col-sm-4">
+                    <label for="percentage_easy" class="col-form-label"><small>Easy (%)</small></label>
+                    <input type="number" class="form-control percentage_difficulty" id="percentage_easy" step="10">
+                    <small id="easy_num"></small>
+                  </div>
+                  <div class="col-sm-4">
+                    <label for="percentage_medium" class="col-form-label"><small>Medium (%)</small></label>
+                    <input type="number" class="form-control percentage_difficulty" id="percentage_medium" step="10">
+                    <small id="medium_num"></small>
+                  </div>
+                  <div class="col-sm-4">
+                    <label for="percentage_difficult" class="col-form-label"><small>Difficult (%)</small></label>
+                    <input type="number" class="form-control percentage_difficulty" id="percentage_difficult" step="10">
+                    <small id="difficult_num"></small>
+                  </div>
+                  <strong class="pt-2"><small id="total_num"></small></strong>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label for="easy_values_min" class="col-form-label"><strong>Range for Easy Questions</strong>
+                  <i class="fas fa-info-circle" data-bs-toggle="tooltip" data-bs-placement="right"
+                    title="The min and max number used to generate random values for easy questions"></i>
+                </label>
+                <div class="row">
+                  <div class="col-sm-6">
+                    <label for="easy_values_min" class="col-form-label"><small>Min</small></label>
+                    <input type="number" class="form-control sliderValue-easy" id="easy_values_min" data-index="0"
+                      value="10" />
+                  </div>
+                  <div class="col-sm-6">
+                    <label for="easy_values_max" class="col-form-label"><small>Max</small></label>
+                    <input type="number" class="form-control sliderValue-easy" id="easy_values_max" data-index="1"
+                      value="90" />
+                  </div>
+                  <div>
+                    <div class="mt-3" id="slider-range-easy"></div>
+                  </div>
+
+                </div>
+              </div>
+              <div class="mb-4">
+                <label for="medium_values_min" class="col-form-label"><strong>Range for Medium Questions</strong>
+                  <i class="fas fa-info-circle" data-bs-toggle="tooltip" data-bs-placement="right"
+                    title="The min and max number used to generate random values for medium questions"></i>
+                </label>
+                <div class="row">
+                  <div class="col-sm-6">
+                    <label for="medium_values_min" class="col-form-label"><small>Min</small></label>
+                    <input type="number" class="form-control sliderValue-medium" id="medium_values_min" data-index="0"
+                      value="10" />
+                  </div>
+                  <div class="col-sm-6">
+                    <label for="medium_values_max" class="col-form-label"><small>Max</small></label>
+                    <input type="number" class="form-control sliderValue-medium" id="medium_values_max" data-index="1"
+                      value="90" />
+                  </div>
+                  <div>
+                    <div class="mt-3" id="slider-range-medium"></div>
+                  </div>
+
+                </div>
+              </div>
+              <div class="mb-4">
+                <label for="difficult_values_min" class="col-form-label"><strong>Range for Difficult Questions</strong>
+                  <i class="fas fa-info-circle" data-bs-toggle="tooltip" data-bs-placement="right"
+                    title="The min and max number used to generate random values for difficult questions"></i>
+                </label>
+                <div class="row">
+                  <div class="col-sm-6">
+                    <label for="difficult_values_min" class="col-form-label"><small>Min</small></label>
+                    <input type="number" class="form-control sliderValue-difficult" id="difficult_values_min"
+                      data-index="0" value="10" />
+                  </div>
+                  <div class="col-sm-6">
+                    <label for="difficult_values_max" class="col-form-label"><small>Max</small></label>
+                    <input type="number" class="form-control sliderValue-difficult" id="difficult_values_max"
+                      data-index="1" value="90" />
+                  </div>
+                  <div>
+                    <div class="mt-3" id="slider-range-difficult"></div>
+                  </div>
+                </div>
+              </div>
+              <span id="error" style="color:red;"></span>
+            </form>
+          </div>
+          <div class="d-flex justify-content-center pb-4">
+            <button id="updateSkill" type="button" class="btn">Update</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

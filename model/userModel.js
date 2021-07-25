@@ -133,7 +133,7 @@ const userModel = {
             try {
                 const users = await User.find({
                     email: { $regex: email, $options: "i" }
-                }).select("-password -__v -isDeleted");
+                }).select("-password -__v -isDeleted").limit(5);
 
                 console.log("SUCCESS! Result", users);
                 resolve(users);

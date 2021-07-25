@@ -112,6 +112,9 @@ $(document).on('click','#signupBtn',function(event){
             type: 'POST',
             data: data,
             dataType: "json",
+            xhrFields: {
+                withCredentials: true
+            },
             success: function(data, textStatus, xhr){
                 window.location.href = './login.html';
             },
@@ -171,12 +174,12 @@ $(document).on("click", "#loginBtn", function(event){
         dataType: "json",
         success: function(data, textStatus, xhr){
             var remember = $('input:checkbox:checked');
-            // if(remember != null){
-            //     rememberMe() 
-            // 
+            
             localStorage.setItem('token', data.accessTK);
             localStorage.setItem('userInfo', JSON.stringify(data.user));
-            window.location.href = './overview.html';
+            
+            if(data.user.role == "admin")  window.location.href = './control.html';
+            else window.location.href = './overview.html';
         },
         error: function(xhr, textStatus, errorThrown){
             var error, key;

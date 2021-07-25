@@ -23,7 +23,7 @@ const levelModel = {
     getAllLevels: () => {
         return new Promise(async (resolve, reject) => {
             try {
-                const result = await Level.find().select("-__v");
+                const result = await Level.find().select("-__v").sort( { level: 1 } );
 
                 if (!result) throw "UNEXPECTED_ERROR";
                 
@@ -120,7 +120,7 @@ const levelModel = {
 
                 const defaultSyllabus = require('../datasheets/syllabus.json');
                 const newLevels = new Level(defaultSyllabus);
-                const result2 = newLevels.save();
+                const result2 = await newLevels.save();
 
                 if (!result2) throw "UNEXPECTED_ERROR";
 

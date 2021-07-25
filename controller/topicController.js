@@ -10,7 +10,9 @@ const levelModel = require("../model/levelModel");
 
 // validation
 const { validate } = require("../validation/topicValidation");
-const { errorHandler } = require("../validation/errorHandler");
+
+// authentiication
+const { isAuth, isAdmin } = require("../auth/authorization");
 
 // error handler modules
 const { MongoError } = require("mongodb");
@@ -47,6 +49,8 @@ router.get("/:topicId",
  */
 router.post("/:levelId",
     validate("createTopic"),
+    isAuth,
+    isAdmin,
     async (req, res) => {
         const { levelId } = req.params;
         const { topic_name, skills } = req.body;
@@ -72,6 +76,8 @@ router.post("/:levelId",
  */
 router.put("/:topicId",
     validate("updateTopic"),
+    isAuth,
+    isAdmin,
     async (req, res) => {
         const { topicId } = req.params;
         const changedFields = { ...req.body };
@@ -92,13 +98,13 @@ router.put("/:topicId",
         }
     });
 
-
-
 /**
  * DELETE /topic/:topicId - delete topic by id
  */
 router.delete("/:topicId",
     validate("topicId"),
+    isAuth,
+    isAdmin,
     async (req, res) => {
         const { topicId } = req.params;
         try {

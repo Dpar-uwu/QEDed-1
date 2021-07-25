@@ -59,6 +59,57 @@ router.get("/user",
         }
     });
 
+
+/**
+ * GET /quiz/recommendation?userId
+ * used after student completes quiz
+ */
+router.get("/recommendation",
+    validate("userId"),
+    async (req, res) => {
+        const { userId } = req.query;
+        try {
+            console.time("POST recommend quiz");
+            const result = await quizModel.recommendQuiz(userId);
+            res.status(200).send(result);
+        } catch (err) {
+            console.log(err)
+            if (err == "NOT_FOUND")
+                res.status(404).send({ error: "User ID not found", code: err });
+            else if (err instanceof Error || err instanceof MongoError)
+                res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+            else
+                res.status(500).send({ error: "Error getting benchmark", code: "UNEXPECTED_ERROR" });
+        } finally {
+            console.timeEnd("POST recommend quiz");
+        }
+    }
+)
+
+/**
+ * GET /quiz/recommendation?userId
+ * used for emails and to show progress
+ */
+router.get("/progress",
+    validate("userId"),
+    async (req, res) => {
+        const { userId } = req.query;
+        try {
+            console.time("POST weekly progress");
+            const result = await quizModel.getWeeklyProgress(userId);
+            res.status(200).send(result);
+        } catch (err) {
+            if (err instanceof Error || err instanceof MongoError)
+                res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+            else
+                res.status(500).send({ error: "Error getting benchmark", code: "UNEXPECTED_ERROR" });
+        } finally {
+            console.timeEnd("POST weekly progress");
+        }
+    }
+)
+
+
 /**
  * GET /quiz/:quizId - get quiz by id
  */
@@ -103,7 +154,6 @@ router.post("/",
 
             res.status(201).send({ new_id: result._id });
         } catch (err) {
-            g
             if (err instanceof Error || err instanceof MongoError)
                 res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
             else
@@ -180,7 +230,7 @@ router.post("/leaderboard",
                 res.status(200).send(result);
             }
             else {
-                res.status(500).send({ error: "Sorry this feature is still yet to be built", code: "LAZINESS"});
+                res.status(500).send({ error: "Sorry this feature is still yet to be built", code: "LAZINESS" });
             }
             // do get leaderboard by group id
         } catch (err) {

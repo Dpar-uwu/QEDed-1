@@ -54,6 +54,7 @@ let attribute = {
     questions: () => {
         return body("questions")
             .isArray().withMessage("Questions should be in array format")
+            .toArray()
     },
     num_of_qn: () => {
         return body("num_of_qn")
@@ -115,7 +116,7 @@ exports.validate = (method) => {
                 attribute.num_of_qn(),
                 attribute.percent_difficulty(),
                 attribute.time_taken().optional(),
-                attribute.isCompleted().optional(),
+                attribute.isCompleted(),
                 attribute.assigned_by().optional(),
                 attribute.group_id().optional(),
                 attribute.deadline().optional(),

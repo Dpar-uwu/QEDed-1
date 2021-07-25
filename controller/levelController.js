@@ -11,6 +11,9 @@ const levelModel = require("../model/levelModel");
 // validation
 const { validate } = require("../validation/levelValidation");
 
+// authentiication
+const { isAuth, isAdmin } = require("../auth/authorization");
+
 // error handler modules
 const { MongoError } = require("mongodb");
 const { Error } = require("mongoose");
@@ -67,6 +70,8 @@ router.get("/:levelId",
  */
 router.post("/",
     validate("createLevel"),
+    isAuth,
+    isAdmin,
     async (req, res) => {
         const { level, topics } = req.body;
         try {
@@ -92,6 +97,8 @@ router.post("/",
  */
 router.put("/:levelId",
     validate("updateLevel"),
+    isAuth,
+    isAdmin,
     async (req, res) => {
         const { levelId } = req.params;
         const changedFields = { ...req.body };
@@ -118,6 +125,8 @@ router.put("/:levelId",
 */
 router.delete("/:levelId",
     validate("levelId"),
+    isAuth,
+    isAdmin,
     async (req, res) => {
         const { levelId } = req.params;
         try {
@@ -142,14 +151,16 @@ router.delete("/:levelId",
 * POST /level/resetDefault - delete all level and create the default ones
 */
 router.post("/resetDefault",
+    isAuth,
+    isAdmin,
     async (_req, res) => {
         try {
             console.time("POST reset default levels");
 
-            const result = levelModel.resetDefault();
-
+            const result = await levelModel.resetDefault();
             res.status(200).send({ message: "Default Levels Resetted" });
         } catch (err) {
+            console.log("OMG",err)
             if (err instanceof Error || err instanceof MongoError)
                 res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
             else

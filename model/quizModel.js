@@ -7,7 +7,8 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const { ObjectId, } = mongoose.Types;
 
-const { Question } = require("./questionModel");
+const { QuestionSchema } = require("./questionModel");
+const { LevelSchema } = require("./levelModel");
 
 // creating user object schema
 const QuizSchema = new Schema({
@@ -41,9 +42,7 @@ const QuizSchema = new Schema({
             type: Number
         }
     },
-    questions: {
-        type: [Question]
-    },
+    questions: [QuestionSchema],
     num_of_qn: {
         type: Number,
         required: "Number of questions is required"
@@ -79,6 +78,7 @@ const QuizSchema = new Schema({
 // isCompleted, created_at, group_id, assigned_by, deadline
 
 const Quiz = mongoose.model("Quiz", QuizSchema);
+const Level = mongoose.model("Level", LevelSchema);
 
 const quizModel = {
     QuizSchema,
@@ -119,7 +119,7 @@ const quizModel = {
     getQuizByUserId: (userId) => {
         return new Promise(async (resolve, reject) => {
             try {
-                const result = await Quiz.find({ "done_by": ObjectId(userId) }).select("-__v -questions");
+                const result = await Quiz.find({ "done_by": ObjectId(userId) }).select("-__v");
                 if (!result) throw "NOT_FOUND";
 
                 console.log("SUCCESS! Result", result);
@@ -190,18 +190,18 @@ const quizModel = {
         return new Promise(async (resolve, reject) => {
             try {
                 const result = await Quiz.aggregate([
-                    // {
-                    //     $group: {
-                    //         "_id": "$done_by",
-                    //         "average_score": { $avg: "$score.total" },
-                    //         "num_of_quiz": { $sum: 1 },
-                    //         "average_time_taken": { $avg: "$time_taken" }
-                    //     }
-                    // },
+                    {
+                        $group: {
+                            "_id": "$done_by",
+                            "average_score": { $avg: "$score.total" },
+                            "num_of_quiz": { $sum: 1 },
+                            "average_time_taken": { $avg: "$time_taken" }
+                        }
+                    },
                     {
                         $lookup: {
                             from: "users",
-                            localField: "done_by",
+                            localField: "_id",
                             foreignField: "_id",//<field from the documents of the "from" collection>
                             as: "user" //<output array field>
                         }
@@ -258,7 +258,7 @@ const quizModel = {
                     "done_by": ObjectId(userId), //get all from user
                 }
 
-                if(currentQuiz && currentQuiz != "") {
+                if (currentQuiz && currentQuiz != "") {
                     recent_match_opt._id = { $ne: ObjectId(currentQuiz) }
                 }
                 // recent 10
@@ -276,7 +276,7 @@ const quizModel = {
                             "average_time_taken": { $avg: "$time_taken" }
                         }
                     },
-                    { $project: { _id: 0 }}
+                    { $project: { _id: 0 } }
                 ]).limit(10);
 
                 // global except user
@@ -294,7 +294,7 @@ const quizModel = {
                             "average_time_taken": { $avg: "$time_taken" }
                         }
                     },
-                    { $project: { _id: 0 }}
+                    { $project: { _id: 0 } }
                 ]);
 
                 let result = {
@@ -302,20 +302,130 @@ const quizModel = {
                     "global": global[0]
                 }
 
-                if(currentQuiz && currentQuiz != "") {
+                if (currentQuiz && currentQuiz != "") {
                     const current = await Quiz.findOne({ _id: (currentQuiz) }).select("id score time_taken");
                     result.current = {}
                     result.current.easy_average_score = current.score.easy,
-                    result.current.medium_average_score = current.score.medium,
-                    result.current.difficult_average_score = current.score.difficult,
-                    result.current.total_average_score = current.score.total,
-                    result.current.average_time_taken = current.time_taken
+                        result.current.medium_average_score = current.score.medium,
+                        result.current.difficult_average_score = current.score.difficult,
+                        result.current.total_average_score = current.score.total,
+                        result.current.average_time_taken = current.time_taken
                 }
 
                 console.log("SUCESS! Result", result);
                 resolve(result);
             } catch (err) {
                 console.error(`ERROR! Could not get benchmark: ${err}`);
+                reject(err);
+            }
+        })
+    },
+    // recommend quiz skill by lowest average score
+    recommendQuiz: (userId) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const weakest3 = await Quiz.aggregate([
+                    {
+                        $match: { "done_by": ObjectId(userId) }
+                    },
+                    {
+                        // group quizzes by skillId
+                        $group: {
+                            "_id": "$skill_id",
+                            "average_score": { $avg: "$score.total" },
+                            "skill_name": { $last: "$skill_name" },
+                            "num_of_quiz": { $sum: 1 },
+                            "average_time_taken": { $avg: "$time_taken" }
+                        }
+                    },
+                    {
+                        $sort: {
+                            "average_score": 1, // arrange average score in ascending order
+                            "num_of_quiz": -1, // descending
+                            "average_time_taken": 1 // ascending
+                        }
+                    },
+                    {
+                        $project: {
+                            "num_of_quiz": 0,
+                            "average_time_taken": 0
+                        }
+                    }
+                ]).limit(3);
+
+
+                const newSkills = await Level.aggregate([
+                    { $unwind: '$topics' },
+                    { $unwind: '$topics.skills' },
+                    {
+                        $project:
+                        {
+                            "_id": 0, "levelId": "$_id", "level": 1,
+                            "topicId": "$topics._id", "topic_name": "$topics.topic_name",
+                            "skillId": "$topics.skills._id",
+                            "skill_name": "$topics.skills.skill_name"
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "level",
+                            foreignField: "grade",//<field from the documents of the "from" collection>
+                            as: "user" //<output array field>
+                        }
+                    },
+                    { $match: { "user._id": ObjectId(userId) } },
+                    {
+                        $sort: {
+                            "skillId": -1,
+                        }
+                    },
+                    {
+                        $project: {
+                            "user": 0
+                        }
+                    },
+                ]).limit(3);
+
+                console.log("SUCCESS! Result", weakest3, newSkills);
+                resolve({ weakest3, newSkills });
+            } catch (err) {
+                console.error(`ERROR! Could not get recommended quizzes`);
+                reject(err);
+            }
+        })
+    },
+    getWeeklyProgress: (userId) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                var d = new Date();
+                d.setMonth(d.getMonth() - 1);// Set it to one month ago
+                d.setHours(0, 0, 0, 0);
+                
+                const result = await Quiz.aggregate([
+                    {
+                        $match: { "done_by": ObjectId(userId) }
+                    },
+                    {
+                        $match: {
+                            "created_at": {$gt: d},
+                        }
+                    },
+                    {
+                        $group: {
+                            // _id: { $week: '$created_at' }, 
+                            _id: {$dateToString: { format: "%Y-%m-%d", date: "$created_at" }},
+                            "average_score": { $avg: "$score.total" },
+                            "num_of_quiz": { $sum: 1 },
+                            "average_time_taken": { $avg: "$time_taken" }
+                        }
+                    }
+                ]);
+
+                console.log("SUCCESS! Result", result);
+                resolve(result);
+            } catch (err) {
+                console.error(`ERROR! Could not get weekly progress`);
                 reject(err);
             }
         })
@@ -333,8 +443,9 @@ const quizModel = {
                     { $match: { "questions._id": ObjectId(questionId) } },
                     {
                         $project: {
-                            _id: 0, "quizId": "$_id", "question": "$questions",
-                            // "topicId": "$topics._id", "topic_name": "$topics.topic_name", "skills": "$topics.skills"
+                            _id: 0,
+                            "quizId": "$_id",
+                            "question": "$questions"
                         }
                     }
                 ]);

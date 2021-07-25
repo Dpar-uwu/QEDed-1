@@ -1,4 +1,7 @@
 var connection;
+const isDevelopment = process.env.NODE_ENV === 'development';
+const path = require('path');
+
 const mongoose = require("mongoose");
 const express = require("express");
 
@@ -9,36 +12,45 @@ const skillController = require("./skillController.js");
 const quizController = require("./quizController.js");
 const questionController = require("./questionController.js");
 
+const email = require("../email/email");
 const app = express();
-
-// cors middleware
-var cors = require('cors');
-app.options('*', cors());
-app.use(cors());
-
-// json middleware
-// app.use(express.json()); // expect json in http req
-app.use(express.json({
-    verify : (_req, res, buf, _encoding) => {
-      try {
-        JSON.parse(buf);
-      } catch(e) {
-        return res.status(400).send({ error:"Invalid Request Body", code: "INVALID_JSON_BODY" });
-      }
-    }
-  }));
-app.use(express.urlencoded({ extended: false }));
 
 // cookie parser middleware
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
-// host web pages
+// cors middleware
+const cors = require('cors');
+app.options('*', cors());
+app.use(cors({
+    credentials: true,
+    origin: true,
+    methods: ['GET', 'PUT', 'POST', "DELETE"],
+    allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+}));
+
+
+// json middleware
+// app.use(express.json()); // expect json in http req
+app.use(express.json({
+    verify: (_req, res, buf, _encoding) => {
+        try {
+            JSON.parse(buf);
+        } catch (e) {
+            // returns error if body is not json
+            return res.status(400).send({ error: "Invalid Request Body", code: "INVALID_JSON_BODY" });
+        }
+    }
+}));
+app.use(express.urlencoded({ extended: false }));
+
+
+/* host web pages */
 app.use(express.static('public'));
 
-/* Connect to MondoBD Instance */
-const localurl = process.env.CONNECTION_STRING || "mongodb://localhost:27017/" + process.env.DATABASE_CLUSTER;
 
+/* Connect to MondoBD Instance */
+const localurl = isDevelopment ? ("mongodb://localhost:27017/" + process.env.DATABASE_CLUSTER) : process.env.CONNECTION_STRING;
 const options = {
     useNewUrlParser: true, // avoid deprecation when connecting
     useUnifiedTopology: true,
@@ -46,7 +58,7 @@ const options = {
     useFindAndModify: false // avoid deprecation for findOneAndUpdate()
 };
 
-// (func() {...})() is an Immediately Invoked Function Expression
+// run database connect
 (async () => {
     try {
         connection = await mongoose.connect(localurl, options);
@@ -62,13 +74,14 @@ mongoose.connection.on('error', err => {
     console.error("\x1b[31mDatabase error:", err, "\x1b[0m");
 });
 
+
 // logging middleware
 app.use((req, _res, next) => {
     // go to for console.log font color
     // https://stackoverflow.com/questions/9781218/how-to-change-node-jss-console-font-color
-    console.log("\x1b[43m\x1b[30m", req.method, "\x1b[0m\x1b[1m", req.path,"\x1b[0m");
-    if(Object.keys(req.query).length !== 0) console.log("\x1b[34mquery:\x1b[0m", req.query);
-    if(Object.keys(req.body).length !== 0) console.log("\x1b[34mbody:\x1b[0m", req.body);
+    console.log("\x1b[43m\x1b[30m", req.method, "\x1b[0m\x1b[1m", req.path, "\x1b[0m");
+    if (Object.keys(req.query).length !== 0) console.log("\x1b[34mquery:\x1b[0m", req.query);
+    if (Object.keys(req.body).length !== 0) console.log("\x1b[34mbody:\x1b[0m", req.body);
     next();
 });
 
@@ -88,7 +101,7 @@ app.use("/quiz", quizController);
 app.use("/question", questionController);
 
 
-// error handling
+// uncaught error handling
 app.use((_error, _req, res, _next) => {
     // Any request to this server will get here, and will send an HTTP
     res.status(500).send({ error: "An error occured", code: "UNEXPECTED_ERROR" });
@@ -97,7 +110,7 @@ app.use((_error, _req, res, _next) => {
 
 // to handle paths that do not exist
 app.all("*", (_req, res) => {
-    res.status(404).send({ error: "Page not found", code: "NOT_FOUND" });
+    res.status(404).sendFile(path.resolve("public/404.html"))
 });
 
 // handle unhandledrejection to prevent program from breaking

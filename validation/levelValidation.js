@@ -70,7 +70,10 @@ let attribute = {
     num_of_qn: (location = "topics.*.skills.*.num_of_qn") => {
         return body(location)
             .notEmpty().withMessage("Skill name cannot be empty").bail()
-            .isInt({ min: 1 }).withMessage("Number of questions must be an integer")
+            .isInt({ min: 1 }).withMessage("Number of questions must be an integer").bail()
+            .custom((val, { req }) => {
+                return val % 10 == 0;
+            }).withMessage("Number of Question must be a multiple of 10")
             .toInt()
     },
     percent_difficult: (location = "topics.*.skills.*.percent_difficulty") => {

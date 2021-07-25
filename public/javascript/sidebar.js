@@ -3,7 +3,13 @@ var navItems = [
         name : "Overview",
         link : "overview.html",
         icon : "fas fa-home",
-        access : ["parent","student"]
+        access : ["parent","teacher","student"]
+    },
+    {
+        name : "Quiz Control Panel",
+        link : "control.html",
+        icon : "fas fa-cog",
+        access : ["admin"]
     },
     {
         name : "Quiz",
@@ -21,7 +27,7 @@ var navItems = [
         name : "My Groups",
         link : "group.html",
         icon : "fas fa-users",
-        access : ["parent","student"]
+        access : ["parent","teacher","student"]
     },
     {
         name : "My Statistics",
@@ -33,7 +39,7 @@ var navItems = [
         name : "Leaderboard",
         link : "leaderboard.html",
         icon : "fas fa-award",
-        access : ["student"]
+        access : ["parent","teacher","student","admin"]
     },
     {
         name : "Learning Resources",
@@ -45,7 +51,7 @@ var navItems = [
         name : "Assign Quiz",
         link : "assign.html",
         icon : "fas fa-folder",
-        access : ["parent"]
+        access : ["parent","teacher"]
     },
 ]
 
@@ -56,14 +62,20 @@ $(document).ready(function(){
 })
 
 function sidebar(){
-    const role = decodeToken().issuedRole;
+    var role = decodeToken().issuedRole;
 
     for(var i = 0; i<navItems.length; i++){
         if(navItems[i].access.includes(role)){ 
             var content = 
             `
             <div class="nav-item align-self-center">
-                <a href="${navItems[i].link}" class="nav-link align-middle px-0">
+                <a 
+                    href="${navItems[i].link}"
+                    class="nav-link align-middle px-0"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="right"
+                    title="${navItems[i].name}"
+                    >
                     <i class="${navItems[i].icon}"></i><span class="ms-1 d-none d-sm-inline">${navItems[i].name}</span>
                 </a>
             </div> 

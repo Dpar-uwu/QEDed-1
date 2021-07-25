@@ -10,7 +10,9 @@ const levelModel = require("../model/levelModel");
 
 // validation
 const { validate } = require("../validation/skillValidation");
-const { errorHandler } = require("../validation/errorHandler");
+
+// authentiication
+const { isAuth, isAdmin } = require("../auth/authorization");
 
 // error handler modules
 const { MongoError } = require("mongodb");
@@ -48,6 +50,8 @@ router.get("/:skillId",
  */
 router.post("/:topicId",
     validate("createSkill"),
+    isAuth,
+    isAdmin,
     async (req, res) => {
         const { topicId } = req.params;
         const { skill_code, skill_name, num_of_qn, percent_difficulty, duration, easy_values, medium_values, difficult_values } = req.body;
@@ -73,6 +77,8 @@ router.post("/:topicId",
  */
 router.put("/:skillId",
     validate("updateSkill"),
+    isAuth,
+    isAdmin,
     async (req, res) => {
         const { skillId } = req.params;
         const changedFields = { ...req.body };
@@ -99,6 +105,8 @@ router.put("/:skillId",
 */
 router.delete("/:skillId",
     validate("skillId"),
+    isAuth,
+    isAdmin,
     async (req, res) => {
         const { skillId } = req.params;
         try {

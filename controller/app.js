@@ -11,8 +11,11 @@ const topicController = require("./topicController.js");
 const skillController = require("./skillController.js");
 const quizController = require("./quizController.js");
 const questionController = require("./questionController.js");
+const groupController = require("./groupController.js");
+const postController = require("./postController.js");
+const assignmentController = require('./assignmentController');
 
-const email = require("../email/email");
+// const email = require("../email/email");
 const app = express();
 
 // cookie parser middleware
@@ -100,6 +103,10 @@ app.use("/skill", skillController);
 app.use("/quiz", quizController);
 app.use("/question", questionController);
 
+// group routes
+app.use("/group", groupController);
+app.use("/post", postController);
+app.use('/assignment', assignmentController);
 
 // uncaught error handling
 app.use((_error, _req, res, _next) => {

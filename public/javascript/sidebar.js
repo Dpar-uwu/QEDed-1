@@ -43,7 +43,7 @@ var navItems = [
     },
     {
         name : "Learning Resources",
-        link : "stats.html",
+        link : ".html",
         icon : "far fa-newspaper",
         access : ["student"]
     },
@@ -97,4 +97,7 @@ function decodeToken(){
 
 function getName(){
     return JSON.parse(localStorage.getItem('userInfo')).first_name;
+}
+function getUserId(){
+    return JSON.parse(localStorage.getItem('userInfo'))._id;
 }

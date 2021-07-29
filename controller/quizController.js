@@ -59,7 +59,25 @@ router.get("/user",
         }
     });
 
-
+router.get("/filter",
+    validate("benchmark"),
+    async (req, res) => {
+        const { user, level, topic } = req.query;
+        try {
+            console.time("GET quiz by ");
+            const result = await quizModel.getQuizByFilter(user, level, topic);
+            res.status(200).send(result);
+        } catch (err) {
+            if (err == "NOT_FOUND")
+                res.status(404).send({ error: "User ID not found", code: err });
+            else if (err instanceof Error || err instanceof MongoError)
+                res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+            else
+                res.status(500).send({ error: "Error getting quiz by user id", code: "UNEXPECTED_ERROR" });
+        } finally {
+            console.timeEnd("GET quiz by user id");
+        }
+    });
 /**
  * GET /quiz/recommendation?userId
  * used after student completes quiz
@@ -141,13 +159,13 @@ router.get("/:quizId",
 router.post("/",
     validate("createQuiz"),
     async (req, res) => {
-        const { skill_id, skill_name, topic_name, done_by,
+        const { skill_id, level, skill_name, topic_name, done_by,
             score, questions, num_of_qn, percent_difficulty, time_taken,
             isCompleted, assigned_by, group_id, deadline } = req.body;
         try {
             console.time("POST quiz");
             const result = await quizModel.createQuiz({
-                skill_id, skill_name, topic_name, done_by,
+                skill_id, level, skill_name, topic_name, done_by,
                 score, questions, num_of_qn, percent_difficulty, time_taken,
                 isCompleted, assigned_by, group_id, deadline
             });
@@ -252,10 +270,10 @@ router.post("/leaderboard",
 router.post("/benchmark",
     validate("benchmark"),
     async (req, res) => {
-        const { user, currentQuiz } = req.query;
+        const { user, level, topic, skill } = req.query;
         try {
             console.time("POST benchmark");
-            const result = await quizModel.getGlobalBenchmark(user, currentQuiz);
+            const result = await quizModel.getGlobalBenchmark(user, level, topic, skill);
             res.status(200).send(result);
         } catch (err) {
             if (err == "NOT_FOUND")

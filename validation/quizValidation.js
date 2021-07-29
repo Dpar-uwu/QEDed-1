@@ -9,8 +9,15 @@ let attribute = {
     },
     skill_id: () => {
         return body("skill_id")
-            .notEmpty().withMessage("Skill ID cannot be empty").bail()
-            .isMongoId().withMessage("Skill ID given is not a valid ID")
+        .notEmpty().withMessage("Skill ID cannot be empty").bail()
+        .isMongoId().withMessage("Skill ID given is not a valid ID")
+    },
+    level: () => {
+        return body("level")
+            .notEmpty().withMessage("Level cannot be empty").bail()
+            .isInt().withMessage("Level required, must be an integer").bail()
+            .stripLow()
+            .toInt()
     },
     skill_name: () => {
         return body("skill_name")
@@ -71,7 +78,7 @@ let attribute = {
     time_taken: () => {
         return body("time_taken")
             .notEmpty().withMessage("Time taken cannot be empty").bail()
-            .isFloat({ min: 1 }).withMessage("Time taken should be a float").bail()
+            .isFloat().withMessage("Time taken should be a float").bail()
             .toFloat()
     },
     isCompleted: () => {
@@ -105,6 +112,7 @@ exports.validate = (method) => {
         case "createQuiz": {
             return [
                 attribute.skill_id(),
+                attribute.level(),
                 attribute.skill_name(),
                 attribute.topic_name(),
                 attribute.done_by(),
@@ -133,6 +141,7 @@ exports.validate = (method) => {
             return [
                 attribute.quiz_id().optional(),
                 attribute.skill_id().optional(),
+                attribute.level().optional(),
                 attribute.skill_name().optional(),
                 attribute.topic_name().optional(),
                 attribute.done_by().optional(),
@@ -147,7 +156,6 @@ exports.validate = (method) => {
                 attribute.isCompleted().optional(),
                 attribute.assigned_by().optional(),
                 attribute.deadline().optional(),
-                
                 errorHandler
             ]
         }
@@ -173,11 +181,19 @@ exports.validate = (method) => {
                 query("user")
                     .notEmpty().withMessage("User ID cannot be empty").bail()
                     .isMongoId().withMessage("User ID given is not a valid ID"),
-                query("currentQuiz")
+                query('level')
                     .optional()
-                    .if(query("currentQuiz").isEmpty())
-                    .not().isMongoId().withMessage("Quiz ID given is not a valid ID"),
-                errorHandler
+                    .if(query('level').isEmpty())
+                    .not().isInt().withMessage("Level is not int")
+                    .toInt(),
+                query('topic_name')
+                    .optional()
+                    .if(query('topic_name').isEmpty())
+                    .not().matches(/^(?=.*[a-zA-Z])([a-zA-Z0-9_\-,' ]+)$/).withMessage("Topic name should contain letters, numbers, _, -, commas and whitespaces only"),
+                query('skill_name')
+                    .optional()
+                    .if(query('skill_name').isEmpty())
+                    .not().matches(/^(?=.*[a-zA-Z])([a-zA-Z0-9_\-,' ]+)$/).withMessage("Skill name should contain letters, numbers, _, -, commas and whitespaces only"),          errorHandler
             ]
         }
     }

@@ -34,7 +34,7 @@ let attribute = {
         return body("password")
             .notEmpty().withMessage("Password cannot be empty").bail()
             .matches(/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&])([a-zA-Z0-9@$!%*?&]{8,})$/)
-            .withMessage("Password must conatin at least 1 uppercase, 1 lowercase, 1 digit, 1 special char, at least 8 chars long and have no whitespaces")
+            .withMessage("Password must contain at least 1 uppercase, 1 lowercase, 1 digit, 1 special char, at least 8 chars long and have no whitespaces")
     },
 
     gender: () => {

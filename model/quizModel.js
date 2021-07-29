@@ -16,6 +16,10 @@ const QuizSchema = new Schema({
         type: ObjectId,
         required: "Skill ID is required"
     },
+    level: {
+        type: Number,
+        required: "Level is required"
+    },
     skill_name: {
         type: String,
         required: "Skill Name required"
@@ -42,7 +46,9 @@ const QuizSchema = new Schema({
             type: Number
         }
     },
-    questions: [QuestionSchema],
+    questions: {
+        type: [QuestionSchema]
+    },
     num_of_qn: {
         type: Number,
         required: "Number of questions is required"
@@ -126,6 +132,26 @@ const quizModel = {
                 resolve(result);
             } catch (err) {
                 console.error("ERROR! Could not get quizzes by user:", err);
+                reject(err);
+            }
+        })
+    },
+    getQuizByFilter: (userId, level, topic_name) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let match_opt = {"done_by": ObjectId(userId)};
+                let search = "level";
+
+                if(level != undefined && level != ""){match_opt.level = level; search = "topic_name";}
+                if(topic_name != undefined && topic_name != "") {match_opt.topic_name = topic_name; search = "skill_name";}
+
+                const result = await Quiz.find(match_opt).distinct(search);
+                if (!result) throw "NOT_FOUND";
+
+                console.log("SUCCESS! Result", result);
+                resolve(result);
+            } catch (err) {
+                console.error("ERROR! Could not get quizzes by: ", err);
                 reject(err);
             }
         })
@@ -251,16 +277,29 @@ const quizModel = {
     // - last quiz
     // - global average
     // - recent 10 quizzes
-    getGlobalBenchmark: (userId, currentQuiz) => {
+    getGlobalBenchmark: (userId, level, topic, skill) => {
         return new Promise(async (resolve, reject) => {
             try {
+                let result = {};
                 let recent_match_opt = {
                     "done_by": ObjectId(userId), //get all from user
                 }
 
-                if (currentQuiz && currentQuiz != "") {
-                    recent_match_opt._id = { $ne: ObjectId(currentQuiz) }
+                if(level != undefined && level != "") recent_match_opt.level = parseInt(level);
+                if(topic != undefined && topic != "") recent_match_opt.topic_name = topic;
+                if(skill != undefined && skill != "") recent_match_opt.skill_name = skill;
+
+                var current = await Quiz.find(recent_match_opt).sort({_id: -1}).limit(1);
+                if(current.length > 0){
+                    current = current[0], result.current = {};
+                    recent_match_opt._id = { $ne: ObjectId(current._id) }
+                    result.current.easy_average_score = current.score.easy;
+                    result.current.medium_average_score = current.score.medium;
+                    result.current.difficult_average_score = current.score.difficult;
+                    result.current.total_average_score = current.score.total;
+                    result.current.average_time_taken = current.time_taken;
                 }
+                  
                 // recent 10
                 const recent = await Quiz.aggregate([
                     {
@@ -279,10 +318,14 @@ const quizModel = {
                     { $project: { _id: 0 } }
                 ]).limit(10);
 
+                recent_match_opt.done_by = { $ne: ObjectId(userId) };
+                delete recent_match_opt['_id'];
+
+                console.log(recent_match_opt)
                 // global except user
                 const global = await Quiz.aggregate([
                     {
-                        $match: { "done_by": { $ne: ObjectId(userId) } } //matches everyt except user
+                        $match: recent_match_opt
                     },
                     {
                         $group: {
@@ -297,22 +340,10 @@ const quizModel = {
                     { $project: { _id: 0 } }
                 ]);
 
-                let result = {
-                    "recent": recent[0],
-                    "global": global[0]
-                }
+                result.recent = recent[0];
+                result.global = global[0];                
 
-                if (currentQuiz && currentQuiz != "") {
-                    const current = await Quiz.findOne({ _id: (currentQuiz) }).select("id score time_taken");
-                    result.current = {}
-                    result.current.easy_average_score = current.score.easy,
-                        result.current.medium_average_score = current.score.medium,
-                        result.current.difficult_average_score = current.score.difficult,
-                        result.current.total_average_score = current.score.total,
-                        result.current.average_time_taken = current.time_taken
-                }
-
-                console.log("SUCESS! Result", result);
+                console.log("SUCCESS! Result", result);
                 resolve(result);
             } catch (err) {
                 console.error(`ERROR! Could not get benchmark: ${err}`);

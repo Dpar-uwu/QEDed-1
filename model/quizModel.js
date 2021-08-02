@@ -212,9 +212,14 @@ const quizModel = {
     // - Percentage total
     // - Number of quizzes sat for
     // - Average Time taken
-    getGlobalLeaderboard: (topLimit = 50) => {
+    getGlobalLeaderboard: (grade) => {
         return new Promise(async (resolve, reject) => {
             try {
+                let match_options = 
+                {
+                    $match: grade? {"user.grade": grade} : ({ _id : {$ne: ""} })
+                };
+                
                 const result = await Quiz.aggregate([
                     {
                         $group: {
@@ -233,9 +238,9 @@ const quizModel = {
                         }
                     },
                     {
-                        //ensure only students are in leaderboard
-                        $match: { "user.role": "student" }
+                        $match: { "user.role": "student" }//ensure only students are in leaderboard
                     },
+                    match_options,
                     {
                         $sort: {
                             "average_score": -1, //descending
@@ -249,7 +254,7 @@ const quizModel = {
                             "user.__v": 0
                         }
                     }
-                ]).limit(topLimit);
+                ]).limit(50);
 
                 // transform result data
                 result.forEach(row => {
@@ -347,6 +352,73 @@ const quizModel = {
                 resolve(result);
             } catch (err) {
                 console.error(`ERROR! Could not get benchmark: ${err}`);
+                reject(err);
+            }
+        })
+    },
+    getTopBenchmarkByUser: (userId) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let result = [];
+                // WRONGGG NEED TO GROUP THEM TGT USNING AGGREGATE
+                var top2 = await Quiz.find({ done_by: userId }).select("_id").sort({ "score.total":-1, "time_taken":1}).limit(2);
+
+                for(var i = 0; i<top2.length; i++) {
+                    let temp = {};
+                    const skillId = top2[i]._id;
+                    console.log(userId, skillId)
+                    let current = await Quiz.findOne({ done_by: userId, skill_id: skillId }).select("_id score time_taken").sort({created_at:-1});
+                    console.log(current)
+                    // if(!current) throw "UNEXPECTED_ERROR";
+                    temp.current = {};
+                    temp.current.total_average_score = current.score.total;
+                    
+                    // recent 10
+                    const recent = await Quiz.aggregate([
+                        {
+                            $match: {
+                                "done_by": ObjectId(userId), //get all from user
+                                "skill_id": ObjectId(skillId)
+                            }
+                        },
+                        {
+                            $group: {
+                                "_id": "$skill_id",
+                                "total_average_score": { $avg: "$score.total" },
+                            }
+                        },
+                        { $project: { _id: 0 } }
+                    ]).limit(10);
+
+                    // global except user
+                    const global = await Quiz.aggregate([
+                        {
+                            $match: { 
+                                "done_by": { $ne: ObjectId(userId) }, //matches everyt except user
+                                "skill_id": ObjectId(skillId)
+                            } 
+                        },
+                        {
+                            $group: {
+                                "_id": "$skill_id",
+                                "total_average_score": { $avg: "$score.total" },
+                            }
+                        },
+                        { $project: { _id: 0 } }
+                    ]);
+
+                    temp.recent = recent[0];
+                    temp.global = global[0];
+
+                    result[i].push(temp);
+
+                    console.log(result)
+                };
+
+                console.log("SUCESS! Result", result);
+                resolve(result);
+            } catch (err) {
+                console.error(`ERROR! Could not get benchmark for top skill of student: ${err}`);
                 reject(err);
             }
         })

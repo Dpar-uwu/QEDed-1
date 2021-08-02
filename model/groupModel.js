@@ -2,8 +2,9 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const { ObjectId } = mongoose.Types;
 const { QuizSchema } = require("./quizModel")
-const { AssignmentSchema } = require("./assignmentModel");
+// const { AssignmentSchema } = require("./assignmentModel");
 const { PostSchema } = require("./postModel");
+const { resetDefault } = require("./levelModel");
 
 // creating group object schema
 const GroupSchema = new Schema({
@@ -40,13 +41,77 @@ const groupModel = {
     getGroupsByUser: (user_id) => {
         return new Promise(async (resolve, reject) => {
             try {
-                const result = await Group.find({ "members.user_id": ObjectId(user_id) }).select('-__v');
+                // const result = await Group.find({ "members.user_id": ObjectId(user_id) }).select('-__v');
+                const result = await Group.aggregate([
+                    {
+                        $match: {
+                            $or: [
+                                { "members.user_id": ObjectId(user_id) },
+                                { "owner": ObjectId(user_id) }
+                            ]
+                        }
+                    },
+                    {
+                        $addFields: {
+                            posts: { $last: "$posts" } // get only the latest post
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "posts.made_by",
+                            foreignField: "_id",//<field from users collection>
+                            as: "user" //<output array field>
+                        }
+                    },
+                    {
+                        $addFields: { //get made_by name using id
+                            "posts.sender_name": {
+                                $map: {
+                                    input: "$user",
+                                    as: "sender_name",
+                                    in: {
+                                        $concat:
+                                            ["$$sender_name.first_name", " ", "$$sender_name.last_name"]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $addFields: {
+                            "posts.sender_name": { $last: "$posts.sender_name" } // chg sender_name from array to obj
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "owner",
+                            foreignField: "_id",//<field from users collection>
+                            as: "owner_name" //<output array field>
+                        }
+                    },
+                    {
+                        $addFields: {
+                            owner_name: { $last: "$owner_name" } // chg owner_name from array to obj
+                        }
+                    },
+                    {
+                        $addFields: {
+                            owner_name: { $concat: ["$owner_name.first_name", " ", "$owner_name.last_name"] }
+                        }
+                    },
+                    {
+                        $project: {
+                            user: 0
+                        }
+                    }
+                ]);
 
                 if (!result) throw "NOT_FOUND";
 
                 console.log("SUCCESS! Result", result);
-                console.log(result.length);
-                resolve(result[0]);
+                resolve(result);
             } catch (err) {
                 console.error("ERROR! Could not get groups by userid:", err);
                 reject(err);
@@ -58,8 +123,109 @@ const groupModel = {
     getMemberByGrpId: (groupId) => {
         return new Promise(async (resolve, reject) => {
             try {
-                const result = await Group.find({ "_id": groupId }).select('owner members.user_id');
-                console.log(result)
+                // const result = await Group.find({ "_id": groupId }).select('owner members.user_id');
+                const result = await Group.aggregate([
+                    {
+                        $match: {
+                            "_id": ObjectId(groupId)
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "users",
+                            as: "user",
+                            foreignField: "_id",
+                            localField: "owner"
+                        }
+                    },
+                    {
+                        $project: { posts: 0 }
+                    },
+                    {
+                        $project: {
+                            "owner": {
+                                $first: "$user"
+                            },
+                            "members": 1
+                        }
+                    },
+                    {
+                        $project: {
+                            "owner._id": 1,
+                            "owner.first_name": 1,
+                            "owner.last_name": 1,
+                            "owner.role": 1,
+                            "members": 1
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$_id",
+                            group_name: { $first: "$group_name" },
+                            members: { $first: "$members" },
+                            owner: { $first: "$owner" },
+                            owner_name: { $first: "$owner_name" },
+                        }
+                    },
+                    {
+                        $unwind: {
+                            path: "$members"
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "users",
+                            as: "user",
+                            foreignField: "_id",
+                            localField: "members.user_id"
+                        }
+                    },
+                    {
+                        $project: {
+                            "owner": 1,
+                            "members.user_id": 1,
+                            "members.is_admin": 1,
+                            "members.user_name": {
+                                $first: {
+                                    $map: {
+                                        input: "$user",
+                                        as: "user",
+                                        in: {
+                                            $concat:
+                                                ["$$user.first_name", " ", "$$user.last_name"]
+                                        }
+                                    }
+                                }
+                            },
+                            "members.role": {
+                                $first: {
+                                    $map: {
+                                        input: "$user",
+                                        as: "user",
+                                        in: "$$user.role"
+                                    }
+                                }
+                            },
+                            "members.email": {
+                                $first: {
+                                    $map: {
+                                        input: "$user",
+                                        as: "user",
+                                        in: "$$user.email"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$_id",
+                            members: { $push: "$members" },
+                            owner: { $first: "$owner" }
+                        }
+                    }
+                ]);
+
                 if (!result) throw "NOT_FOUND";
 
                 console.log("SUCCESS! Result", result);
@@ -71,15 +237,66 @@ const groupModel = {
         })
     },
 
-    // get specific group by group id  DONE
+    // get specific group by group id DONE
     getGroupById: (groupId) => {
         return new Promise(async (resolve, reject) => {
             try {
-                const result = await Group.findOne({ "_id": groupId }).select("-__v");
-                if (!result) throw "NOT_FOUND";
+                const result = await Group.aggregate([
+                    {
+                        $match: { "_id": ObjectId(groupId) }
+                    },
+                    {
+                        $unwind: {
+                            path: "$posts",
+                            "preserveNullAndEmptyArrays": true
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "users",
+                            as: "sender_name",
+                            localField: "posts.made_by",
+                            foreignField: "_id",//<field from users collection>
+                        }
+                    },
+                    {
+                        $project: { //get made_by name using id
+                            "group_name": 1,
+                            "members": 1,
+                            "owner": 1,
+                            "posts._id": 1,
+                            "posts.content": 1,
+                            "posts.made_by": 1,
+                            "posts.created_at": 1,
+                            "posts.sender_name": {
+                                $first: {
+                                    $map: {
+                                        input: "$sender_name",
+                                        as: "sender_name",
+                                        in: {
+                                            $concat:
+                                                ["$$sender_name.first_name", " ", "$$sender_name.last_name"]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$_id",
+                            group_name: { $first: "$group_name" },
+                            members: { $first: "$members" },
+                            owner: { $first: "$owner" },
+                            posts: { $push: "$posts" },
+                        }
+                    },
+                ]);
+
+                if (!result || result.length < 1) throw "NOT_FOUND";
 
                 console.log("SUCCESS! Result", result);
-                resolve(result);
+                resolve(result[0]);
             } catch (err) {
                 console.error("ERROR! Could not get grp by id:", err);
                 reject(err);
@@ -105,23 +322,39 @@ const groupModel = {
         })
     },
 
+    // update group
+    updateGroupName: (groupId, group_name) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const result = await Group.findByIdAndUpdate(ObjectId(groupId), {"group_name": group_name});
+
+                if (!result) throw "NOT_FOUND";
+
+                console.log("Result: ", result);
+                resolve(result);
+            }
+            catch(err) {
+                console.error(`ERROR! Could not update group by ID ${groupId}`, err);
+                reject(err);
+            }
+        })
+    },
+
     // add new member(existing user) by user id to existing grp  DONE
     addMember: (groupId, user_id) => {
         return new Promise(async (resolve, reject) => {
             try {
                 const group = await Group.findOne({ "_id": ObjectId(groupId) });
-                console.log(group)
                 if (!group) throw "NOT_FOUND";
 
                 // find if members exist in the grp
                 const found = group.members.find(element => element.user_id == user_id);
-                console.log(found)
-                if (found) throw "UNEXPECTED_ERROR";
+                if (found) throw "USER_EXISTS";
 
                 // append user to db array and save to db
                 group.members.push({ user_id });
 
-                const result = group.save();
+                const result = await group.save();
 
                 if (!result) throw "UNEXPECTED_ERROR";
 
@@ -142,7 +375,7 @@ const groupModel = {
 
                 // find index of the user in the array that matches the id
                 const foundIndex = group.members.findIndex(element => element.user_id == user_id);
-                if (!foundIndex) throw "NOT_FOUND";
+                if (isNaN(foundIndex) && !foundIndex) throw "NOT_FOUND";
 
                 // delete member from members array
                 group.members.pull(group.members[foundIndex]);
@@ -166,16 +399,14 @@ const groupModel = {
 
                 // find if members exist in the grp
                 const found = group.members.find(element => element.user_id == user_id);
-                console.log(found)
                 if (!found) throw "NOT_FOUND";
 
                 // find if member is an admin
                 const isAdmin = found.is_admin;
-                console.log(isAdmin)
-                if (isAdmin == true) throw "UNEXPECTED_ERROR"
+                if (isAdmin) throw "UNEXPECTED_ERROR"
 
                 found.is_admin = !found.is_admin;
-                const result = group.save();
+                const result = await group.save();
 
                 console.log("SUCESS! Result", result);
                 resolve(result);
@@ -250,7 +481,7 @@ const groupModel = {
 
                 if (!result) throw "NOT_FOUND";
 
-                console.log("Yayy, Result: ", result);
+                console.log("Result: ", result);
                 resolve(result);
             } catch (err) {
                 console.error(`ERROR! Could not delete group with id ${groupId}: ${err}`);
@@ -266,12 +497,50 @@ const groupModel = {
     getPostsByGrpId: (groupId) => {
         return new Promise(async (resolve, reject) => {
             try {
-                const result = await Group.find({ "_id": groupId }).select("posts");
+                // const result = await Group.find({ "_id": groupId }).select("posts");
+                const result = await Group.aggregate([
+                    {
+                        $match: { "_id": ObjectId(groupId) }
+                    },
+                    {
+                        $unwind: "$posts"
+                    },
+                    {
+                        $lookup: {
+                            from: "users",
+                            as: "sender_name",
+                            localField: "posts.made_by",
+                            foreignField: "_id",//<field from users collection>
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            "posts._id": 1,
+                            "posts.content": 1,
+                            "posts.made_by": 1,
+                            "posts.created_at": 1,
+                            "posts.sender_name": {
+                                $first: {
+                                    $map: {
+                                        input: "$sender_name",
+                                        as: "sender_name",
+                                        in: {
+                                            $concat:
+                                                ["$$sender_name.first_name", " ", "$$sender_name.last_name"]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    { $replaceRoot: { newRoot: "$posts" } }
+                ]);
+
                 if (!result) throw "NOT_FOUND";
 
                 console.log("SUCESS! Result", result);
-                console.log(result.length);
-                resolve(result[0]);
+                resolve(result);
             } catch (err) {
                 console.error(`ERROR! Could not get post by ${groupId}: ${err}`);
                 reject(err);
@@ -354,7 +623,7 @@ const groupModel = {
 
                 // find index of the post in the array that matches the id
                 const foundIndex = group.posts.findIndex(element => element._id == postId);
-                if (!foundIndex) throw "NOT_FOUND";
+                if (isNaN(foundIndex) && !foundIndex) throw "NOT_FOUND";
 
                 // delete post from posts array
                 group.posts.pull(group.posts[foundIndex]);
@@ -391,7 +660,7 @@ const groupModel = {
     },
     // get all assignment by user id  do we rlly need this?
     getAsgByUserId: (user_id) => {
-        
+
     },
     // assign quiz to a grp  
     createAsgbyGrpId: (groupId, assignment) => {

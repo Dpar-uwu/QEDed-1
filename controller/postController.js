@@ -12,7 +12,9 @@ const groupModel = require("../model/groupModel");
 const { MongoError } = require("mongodb");
 const { Error } = require("mongoose");
 
-
+/**
+ * REST API
+ */
 /**
  * GET /post/group?groupId=
  */
@@ -21,7 +23,7 @@ router.get("/group",
     async (req, res) => {
         const { groupId } = req.query;
         try {
-            console.time("GET post by groupid");
+            console.time("GET posts by groupID");
             const result = await groupModel.getPostsByGrpId(groupId);
             res.status(200).send(result);
         } catch (err) {
@@ -33,7 +35,7 @@ router.get("/group",
             else
                 res.status(500).send({ error: "Error getting post by grp id", code: "UNEXPECTED_ERROR" });
         } finally {
-            console.timeEnd("GET posts by groupid");
+            console.timeEnd("GET posts by groupID");
         }
     });
 
@@ -140,4 +142,15 @@ router.delete("/:postId",
         }
     });
 
-module.exports = router;
+
+/**
+ * SOCKET
+ */
+const postSocket = async (message) => {
+    const { group_id, post } = message;
+    console.log(group_id, post);
+    const result = await groupModel.createPostByGrpId(group_id, post);
+    return result;
+}
+
+module.exports = { router, postSocket };

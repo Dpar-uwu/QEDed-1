@@ -1,4 +1,4 @@
-
+/* EVENT LISTENERS & API CALLS */
 // onload get all levels
 $(document).ready(function () {
     $.ajax({
@@ -6,14 +6,15 @@ $(document).ready(function () {
         dataType: 'JSON',
         success: function (data, textStatus, xhr) {
             if(data.length >= 1) {
-                var notes = [];
-                for (var i = 0; i < data.length; i++) {
+                let notes = [];
+                for (let i = 0; i < data.length; i++) {
                     notes.push({
                         "id": data[i]._id,
                         "display": "Primary " + data[i].level
                     })
                 }
-                displayLevel(notes, "level");
+                displayLevel(notes);
+                displayAddLevelBtn();
             }
         },
         error: function (xhr, textStatus, errorThrown) {
@@ -24,7 +25,7 @@ $(document).ready(function () {
 
 //get level by id when level is clicked
 $(document).on("click", ".level", function () {
-    var id = this.id;
+    let id = this.id;
     $.ajax({
         url: `/level/${id}`,
         dataType: 'JSON',
@@ -38,7 +39,7 @@ $(document).on("click", ".level", function () {
 })
 
 $(document).on("click", ".skill", function () {
-    var id = this.id; // get id of skill being clicked
+    let id = this.id; // get id of skill being clicked
 
     // get skill details by id
     $.ajax({
@@ -83,6 +84,30 @@ $(document).on("click", "#setDefault", function () {
     });
 });
 
+
+$(document).on("click", "#addLevelBtn", function() {
+    let lvlList = this.parentElement;
+    let lvlForm = document.createElement("div");
+    lvlForm.classList.add("levelForm");
+    lvlForm.innerHTML = `
+        <form>
+            <div class="pb-2">
+                <input class="form-control newLevel" type="number" placeholder="New Level"/>
+            </div>
+            <div class="pb-2 form-btn-wrapper">
+                <span class="confirmLevel">
+                    <i class="fas fa-check"></i>
+                </span>
+                <span class="cancelLevel">
+                    <i class="fas fa-times"></i>
+                </span>
+            </div>
+        </form>
+    `
+    lvlList.insertBefore(lvlForm, this);
+})
+
+
 // on change percentage difficulty update ui of total qns
 $(document).on("keyup change", ".percentage_difficulty", function () {
     calculateQn();
@@ -92,20 +117,20 @@ $(document).on("keyup change", "#num_of_qn", function () {
 })
 
 $(document).on("click", "#updateSkill", function () {
-    var id = document.querySelector('#skill_id').value;
-    var num_of_qn = document.querySelector('#num_of_qn').value;
-    var duration = document.querySelector('#duration').value;
-    var percentage_easy = document.querySelector("#percentage_easy").value;
-    var percentage_medium = document.querySelector("#percentage_medium").value;
-    var percentage_difficult = document.querySelector("#percentage_difficult").value;
-    var easy_values_min = document.querySelector("#easy_values_min").value;
-    var easy_values_max = document.querySelector("#easy_values_max").value;
-    var medium_values_min = document.querySelector("#medium_values_min").value;
-    var medium_values_max = document.querySelector("#medium_values_max").value;
-    var difficult_values_min = document.querySelector("#difficult_values_min").value;
-    var difficult_values_max = document.querySelector("#difficult_values_max").value;
+    let id = document.querySelector('#skill_id').value;
+    let num_of_qn = document.querySelector('#num_of_qn').value;
+    let duration = document.querySelector('#duration').value;
+    let percentage_easy = document.querySelector("#percentage_easy").value;
+    let percentage_medium = document.querySelector("#percentage_medium").value;
+    let percentage_difficult = document.querySelector("#percentage_difficult").value;
+    let easy_values_min = document.querySelector("#easy_values_min").value;
+    let easy_values_max = document.querySelector("#easy_values_max").value;
+    let medium_values_min = document.querySelector("#medium_values_min").value;
+    let medium_values_max = document.querySelector("#medium_values_max").value;
+    let difficult_values_min = document.querySelector("#difficult_values_min").value;
+    let difficult_values_max = document.querySelector("#difficult_values_max").value;
 
-    var data = {
+    let data = {
         num_of_qn,
         duration,
         percent_difficulty: `${percentage_easy}-${percentage_medium}-${percentage_difficult}`,
@@ -133,13 +158,13 @@ $(document).on("click", "#updateSkill", function () {
             Authorization:  (localStorage.getItem("token") != null) ? "Bearer " +localStorage.getItem("token") : ""
         },
         success: function (data, textStatus, xhr) {
-            var errorDisplay = document.querySelector("#error");
+            let errorDisplay = document.querySelector("#error");
             errorDisplay.innerHTML = "";
             alert("Updated Successfully");
         },
         error: function (xhr, textStatus, errorThrown) {
             const res = xhr.responseJSON;
-            var errorDisplay = document.querySelector("#error");
+            let errorDisplay = document.querySelector("#error");
             errorDisplay.innerHTML = "";
 
             if(res.code == "INVALID_REQUEST") {
@@ -161,14 +186,14 @@ $(document).on("click", "#updateSkill", function () {
 })
 
 
-// DISPLAY FUNCTIONS
-function displayLevel(data, name) {
-    var container = document.getElementById(name+"Container");
-    var content = '';
+/* DISPLAY FUNCTIONS */
+function displayLevel(data) {
+    let container = document.getElementById("levelContainer");
+    let content = '';
     container.innerHTML = '';
-    for (var i = 0; i < data.length; i++) {
+    for (let i = 0; i < data.length; i++) {
         content = `
-        <div class="${name}" id="${data[i].id}">
+        <div class="level" id="${data[i].id}">
             <div class="text-center">
                 <p>${data[i].display}</p>
             </div>
@@ -178,16 +203,28 @@ function displayLevel(data, name) {
         container.innerHTML += content;
     }
 }
+
+function displayAddLevelBtn() {
+    let container = document.getElementById("levelContainer");
+    container.innerHTML += `
+        <div id="addLevelBtn">
+            <div class="text-center">
+                + Add Level 
+            </div>
+        </div>
+    `
+}
+
 function displayTopic(data, name) {
     const { _id, level, topics } = data;
     document.getElementById("levelContainer").style.display = "none";
     document.getElementById("back").style.display = "block";
     document.getElementById("levelTag").innerHTML = "Primary " + level;
 
-    var container = document.getElementById(name+"Container");
-    var content = "";
+    let container = document.getElementById(name+"Container");
+    let content = "";
     container.innerHTML = "";
-    for (var i = 0; i < topics.length; i++) {
+    for (let i = 0; i < topics.length; i++) {
         content = `
         <div class="topicWrapper">
             <div class="${name}" 
@@ -226,40 +263,40 @@ function createSlider(id, valueMin = 100, valueMax = 300) {
     $("#slider-range-" + id).slider({
         range: true,
         min: 0,
-        max: 500,
+        max: 100000000,
         values: [valueMin, valueMax],
         slide: function (event, ui) {
-            for (var i = 0; i < ui.values.length; ++i) {
+            for (let i = 0; i < ui.values.length; ++i) {
                 $("input.sliderValue-" + id + "[data-index=" + i + "]").val(ui.values[i]);
             }
         }
     });
 
     $("input.sliderValue-" + id).change(function () {
-        var $this = $(this);
+        let $this = $(this);
         $("#slider-range-" + id).slider("values", $this.data("index"), $this.val());
     });
 }
 
 
 function displaySkillDetail(data) {
-    var id = document.querySelector('#skill_id');
+    let id = document.querySelector('#skill_id');
 
-    var level = document.querySelector('#level');
-    var topic_name = document.querySelector('#topic_name');
-    var skill_name = document.querySelector('#skill_name');
+    let level = document.querySelector('#level');
+    let topic_name = document.querySelector('#topic_name');
+    let skill_name = document.querySelector('#skill_name');
 
-    var num_of_qn = document.querySelector('#num_of_qn');
-    var duration = document.querySelector('#duration');
-    var percentage_easy = document.querySelector("#percentage_easy");
-    var percentage_medium = document.querySelector("#percentage_medium");
-    var percentage_difficult = document.querySelector("#percentage_difficult");
-    var easy_values_min = document.querySelector("#easy_values_min");
-    var easy_values_max = document.querySelector("#easy_values_max");
-    var medium_values_min = document.querySelector("#medium_values_min");
-    var medium_values_max = document.querySelector("#medium_values_max");
-    var difficult_values_min = document.querySelector("#difficult_values_min");
-    var difficult_values_max = document.querySelector("#difficult_values_max");
+    let num_of_qn = document.querySelector('#num_of_qn');
+    let duration = document.querySelector('#duration');
+    let percentage_easy = document.querySelector("#percentage_easy");
+    let percentage_medium = document.querySelector("#percentage_medium");
+    let percentage_difficult = document.querySelector("#percentage_difficult");
+    let easy_values_min = document.querySelector("#easy_values_min");
+    let easy_values_max = document.querySelector("#easy_values_max");
+    let medium_values_min = document.querySelector("#medium_values_min");
+    let medium_values_max = document.querySelector("#medium_values_max");
+    let difficult_values_min = document.querySelector("#difficult_values_min");
+    let difficult_values_max = document.querySelector("#difficult_values_max");
 
     // Update the modal's content
     id.value = data.skillId;
@@ -271,7 +308,7 @@ function displaySkillDetail(data) {
     num_of_qn.value = data.num_of_qn;
     duration.value = data.duration;
 
-    var difficulty = data.percent_difficulty.split("-");
+    let difficulty = data.percent_difficulty.split("-");
     percentage_easy.value = difficulty[0];
     percentage_medium.value = difficulty[1];
     percentage_difficult.value = difficulty[2];
@@ -292,25 +329,25 @@ function displaySkillDetail(data) {
 
 function calculateQn() {
     // check all values in params are multiple of 10
-    var num_of_qn = document.querySelector('#num_of_qn').value;
+    let num_of_qn = document.querySelector('#num_of_qn').value;
 
-    var percentage_easy = document.querySelector("#percentage_easy").value;
-    var percentage_medium = document.querySelector("#percentage_medium").value;
-    var percentage_difficult = document.querySelector("#percentage_difficult").value;
+    let percentage_easy = document.querySelector("#percentage_easy").value;
+    let percentage_medium = document.querySelector("#percentage_medium").value;
+    let percentage_difficult = document.querySelector("#percentage_difficult").value;
 
-    var condition = num_of_qn % 10 == 0 && percentage_easy % 10 == 0 && percentage_medium % 10 == 0 && percentage_difficult % 10 == 0;
+    let condition = num_of_qn % 10 == 0 && percentage_easy % 10 == 0 && percentage_medium % 10 == 0 && percentage_difficult % 10 == 0;
     if (condition) {
-        var easy_num = (percentage_easy / 100) * num_of_qn;
-        var medium_num = (percentage_medium / 100) * num_of_qn;
-        var difficult_num = (percentage_difficult / 100) * num_of_qn;
-        var total = easy_num + medium_num + difficult_num;
+        let easy_num = (percentage_easy / 100) * num_of_qn;
+        let medium_num = (percentage_medium / 100) * num_of_qn;
+        let difficult_num = (percentage_difficult / 100) * num_of_qn;
+        let total = easy_num + medium_num + difficult_num;
 
         document.querySelector("#easy_num").textContent = "Easy Questions: " + easy_num;
         document.querySelector("#medium_num").textContent = "Medium Questions: " + medium_num;
         document.querySelector("#difficult_num").textContent = "Difficult Questions: " + difficult_num;
         document.querySelector("#total_num").textContent = "Total Questions: " + total;
 
-        var num_of_qn = document.querySelector("#num_of_qn");
+        let num_of_qn = document.querySelector("#num_of_qn");
         if (num_of_qn.value != total) {
             document.querySelector("#total_num").style.color = "red";
             document.querySelector("#total_num").textContent += " (Total not 100%)"
@@ -323,8 +360,8 @@ function calculateQn() {
 }
 
 function validateNumOfQn() {
-    var num_of_qn = document.querySelector('#num_of_qn').value;
-    var error = document.querySelector("#num-error");
+    let num_of_qn = document.querySelector('#num_of_qn').value;
+    let error = document.querySelector("#num-error");
     // alert(num_of_qn)
     if(num_of_qn % 10 == 0) {
         error.style.display = "none";

@@ -235,7 +235,7 @@ router.delete("/:quizId",
 
 
 /**
- * POST /quiz/leaderboard?scope=groupId
+ * POST /quiz/leaderboard?scope=grade
  */
 router.post("/leaderboard",
     validate("scope"),
@@ -248,7 +248,8 @@ router.post("/leaderboard",
                 res.status(200).send(result);
             }
             else {
-                res.status(500).send({ error: "Sorry this feature is still yet to be built", code: "LAZINESS" });
+                const result = await quizModel.getGlobalLeaderboard(parseInt(scope));
+                res.status(200).send(result);
             }
             // do get leaderboard by group id
         } catch (err) {
@@ -279,6 +280,27 @@ router.post("/benchmark",
             if (err == "NOT_FOUND")
                 res.status(404).send({ error: "User ID not found", code: err });
             else if (err instanceof Error || err instanceof MongoError)
+                res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+            else
+                res.status(500).send({ error: "Error getting benchmark", code: "UNEXPECTED_ERROR" });
+        } finally {
+            console.timeEnd("POST benchmark");
+        }
+    }
+)
+
+/**
+ * POST /quiz/benchmark/top?user=
+ */
+router.post("/benchmark/top",
+    async (req, res) => {
+        const { user } = req.query;
+        try {
+            console.time("POST benchmark");
+            const result = await quizModel.getTopBenchmarkByUser(user);
+            res.status(200).send(result);
+        } catch (err) {
+            if (err instanceof Error || err instanceof MongoError)
                 res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
             else
                 res.status(500).send({ error: "Error getting benchmark", code: "UNEXPECTED_ERROR" });

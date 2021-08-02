@@ -63,7 +63,7 @@ const assignmentModel = {
     },
 
     // get assignment by grp
-        : (groupId) => {
+    getAsgByGrpId: (groupId) => {
         return new Promise(async (resolve, reject) => {
             try{
                 const result = await Assignment.find({ "group_id": ObjectId(groupId) }).select('-__v');

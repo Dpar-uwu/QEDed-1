@@ -11,9 +11,10 @@
 
 .rightbar {
     font-family: 'Roboto', Arial, Helvetica, sans-serif;
+    overflow-x: hidden;
 }
 
-.title {
+.title-leaderboard {
     text-align: center;
     margin: 0.3em 0 0.2em;
     font-weight: 700;
@@ -57,6 +58,7 @@
     grid-template-columns: auto auto auto;
     grid-column-gap: 16px;
     text-align: center;
+    margin: 19px 1rem;
 }
 
 .top-rank {
@@ -131,11 +133,13 @@
 /* Leaderboard list */
 
 .heading {
+    max-width: 100%;
     font-size: 14px;
+    margin: 0 1rem;
 }
 
 #leaderboard {
-    margin-top: 19px;
+    margin: 19px 1rem;
     font-size: 15px;
 }
 
@@ -217,7 +221,7 @@
         font-size: 12px;
     }
     .heading span {
-        padding: 4px;
+        padding: 0;
     }
     .rank {
         /* border-radius: 25px; */

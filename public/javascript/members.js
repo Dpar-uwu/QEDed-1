@@ -232,12 +232,7 @@ function updateGroupName(groupId, groupName) {
 
 /* DISPLAY DATA */
 function displayGroup(data) {
-    $(".rightbar").prepend(`
-        <header class="header">
-            <a href="/group.html" id="back"><i class="fas fa-chevron-left"></i></a>
-            <h5 class="title">${data.group_name}</h5>
-        </header>
-    `);
+    document.querySelector(".title").textContent = data.group_name;
 
     // display group name on modal
     document.querySelector("#group_name").value = data.group_name;

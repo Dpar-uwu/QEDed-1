@@ -1,4 +1,22 @@
 /* NAVBAR */
+html {
+    scrollbar-color: rgba(0,0,0,.2) hsla(0,0%,100%,0.1);
+    scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+    width: 6px!important;
+    height: 6px!important;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,.2);
+}
+
+::-webkit-scrollbar-track {
+    background: hsla(0,0%,100%,.1);
+}
+
 .header {
     display: flex;
     flex-direction: row;
@@ -10,9 +28,7 @@
     margin: 0 1px 0 24px;
     font-weight: 700;
     color: #003844;
-    /* text-shadow: 2px 2px 0px #ffcb45; */
     flex: 1;
-    /* overflow-x: hidden; */
     width: auto;
 }
 
@@ -27,25 +43,18 @@
 
 #navigation {
     margin: 0;
-    /* padding: 0 0 6px 0; */
     font-size: 11px;
     list-style: none;
     display: flex;
     justify-content: center;
     border-bottom: 1px solid #ddd;
     align-items: center;
-    overflow-y: scroll;
-    /* flex-wrap: wrap; */
-    /* overflow-x: auto; */
-    /* overflow-y: none; */
-    /* -ms-overflow-style: none; */
-    /* scrollbar-width: none; */
+    overflow-y: hidden;
+    overflow-x: auto;
+    scrollbar-color: rgba(0,0,0,.2) hsla(0,0%,100%,0.1);
+    scrollbar-width: thin;
 }
 
-/* Hide scrollbar for IE, Edge and Firefox */
-#navigation::-webkit-scrollbar {
-    display: none;
-}
 
 
 .active {
@@ -81,7 +90,7 @@
 @media (max-width: 768px) {
     #navigation {
         margin: 0;
-        padding: 0 0 0 70px;
+        padding: 0 0 0 80px;
         justify-items: flex-start;
         max-width: 100%;
     }

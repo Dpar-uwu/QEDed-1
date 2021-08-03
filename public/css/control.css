@@ -106,6 +106,15 @@
     color: #fff;
 }
 
+.level i {
+    padding: 6px;
+    transition: color 0.2s ease;
+}
+
+.level i:hover {
+    color: #003844;
+}
+
 .topicWrapper {
     padding: 0 0 8px;
 }

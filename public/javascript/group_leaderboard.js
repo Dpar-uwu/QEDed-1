@@ -1,19 +1,19 @@
+var urlSearchParams = new URLSearchParams(window.location.search);
+var groupId = urlSearchParams.get("groupId");
+
 /* EVENT LISTENER */
 $(document).ready(function () {
-    getLeaderboard();
-});
-
-$(document).on("change", ".filter-select", function() {
-    getLeaderboard(this.value)
+    getLeaderboard(groupId);
 });
 
 /* API CALLS */
-function getLeaderboard(scope = "") {
+function getLeaderboard(groupId) {
     $.ajax({
-        url: '/quiz/leaderboard?scope='+scope,
+        url: '/group/leaderboard?groupId='+groupId,
         method: 'POST',
         dataType: 'JSON',
         success: function (data, textStatus, xhr) {
+            console.log(data)
             displayLeaderboard(data);
         },
         error: function (xhr, textStatus, errorThrown) {
@@ -23,15 +23,17 @@ function getLeaderboard(scope = "") {
 }
 
 /* DISPLAY DATA */
-function displayLeaderboard(data) {
+function displayLeaderboard(result) {
+    // display group name
+    document.querySelector(".title").innerHTML = result.group_name;
+
+    let data = result.leaderboard;
     let leaderboard = document.querySelector("#leaderboard");
     let top3 = document.querySelector("#top-3");
-    // let noresult = $("#noresult");
 
     // reset ui
     leaderboard.innerHTML = "";
     top3.innerHTML = "";
-    // $("#noresult").hide();
     document.getElementById("noresult").style.display = "none";
 
     var ordinal = "";

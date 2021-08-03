@@ -457,21 +457,182 @@ const groupModel = {
     viewGroupBenchmark: (groupId) => {
         return new Promise(async (resolve, reject) => {
             try {
-                const result = await Quiz.aggregate([
+                const group = await Group.aggregate([
                     {
-                        $lookup
+                        $match: { _id: ObjectId(groupId) }
                     },
                     {
-                        $lookup
+                        $unwind: "$members"
+                    },
+                    {
+                        $project: {
+                            user_id: "$members.user_id",
+                            group_name: 1,
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "quizzes",
+                            as: "quiz",
+                            localField: "user_id",
+                            foreignField: "done_by"
+                        }
+                    },
+                    {
+                        $project: { "quiz.questions": 0 }
+                    },
+                    {
+                        $unwind: "$quiz"
+                    },
+                    {
+                        $addFields: {
+                            "quiz.group_name": "$group_name",
+                            "quiz.group_id": "$_id",
+                        }
+                    },
+                    { $replaceRoot: { newRoot: "$quiz" } },
+                    {
+                        $group: {
+                            "_id": "$group_id",
+                            "group_name": { $first: "$group_name" },
+                            "easy_average_score": { $avg: "$score.easy" },
+                            "medium_average_score": { $avg: "$score.medium" },
+                            "difficult_average_score": { $avg: "$score.difficult" },
+                            "average_score": { $avg: "$score.total" },
+                            "average_time_taken": { $avg: "$time_taken" }
+                        }
                     }
-                ])
-            } catch (err) {
+                ]);
 
+                const global = await Quiz.aggregate([
+                    {
+                        $group: {
+                            "_id": null,
+                            "easy_average_score": { $avg: "$score.easy" },
+                            "medium_average_score": { $avg: "$score.medium" },
+                            "difficult_average_score": { $avg: "$score.difficult" },
+                            "total_average_score": { $avg: "$score.total" },
+                            "average_time_taken": { $avg: "$time_taken" }
+                        }
+                    },
+                    { $project: { _id: 0 } }
+                ]).limit(1);
+
+                const result = {
+                    group: group[0],
+                    global: global[0]
+                };
+
+                console.log("SUCCESS! Result: ", result);
+                resolve(result);
+            } catch (err) {
+                console.error(`ERROR! Could not view group benchmark with id ${groupId}: ${err}`);
+                reject(err);
             }
         })
     },
 
-    // get leaderboard 
+    // get leaderboard
+    viewGroupLeaderboard: (groupId) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const result = await Group.aggregate([
+                    {
+                        $match: { _id: ObjectId(groupId) }
+                    },
+                    {
+                        $unwind: "$members"
+                    },
+                    {
+                        $project: {
+                            user_id: "$members.user_id",
+                            group_name: 1
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "quizzes",
+                            as: "quiz",
+                            localField: "user_id",
+                            foreignField: "done_by"
+                        }
+                    },
+                    {
+                        $unwind: "$quiz"
+                    },
+                    {
+                        $addFields: {
+                            "quiz.group_name": "$group_name",
+                        }
+                    },
+                    { $replaceRoot: { newRoot: "$quiz" } },
+                    {
+                        $group: {
+                            "_id": "$done_by",
+                            "group_name": { $first: "$group_name" },
+                            "average_score": { $avg: "$score.total" },
+                            "num_of_quiz": { $sum: 1 },
+                            "average_time_taken": { $avg: "$time_taken" }
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "_id",
+                            foreignField: "_id",//<field from the documents of the "from" collection>
+                            as: "user" //<output array field>
+                        }
+                    },
+                    {
+                        $addFields: {
+                            user: {
+                                $first: "$user"
+                            }
+                        }
+                    },
+                    {
+                        $addFields: {
+                            first_name: "$user.first_name",
+                            last_name: "$user.last_name",
+                            school: "$user.school",
+                            grade: "$user.grade"
+                        }
+                    },
+                    {
+                        $project: {
+                            user: 0
+                        }
+                    },
+                    {
+                        $sort: {
+                            "average_score": -1, //descending
+                            "num_of_quiz": -1, // descending
+                            "average_time_taken": 1 // ascending 
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$group_name",
+                            leaderboard: { $push: "$$ROOT" }
+                        }
+                    },
+                    {
+                        $project: {
+                            group_name: "$_id",
+                            leaderboard: 1,
+                            _id: 0
+                        }
+                    }
+                ]);
+
+                console.log("SUCCESS! Result: ", result);
+                resolve(result[0]);
+            } catch(err) {
+                console.error(`ERROR! Could not view group leaderboard with id ${groupId}: ${err}`);
+                reject(err);
+            }
+        })
+    },
 
     // delete by group id DONE
     deleteGroupById: (groupId) => {

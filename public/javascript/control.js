@@ -13,8 +13,7 @@ $(document).ready(function () {
                         "display": "Primary " + data[i].level
                     })
                 }
-                displayLevel(notes);
-                displayAddLevelBtn();
+                displayLevel(notes, "level");
             }
         },
         error: function (xhr, textStatus, errorThrown) {
@@ -285,28 +284,6 @@ $(document).on("click", ".addSkill", function () {
 })
 
 
-$(document).on("click", "#addLevelBtn", function() {
-    let lvlList = this.parentElement;
-    let lvlForm = document.createElement("div");
-    lvlForm.classList.add("levelForm");
-    lvlForm.innerHTML = `
-        <form>
-            <div class="pb-2">
-                <input class="form-control newLevel" type="number" placeholder="New Level"/>
-            </div>
-            <div class="pb-2 form-btn-wrapper">
-                <span class="confirmLevel">
-                    <i class="fas fa-check"></i>
-                </span>
-                <span class="cancelLevel">
-                    <i class="fas fa-times"></i>
-                </span>
-            </div>
-        </form>
-    `
-    lvlList.insertBefore(lvlForm, this);
-})
-
 
 // on change percentage difficulty update ui of total qns
 $(document).on("keyup change", ".percentage_difficulty", function () {
@@ -472,7 +449,7 @@ function displayLevel(data, name) {
     container.innerHTML = '';
     for (let i = 0; i < data.length; i++) {
         content = `
-        <div class="level" id="${data[i].id}">
+        <div class="${name}" id="${data[i].id}">
             <div class="text-center">
                 <span>${data[i].display}</span>
                 <i class="icon fas fa-edit"></i>
@@ -489,16 +466,6 @@ function displayLevel(data, name) {
     </div>` 
 }
 
-function displayAddLevelBtn() {
-    let container = document.getElementById("levelContainer");
-    container.innerHTML += `
-        <div id="addLevelBtn">
-            <div class="text-center">
-                + Add Level 
-            </div>
-        </div>
-    `
-}
 
 function displayTopic(data, name) {
     const { _id, level, topics } = data;

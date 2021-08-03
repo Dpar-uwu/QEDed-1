@@ -234,6 +234,49 @@ router.put("/makeAdmin",
          console.timeEnd("PUT dismiss admin by user id");
      }
  });
+
+/**
+ * POST /group/benchmark?groupId=..
+ */
+router.post("/benchmark",
+    async (req, res) => {
+        const { groupId } = req.query;
+        try {
+            console.time("POST group benchmark");
+            const result = await groupModel.viewGroupBenchmark(groupId);
+
+            res.status(200).send(result);
+        } catch (err) {
+            if (err instanceof Error || err instanceof MongoError)
+                res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+            else
+                res.status(500).send({ error: "Error getting group benchmark", code: "UNEXPECTED_ERROR" });
+        } finally {
+            console.timeEnd("POST group benchmark");
+        }
+    });
+ 
+
+/**
+ * POST /group/leaderboard?groupId=..
+ */
+router.post("/leaderboard",
+    async (req, res) => {
+        const { groupId } = req.query;
+        try {
+            console.time("POST group leaderboard");
+            const result = await groupModel.viewGroupLeaderboard(groupId);
+
+            res.status(200).send(result);
+        } catch (err) {
+            if (err instanceof Error || err instanceof MongoError)
+                res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+            else
+                res.status(500).send({ error: "Error getting group leaderboard", code: "UNEXPECTED_ERROR" });
+        } finally {
+            console.timeEnd("POST group leaderboard");
+        }
+    });
  
 /**
 * DELETE /group/:groupId - delete quiz by id

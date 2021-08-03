@@ -28,8 +28,9 @@
     <!--Javascript-->
     <script src="./javascript/auth.js"></script>
     <script src="./javascript/sidebar.js"></script>
-    <script src="./javascript/members.js"></script>
     <script src="./javascript/groupnav.js"></script>
+    <script src="./javascript/members.js"></script>
+
     <!-- CSS -->
     <link rel="stylesheet" href="./css/members.css">
     <link rel="stylesheet" href="./css/groupnav.css">
@@ -40,23 +41,13 @@
         <div class="sidebar col-1 col-sm-4 col-md-3 col-xl-2 px-sm-2 px-0 border-end"></div>
         <div class="rightbar col-11 col-sm-8 col-md-9 col-xl-10 p-0 content">
 
+            <header class="header">
+                <a href="/group.html" id="back"><i class="fas fa-chevron-left"></i></a>
+                <h5 class="title">My Group</h5>
+            </header>
             <ul id="navigation" class="nav-pills">
-                <li class="navigation-li">
-                    <a class="nav-a" href="/group_announcement.html">Announcements</a>
-                </li>
-                <li class="navigation-li">
-                    <a class="nav-a" href="/group_assignments.html">Assignments</a>
-                </li>
-                <li class="navigation-li">
-                    <a class="nav-a active" href="/group_members.html">Members</a>
-                </li>
-                <li class="navigation-li">
-                    <a class="nav-a" href="/group_leaderboard.html">Leaderboard</a>
-                </li>
-                <li class="navigation-li">
-                    <a class="nav-a" href="/group_progress.html">Progress</a>
-                </li>
             </ul>
+
             <div id="member-list">
                 <!-- ALL Members goes here -->
                 <div id="owner">

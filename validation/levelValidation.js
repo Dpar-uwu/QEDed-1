@@ -23,6 +23,7 @@ let attribute = {
     topics: (location = "topics") => {
         return body(location)
             .isArray().withMessage("Topics is not in array format")
+            .optional()
     },
 
     // topic ID
@@ -52,13 +53,14 @@ let attribute = {
     skills: (location = "topics.*.skills") => {
         return body(location)
             .isArray().withMessage("Skills is not in array format")
+            .optional()
     },
 
     // level > topics > skills
     skill_code: (location = "topics.*.skills.*.skill_code") => {
         return body(location)
             .notEmpty().withMessage("Skill code cannot be empty").bail()
-            .matches(/^(?=.*[A-Z])([A-Z0-9_-]+)$/).withMessage("Topic name should contain letters, numbers, _, -, commas and whitespaces only").bail()
+            .matches(/^(?=.*[A-Z])([A-Z0-9_-]+)$/).withMessage("Skill Code should contain letters, numbers, _, -, commas and whitespaces only").bail()
             .stripLow().trim()
     },
     skill_name: (location = "topics.*.skills.*.skill_name") => {

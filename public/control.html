@@ -52,19 +52,74 @@
         <div id="topicContainer"></div>
       </div>
     </div>
-    <!-- Settings Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <!--Level Modal-->
+    <div class="modal fade" id="levelModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="levelModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="levelModalTitle">Add Level</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="mb-2">
+                  <label for="inputLevel" class="col-form-label">Level Name</label>
+                  <input type="number" class="form-control" id="inputLevel">
+                  <small class="mt-2" id="inputLevelErr" style="color:red;"></small>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-warning addLevelBtn">Submit</button>
+            </div>
+          </div>
+        </div>
+    </div>
+      <!--Topic Modal-->
+      <div class="modal fade" id="topicModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="topicModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="topicModalTitle">Add Topic</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form>
+                  <input type="text" class="form-control" id="level_id" style="display: none;">
+                  <div class="mb-2">
+                    <label for="inputTopic" class="col-form-label">Topic Name</label>
+                    <input type="text" class="form-control" id="inputTopic">
+                    <small class="mt-2" id="inputTopicErr" style="color:red;"></small>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-outline-warning addTopicBtn">Submit</button>
+              </div>
+            </div>
+          </div>
+      </div>
+    <!-- Skill Modal -->
+    <div class="modal fade" id="skillModal" tabindex="-1" aria-labelledby="skillModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel"><span id="level"></span>
-              <span id="topic_name"></span>: <span id="skill_name"></span>
+            <h5 class="modal-title" id="skillModalLabel">Edit Skill
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <form>
               <input type="text" id="skill_id" style="display: none;" />
+              <input type="text" id="topic_id" style="display: none;" />
+              <div class="mb-2">
+                <label for="skill_name" class="col-form-label">Skill Name</label>
+                <input type="text" class="form-control" id="skill_name">
+              </div>
+              <div class="mb-2">
+                <label for="skill_code" class="col-form-label">Skill Code</label>
+                <input type="text" class="form-control" id="skill_code" >
+              </div>
               <div class="mb-2">
                 <label for="num_of_qn" class="col-form-label">Number of Questions in a Quiz</label>
                 <input type="number" class="form-control" id="num_of_qn" step="10">
@@ -171,7 +226,8 @@
             </form>
           </div>
           <div class="d-flex justify-content-center pb-4">
-            <button id="updateSkill" type="button" class="btn">Update</button>
+            <button type="button" class="btn btn-outline-danger me-1 deleteSkillBtn">Delete</button>
+            <button type="button" class="btn btn-outline-warning updateSkillBtn">Submit</button>
           </div>
         </div>
       </div>

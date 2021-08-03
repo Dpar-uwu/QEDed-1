@@ -233,7 +233,7 @@ const fraction = {
             "medium": (medium/numOfMedium)*100,
             "difficult": (difficult/numOfDifficult)*100,
         }
-        score["total"] =  ((score.easy / 100 ) * numOfEasy + (score.medium / 100) * numOfMedium + (score.difficult/100) * numOfDifficult)/ 10 * 100;
+        score["total"] =  ((score.easy / 100 ) * numOfEasy + (score.medium / 100) * numOfMedium + (score.difficult/100) * numOfDifficult)/ numOfQ * 100;
         return [questions, score];
     }
 }
@@ -253,8 +253,7 @@ $(document).ready(function(){
     });
 
     if(window.location.toString().includes("ongoing")){
-        alert('No longer exist. Redirecting...');
-        location.href = 'quiz.html'
+        location.href = '404.html'
     }
 
     if(params != null){
@@ -301,22 +300,30 @@ $(document).on("click",".card",function(){
     }
 
     if(path != null || path != undefined){
-        var state = {
-            path : path,
-            id : id,
+        if(path != 'skill'){
+            var state = {
+                path : path,
+                id : id,
+            }
+            history.pushState(state, null, `?${path}=${id}`); 
+            getQuizAjax(path, id);
         }
-        history.pushState(state, null, `?${path}=${id}`); 
-        getQuizAjax(path, id);
+        else{
+            path = "trial";
+            if(window.location.toString().includes("quiz")){
+                path = "quiz";
+            }
+            window.open(`${path}.html?skill=${id}`);
+        }
     }
     else{
         alert("ERROR!");
     }    
 })
 
-$(document).on("click",".btn",function(){
+$(document).on("click",".click",function(){
     var id = this.id;
     if(id == "beginBtn"){
-        history.pushState(null, null, `?ongoing=true`);
         questionArray = [];
         funcs[quizData.topic_name].generateQuestion(quizData);
 
@@ -338,29 +345,15 @@ $(document).on("click",".btn",function(){
 
         if(isFill && isNumber || countdown < 1){  
             clearInterval(intervalId); 
-
+            
             var timeTaken = quizData.duration * 60 - countdown;
             var time = Math.floor(timeTaken/60) + "." + (timeTaken - (Math.floor(timeTaken/60)*60));
-
+            
             var result = funcs[quizData.topic_name].markQuiz(quizData, questionArray);
             var user = JSON.parse(localStorage.getItem("userInfo"));
             var status = (result[1].total >= 50) ? 'pass' : 'fail';
             
-            const data = {
-                    "skill_id": quizData.skillId, 
-                    "level": quizData.level,
-                    "skill_name": quizData.skill_name, 
-                    "topic_name": quizData.topic_name, 
-                    "done_by": user._id,
-                    "score": result[1], 
-                    "questions": result[0],
-                    "num_of_qn": quizData.num_of_qn,
-                    "percent_difficulty": quizData.percent_difficulty, 
-                    "time_taken": time,
-                    "isCompleted": true, 
-                    "created_at": Date.now, 
-            }
-
+            
             $('#skillName').remove();
             $('#support').before(
                 `<div class="row justify-content-center align-items-center text-center mt-4">
@@ -368,17 +361,52 @@ $(document).on("click",".btn",function(){
                     <div class="col-4">
                         <h2>Congratulations!</h2>
                         <p>You ${status} the ${quizData.skill_name} quiz!</p>
-                        <h6><u>${result[1].total} / 100 </u></h6>
+                        <h6><u>${Math.round(result[1].total)} / 100 </u></h6>
                     </div>
                     <i class="col-2 fas fa-glass-cheers fa-4x"></i>
+                    <a class="my-3" href="overview.html"><button class="btn btn-primary">Return back</button></a>
                 </div>
-                <div class="text-center">
-                    Take a look at your progress:
+                <div class="text-center"> Take a look at your progress:</div>`
+                )
+            createCanvas("support");
+            if(!window.location.toString().includes("trial")){
+                const data = {
+                        "skill_id": quizData.skillId, 
+                        "level": quizData.level,
+                        "skill_name": quizData.skill_name, 
+                        "topic_name": quizData.topic_name, 
+                        "done_by": user._id,
+                        "score": result[1], 
+                        "questions": result[0],
+                        "num_of_qn": quizData.num_of_qn,
+                        "percent_difficulty": quizData.percent_difficulty, 
+                        "time_taken": time,
+                        "isCompleted": true, 
+                        "created_at": Date.now, 
+                }
+                submitQuiz(data);
+            }
+            else{
+                for(let i = 0; i<5; i++){
+                    displayChart([50,60,10],i);
+                }
+                var modalHtml =
+                `<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                        <div class="modal-body text-center">
+                            <h5 class="modal-title my-3" id="staticBackdropLabel">Want more? Sign up for Free!!</h5>
+                            <a href="signup.html"><button class="btn btn-primary">Sign up!</button></a>
+                            <a href="index.html"><button class="btn btn-primary">Return to index</button></a>
+                        </div>
+                        </div>
+                    </div>
                 </div>`
-            )
-
+                $("body").append(modalHtml);
+                $(".modal").modal('show');
+                $('body>*:not(.modal)').css('filter', 'blur(10px)');
+            }
             history.pushState(null, null, `?ongoing=done`); 
-            submitQuiz(data);
             window.scrollTo(0,0);
         }
         else{
@@ -387,6 +415,10 @@ $(document).on("click",".btn",function(){
             alert(err);
         }
     }
+})
+
+$(document).on("click",".cancelBtn",function(){
+    window.close();
 })
 
 function displayCard(data,name){
@@ -420,7 +452,7 @@ function getQuizAjax(path, id){
         },
         error: function(xhr, textStatus, errorThrown){
             alert("ERROR!");
-            location.href = 'quiz.html'
+            location.href = '404.html'
         }
     });
 }
@@ -457,7 +489,7 @@ function after(path, data){
         $( "#withBars" ).after( 
             `<div class="row justify-content-center m-2">
                 <div  class="d-flex justify-content-center">
-                   <img src="images/QEDed.jpg" alt="Logo">
+                   <img src="images/Psleonline_logo_transparent.png" alt="Logo" style="width: 30%">
                 </div>
                 <div class="col-10 border rounded" id="content">
                     <div class="row flex-nowrap noBar justify-content-center">
@@ -470,7 +502,7 @@ function after(path, data){
                                     <p>The test will save and submit automatically when the time expires.</p>
                                 </div>
                                 <div class="text-end mt-5">
-                                    <button class="btn btn-primary" id="beginBtn">Begin Quiz</button>
+                                    <button class="btn btn-primary click" id="beginBtn">Begin Quiz</button>
                                 </div>
                             </div>
                         </div>
@@ -485,7 +517,7 @@ function displayQuestion(){
     container.innerHTML =  
     `<div class="h5 text-center my-3" id="skillName">${quizData.skill_name}</div>
     <div class="container row">
-        <div class="col-10 container justify-content-center" id="support">
+        <div class="col-10 container m-auto justify-content-center" id="support">
             <div class="row align-items-center">
                 <div class="col-1 text-end">
                     <i class="fas fa-stopwatch fa-lg"></i>
@@ -499,7 +531,7 @@ function displayQuestion(){
     </div>`;
 
     var content = funcs[quizData.topic_name].arrangeQuestion(quizData, questionArray);   
-    container.innerHTML += content + '<div class="text-center mb-3"><button class="btn-primary btn submitBtn">Submit</div>'
+    container.innerHTML += content + '<div class="text-center mb-3"><button class="btn-primary btn cancelBtn me-2">Cancel</button><button class="btn-primary btn click submitBtn">Submit</button></div>'
     startCountdown();
 }
 
@@ -539,11 +571,10 @@ function submitQuiz(data) {
         contentType: 'application/json',
         success: function(data, textStatus, xhr){
             $('.submitBtn').remove();
-            createCanvas("support");
             updateStats(""); 
 
             var container = document.getElementById("support");
-            container.className = "row m-0 justify-content-center";
+            container.className = "row m-0 m-auto justify-content-center";
             container.innerHTML += '<h4 class="my-5 text-center">Review Quiz</h4>';
         },
         error: function(xhr, textStatus, errorThrown){

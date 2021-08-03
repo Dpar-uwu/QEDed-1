@@ -63,7 +63,7 @@
     min-height: 20vh;
 }
 
-.level, .topicWrapper {
+.level, .topicWrapper, .addLevel {
     border-radius: 15px;
     cursor: pointer;
     width: 45%;
@@ -77,7 +77,7 @@
     /* box-shadow: 3px 10px 20px #fafafa; */
 }
 
-.level {
+.level, .addLevel {
     border-color: #ffcb45;
     background-color: #fffbf2;
     color: #ffcb45;
@@ -86,13 +86,13 @@
     padding: 0 0 8px;
 }
 
-.level:hover {
+.level:hover, .addLevel:hover {
     background-color: #ffcb45;
     color: #003844;
 }
 
 
-.level p {
+.level p, .addLevel p {
     margin: 0;
     font-weight: 600;
 }
@@ -104,7 +104,7 @@
     color: #003844;
 }
 
-.skill {
+.skill, .addSkill {
     padding: 9px;
     /* border-radius: 15px; */
     border-top: 1px solid #ddd;
@@ -113,7 +113,7 @@
     transition: 0.2s ease-in-out;
 }
 
-.skill:hover {
+.skill:hover, .addSkill:hover {
     /* background-color: #fffbf2; */
     background-color: #ffcb45;
     color: #003844;
@@ -133,13 +133,13 @@
     padding: 0.7em 1em;
 }
 
-#updateSkill {
+.updateSkillBtn {
     border-color: #ffcb45;
     background-color: #fffbf2;
     color: #ffcb45;
 }
 
-#updateSkill:hover {
+.updateSkillBtn:hover {
     background-color: #ffcb45;
     color: #fff;
     
@@ -182,4 +182,13 @@ label .fas:hover {
     .level, .topicWrapper {
         width: 95%;
     }
+}
+
+.addLevel{
+    border: dashed;
+}
+
+.icon{
+    position: relative;
+    left: 39%;
 }

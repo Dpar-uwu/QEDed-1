@@ -57,7 +57,7 @@ router.post("/:topicId",
         const { skill_code, skill_name, num_of_qn, percent_difficulty, duration, easy_values, medium_values, difficult_values } = req.body;
         try {
             console.time("POST skill by topic id");
-            const result = await levelModel.createSkillByLevelId(topicId, { skill_code, skill_name, num_of_qn, percent_difficulty, duration, easy_values, medium_values, difficult_values });
+            const result = await levelModel.createSkillByTopicId(topicId, { skill_code, skill_name, num_of_qn, percent_difficulty, duration, easy_values, medium_values, difficult_values });
 
             res.status(200).send({ new_id: result._id });
         } catch (err) {

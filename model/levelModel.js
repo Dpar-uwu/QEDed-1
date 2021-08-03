@@ -8,7 +8,9 @@ const LevelSchema = new Schema({
         type: Number,
         required: "Academic level required"
     },
-    topics: [ TopicSchema ]
+    topics:{
+        type: [ TopicSchema ],
+    }
 });
 
 
@@ -266,7 +268,7 @@ const levelModel = {
         })
     },
     // add skill by topic id
-    createSkillByLevelId: (topicId, skill) => {
+    createSkillByTopicId: (topicId, skill) => {
         return new Promise(async (resolve, reject) => {
             try {
                 const level = await Level.findOne({ "topics._id": topicId });

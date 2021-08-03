@@ -16,7 +16,7 @@
 
 .title {
     text-align: center;
-    margin: 0.6em 0 0.2em;
+    margin: 0.3em 0 0.2em;
     font-weight: 700;
     color: #003844;
     text-shadow: 2px 2px 0px #ffcb45;
@@ -75,20 +75,39 @@
     border: 1px solid #dedede;
     box-shadow: 3px 10px 20px rgba(59, 59, 59, 0.054);
     /* box-shadow: 3px 10px 20px #fafafa; */
+
 }
 
 .level, .addLevel {
     border-color: #ffcb45;
+    color: #fffbf2;
+    background-color: #ffcb45;
+    display: flex;
+    justify-content: center;
+    align-items: center
+}
+
+.level:hover {
     background-color: #fffbf2;
     color: #ffcb45;
 }
-.topicWrapper {
-    padding: 0 0 8px;
+
+#addLevelBtn {
+    border-color: #ffcb45;
+    background-color: #fffbf2;
+    color: #ffcb45;
+    display: flex;
+    justify-content: center;
+    align-items: center
 }
 
 .level:hover, .addLevel:hover {
     background-color: #ffcb45;
-    color: #003844;
+    color: #fff;
+}
+
+.topicWrapper {
+    padding: 0 0 8px;
 }
 
 
@@ -120,7 +139,34 @@
 }
 
 
-/* Modal Content Styles */
+/* NEW LEVEL FORM */
+.levelForm {
+    position: relative;
+}
+
+.form-btn-wrapper {
+    display: flex;
+    position: absolute;
+    top: 0;
+    /* right: 0; */
+    padding: 18px;
+    right: 24px;
+    z-index: -10px;
+}
+
+.confirmLevel, .cancelLevel {
+    color: #ffcb45;
+    padding: 3px;
+    margin: 0 4px;
+    transition: 0.2s ease;
+}
+
+.confirmLevel:hover, .cancelLevel:hover {
+    color: #ef798a;
+}
+
+
+/* NEW/UPDATE MODAL Content Styles */
 .modal-content {
     color: #003844;
 }
@@ -179,7 +225,7 @@ label .fas:hover {
 }
 
 @media (max-width: 768px) {
-    .level, .topicWrapper {
+    .level, .topicWrapper, #addLevelBtn, .levelForm {
         width: 95%;
     }
 }

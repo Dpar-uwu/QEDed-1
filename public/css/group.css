@@ -17,7 +17,7 @@
 
 .title {
     text-align: center;
-    margin: 0.6em 0 0.2em;
+    margin: 0.3em 0 0.2em;
     font-weight: 700;
     color: #003844;
     text-shadow: 2px 2px 0px #ffcb45;
@@ -73,15 +73,25 @@
     padding: 14px;
 }
 
-.group_name {
+.group_name{
     font-size: 18px;
     font-weight: 500;
 }
 
-.latest_msg {
+
+
+.latest_msg, .sender_name {
     font-size: 14px;
-    color: #17505d;
+    color: #256573;
 }
+
+.latest-msg-wrapper {
+    overflow: hidden;
+    position: relative;
+    height: 1.25em;
+
+}
+
 
 .group-icon {
     font-size: 24px;
@@ -96,14 +106,6 @@
 }
 
 /* ADD GROUP MODAL CONTENT */
-/* .form-control {
-    padding: 0.25em 0.2em;
-    border: 0;
-    border-radius: 5px 5px 0 0;
-    border-bottom: 1.3px solid #17505d;
-    transition: 0.3s ease-in-out;
-} */
-
 .modal-body {
     position: relative;
 }

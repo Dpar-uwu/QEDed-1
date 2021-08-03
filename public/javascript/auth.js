@@ -10,17 +10,17 @@ function decodeToken(){
     const token = localStorage.getItem('token');
     let decodedData = "";
 
-    if(token) {
-        let base64Url = token.split('.')[1]; // token you get
-        let base64 = base64Url.replace('-', '+').replace('_', '/');
-        decodedData = JSON.parse(window.atob(base64));
-    }
+    if(!token) return null;
+
+    let base64Url = token.split('.')[1]; // token you get
+    let base64 = base64Url.replace('-', '+').replace('_', '/');
+    decodedData = JSON.parse(window.atob(base64));
 
     return decodedData;
 }
 
 function checkAuth() {
-    var role = ["admin", "student", "teacher", "parent"];
+    let role = ["admin", "student", "teacher", "parent"];
     
     protectedRoutes.forEach(page => {
         if(page.route == window.location.pathname) {
@@ -30,7 +30,7 @@ function checkAuth() {
     
     try {
         const data = decodeToken();
-        if(data == "") throw new Error("Not Authenticated");
+        if(data == "" || !data) throw new Error("Not Authenticated");
         if(!role.includes(data.issuedRole)) throw new Error("Not Authorized");
         if(data.exp*1000 < new Date()) throw new Error("Token Expired");
         
@@ -57,6 +57,9 @@ function checkAuth() {
                     window.location.href = "./login.html";
                 }
             });
+        }
+        else {
+            window.location.href = "./login.html";
         }
     }
 }

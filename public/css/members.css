@@ -1,0 +1,359 @@
+#added-list {
+    scroll-behavior: smooth;
+}
+
+::-webkit-scrollbar {
+    width: 6px!important;
+    height: 6px!important;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,.2);
+}
+
+::-webkit-scrollbar-track {
+    background: hsla(0,0%,100%,.1);
+}
+
+.rightbar {
+    position: relative;
+}
+
+#edit-btn {
+    background-color: #ffcb45;
+    border-radius: 25px;
+    position: fixed;
+    right: 0;
+    /* bottom: 0; */
+    top: 80vh;
+    margin: 24px;
+    height: 50px;
+    width: 50px;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fefae0;
+    cursor: pointer;
+    box-shadow: 3px 10px 20px rgba(59, 59, 59, 0.1);
+}
+
+#owner, #educator, #student {
+    margin: 30px 40px;
+}
+
+.list-header {
+    padding: 10px 0;
+    /* margin-bottom: 8px; */
+    border-bottom: 1.4px solid #eee;
+    display: flex;
+    justify-content: space-between;
+}
+
+#student-count, #educator-count {
+    font-size: 13px;
+    overflow: visible;
+    word-wrap: none;
+}
+
+.member {
+    padding: 6px 8px;
+    margin-bottom: 4px;
+    transition: 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+.member:hover {
+    background-color: #fefae0;
+}
+
+.admin-tag {
+    border: 1px solid #ffcb45;
+    color: #ffcb45;
+    padding: 2px 8px;
+    font-size: 11px;
+    border-radius: 15px;
+    margin-left: 14px;
+    transition: 0.2s ease;
+}
+
+.member:hover .admin-tag {
+    border: 1px solid #ffcb45;
+    background-color: #ffcb45;
+    color: #fff;
+}
+
+
+#leaveGrpToggle {
+    border-color: #ef798a;
+    color: #ef798a;
+    border-radius: 15px;
+    margin: 10px 5% 24px;
+    width: 90%;
+}
+
+#leaveGrpToggle:hover {
+    border-color: #ef798a;
+    background-color: #ef798a;
+    color: #fff;
+}
+
+#leaveGrpToggle:focus {
+    border-color: #ef798a;
+    background-color: #ef798a;
+    color: #fff;
+    box-shadow: 0px 0px 0px 4px #ef798b8b !important;
+}
+
+@media (max-width: 576px) {
+    #owner, #educator, #student {
+        margin: 14px;
+    }
+}
+
+
+/* MANAGE GROUP MODAL */
+#exampleModalLabel {
+    margin-bottom: 16px;
+}
+
+.modal-body {
+    padding: 1.3rem;
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    margin: 8px;
+}
+
+.form-control-plaintext:focus {
+    outline: none;
+}
+
+.form-control {
+    padding: 0.25em 0.7em;
+}
+
+.form-control:focus, .btn:focus {
+    border-color: #ffcb45;
+    box-shadow: 0px 0px 0px 4px #ffe195;
+}
+
+.edit-name-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.edit-name {
+    cursor: pointer;
+    color: #ffcb45;
+    display: flex;
+    justify-content: flex-end;
+    align-content: center;
+}
+
+.modal-label {
+    margin: 10px 2px 0;
+    font-weight: 700;
+    padding: 5px 0;
+}
+
+.group-name-wrapper {
+    position: relative;
+}
+
+#check-icon {
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    padding: 0.5em 0.7em;
+    font-size: 1rem;
+    color: #ffcb45;
+    display: none;
+    transition: 0.2s ease;
+}
+
+
+/* POPOVER CONTENT */
+.popover_wrapper {
+    position: relative;
+}
+
+.popover_content {
+    width: 100%;
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    transform: translate(0, 10px);
+    background-color: #fff;
+    border: 1px solid #f5efcb;
+    transition: all 0.3s cubic-bezier(0.75, -0.02, 0.2, 0.97);
+    z-index: 10;
+}
+
+.display_popover {
+    visibility: visible;
+    opacity: 1;
+    transform: translate(0, 0px);
+}
+
+#search-list {
+    color: #003844;
+}
+
+.result {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    padding: 8px 14px;
+    border-bottom: 1px solid #f5efcb;
+}
+
+.result:hover {
+    background-color: #f5efcb;
+}
+
+.member-name {
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.email {
+    font-size: 13px;
+    color: #17505d;
+}
+
+/* ADDED MEMBERS LIST */
+
+#added-list {
+    color: #003844;
+    margin-top: 5px;
+    max-height: 170px;
+    overflow-y: scroll;
+}
+
+.list-member {
+    display: flex;
+    /* flex-direction: column; */
+    align-items: center;
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 15px;
+    transition: 0.2s ease-in-out;
+}
+
+.list-member:hover {
+    background-color: #f5efcb;
+}
+
+.list-member:hover .edit-member {
+    color: #17505d;
+    display: flex;
+}
+
+.member-details {
+    display: flex;
+    flex-direction: column;
+    width: 95%;
+}
+
+.list-member:hover .admin-tag-modal {
+    background-color: #003844;
+    border-color: #003844;
+    color: #fff;
+}
+.admin-tag-modal {
+    border: 1px solid #ffcb45;
+    border-radius: 15px;
+    color: #ffcb45;
+    padding: 1px 6px;
+    transition: 0.2s ease-in-out;
+}
+
+.edit-member {
+    cursor: pointer;
+    width: 5%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    transition: 0.2s ease-in-out;
+}
+
+.edit-member:focus {
+    display: flex;
+}
+
+.remove-member {
+    color: #ddd;
+    width: 5%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.remove-member:hover {
+    cursor: pointer;
+    color: #003844;
+}
+
+.added-name {
+    font-weight: 500;
+}
+
+#updateGroup {
+    border-color: #ffcb45;
+    color: #ffcb45;
+    font-weight: 500;
+    border-radius: 15px;
+}
+
+#updateGroup:hover {
+    background-color: #ffcb45;
+    color: #003844;
+}
+
+.btn-delete {
+    border-color: #ef798a;
+    color: #ef798a;
+    font-weight: 600;
+    border-radius: 15px;
+}
+
+.btn-delete:hover {
+    background-color: #ef798a;
+    color: #fff;
+}
+
+.btn-delete:focus {
+    box-shadow: 0px 0px 0px 4px #ef798b8b !important;
+}
+
+/* MEMBER ELlIPSIS DROPDOWN */
+
+.dropdown-menu {
+    font-size: 14px !important;
+}
+
+.dropdown-item {
+    cursor: pointer;
+    padding: 0.15em 0.7em;
+}
+
+.dropdown-item:active {
+    background-color: #ffcb45;
+}
+
+
+
+/* CONFIRM DELETE GROUP MODAL */
+#warning-icon {
+    color: #ef798a;
+    margin-bottom: 12px;
+    font-size: 32px;
+}

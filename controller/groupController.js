@@ -40,9 +40,9 @@ router.get("/user",
     });
 
 /**
- * GET /group/group?groupId=
+ * GET /group/members?groupId=
  */
-router.get("/group",
+router.get("/members",
     //validate("userId"),
     async (req, res) => {
         const { groupId } = req.query;
@@ -118,16 +118,16 @@ router.post("/addMember",
     //validate("benchmark"),
     async (req, res) => {
         const { groupId, userId } = req.query;
-        // 
+        
         try {
             console.time("POST addMember");
             const result = await groupModel.addMember(groupId, userId);
-            res.status(200).send(result);
+            res.status(200).send({ message: "Member Added" });
         } catch (err) {
-            // if (err == "NOT_FOUND")
-            //     res.status(404).send({ error: "User ID not found", code: err });
-            // else 
-            if (err instanceof Error || err instanceof MongoError)
+            console.log(err);
+            if (err == "USER_EXISTS")
+                res.status(422).send({ error: "User already exists in group", code: err });
+            else if (err instanceof Error || err instanceof MongoError)
                 res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
             else
                 res.status(500).send({ error: "Error adding member to grp", code: "UNEXPECTED_ERROR" });
@@ -136,6 +136,30 @@ router.post("/addMember",
         }
     });
 
+/**
+ * PUT /group?groupId=.. (update group name)
+ */
+router.put("/",
+    //validate("benchmark"),
+    async (req, res) => {
+        const { groupId } = req.query;
+        const { group_name } = req.body
+        try {
+            console.time("PUT update group name");
+            const result = await groupModel.updateGroupName(groupId, group_name);
+            res.status(200).send({message: "Group Name Updated"});
+        } catch (err) {
+            if (err == "NOT_FOUND")
+                res.status(404).send({ error: "Group ID not found", code: err });
+            else 
+            if (err instanceof Error || err instanceof MongoError)
+                res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+            else
+                res.status(500).send({ error: "Error updating group name", code: "UNEXPECTED_ERROR" });
+        } finally {
+            console.timeEnd("PUT update group name");
+        }
+    });
 /**
  * DELETE /group/removeMember?groupId=..&userId=..
  */
@@ -147,7 +171,7 @@ router.delete("/removeMember",
         try {
             console.time("DELETE removeMember");
             const result = await groupModel.removeMember(groupId, userId);
-            res.status(200).send(result);
+            res.status(200).send({message: "Member Deleted"});
         } catch (err) {
             // if (err == "NOT_FOUND")
             //     res.status(404).send({ error: "User ID not found", code: err });
@@ -174,9 +198,9 @@ router.put("/makeAdmin",
 
             res.status(200).send({ message: "Group Updated" });
         } catch (err) {
-            // if (err == "NOT_FOUND")
-            //     res.status(404).send({ error: "Topic ID not found", code: err });
-            // else 
+            if (err == "NOT_FOUND")
+                res.status(404).send({ error: "User or Group ID not found in group", code: err });
+            else 
             if (err instanceof Error || err instanceof MongoError)
                 res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
             else

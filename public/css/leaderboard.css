@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
-
 ::-moz-selection {
     color: #003844;
     background-color: #ffcb45;
@@ -10,17 +9,45 @@
     background-color: #ffcb45;
 }
 
-
 .rightbar {
     font-family: 'Roboto', Arial, Helvetica, sans-serif;
 }
 
 .title {
     text-align: center;
-    margin: 0.6em 0;
+    margin: 0.3em 0 0.2em;
     font-weight: 700;
     color: #003844;
     text-shadow: 2px 2px 0px #ffcb45;
+}
+
+/* FILTER STYLES */
+
+.filter {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 18px;
+}
+
+.filter-select {
+    width: 30%;
+    border-radius: 15px;
+    font-size: 13px;
+    padding: 0.25em 0.7em;
+}
+
+.filter-select:focus {
+    border-color: #ffcb45;
+    box-shadow: 0px 0px 0px 4px #ffe195;
+}
+
+/* NO RESULT */
+
+#noresult {
+    min-height: 40vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 /* TOP 3 Students */
@@ -45,12 +72,12 @@
 
 .top-rank-num {
     font-size: 16px;
-    font-weight:300;
+    font-weight: 300;
     padding: 10px;
 }
 
-
 /* TROPHY STYLES */
+
 .top-rank:nth-child(1) i {
     font-size: 49px;
     padding: 6px;
@@ -68,7 +95,6 @@
     padding: 6px;
     color: #dc934a;
 }
-
 
 .top-rank:nth-child(2) {
     order: -1;
@@ -96,7 +122,6 @@
     padding: 6px;
     width: 33%;
     font-size: 12px;
-    
 }
 
 .top-num-of-quiz, .top-avg-time {
@@ -104,6 +129,7 @@
 }
 
 /* Leaderboard list */
+
 .heading {
     font-size: 14px;
 }
@@ -168,6 +194,16 @@
     .top-rank-num {
         padding: 0;
     }
+    .stats {
+        flex-direction: column;
+    }
+    .top-avg-score, .top-num-of-quiz, .top-avg-time {
+        font-size: 9px;
+        width: 100%;
+        padding: 2px 0;
+        text-align: center;
+        border: none;
+    }
     .heading {
         font-size: 8px;
     }
@@ -192,10 +228,8 @@
     .name {
         font-size: 13px;
     }
-    .top-avg-score, .top-num-of-quiz, .top-avg-time {
-        font-size: 9px;
-    }
 }
+
 @media (min-width: 1200px) {
     #top-3 {
         grid-column-gap: 3em !important;

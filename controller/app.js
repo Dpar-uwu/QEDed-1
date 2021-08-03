@@ -12,8 +12,9 @@ const skillController = require("./skillController.js");
 const quizController = require("./quizController.js");
 const questionController = require("./questionController.js");
 const groupController = require("./groupController.js");
-const postController = require("./postController.js");
-const assignmentController = require('./assignmentController');
+const { router, postSocket } = require("./postController.js");
+const postController = router;
+// const assignmentController = require('./assignmentController');
 
 // const email = require("../email/email");
 const app = express();
@@ -34,7 +35,6 @@ app.use(cors({
 
 
 // json middleware
-// app.use(express.json()); // expect json in http req
 app.use(express.json({
     verify: (_req, res, buf, _encoding) => {
         try {
@@ -83,8 +83,10 @@ app.use((req, _res, next) => {
     // go to for console.log font color
     // https://stackoverflow.com/questions/9781218/how-to-change-node-jss-console-font-color
     console.log("\x1b[43m\x1b[30m", req.method, "\x1b[0m\x1b[1m", req.path, "\x1b[0m");
-    if (Object.keys(req.query).length !== 0) console.log("\x1b[34mquery:\x1b[0m", req.query);
-    if (Object.keys(req.body).length !== 0) console.log("\x1b[34mbody:\x1b[0m", req.body);
+    if (Object.keys(req.query).length !== 0)
+        console.log("\x1b[34mquery:\x1b[0m", req.query);
+    if (Object.keys(req.body).length !== 0)
+        console.log("\x1b[34mbody:\x1b[0m", req.body);
     next();
 });
 
@@ -106,7 +108,7 @@ app.use("/question", questionController);
 // group routes
 app.use("/group", groupController);
 app.use("/post", postController);
-app.use('/assignment', assignmentController);
+// app.use('/assignment', assignmentController);
 
 // uncaught error handling
 app.use((_error, _req, res, _next) => {
@@ -120,10 +122,79 @@ app.all("*", (_req, res) => {
     res.status(404).sendFile(path.resolve("public/404.html"))
 });
 
+
+/**
+ * WEBSOCKET
+ */
+const WebSocket = require("ws");
+let client = {};
+
+const socketListener = (server) => {
+    var socket = new WebSocket.Server({ server });
+
+    socket.on("connection", connection = (ws) => {
+        console.log("A user is connected");
+
+        ws.on("message", async message => {
+            let msg = JSON.parse(message);
+            switch (msg.action) {
+                case "message": {
+                    const result = await postSocket(msg);
+
+                    if (result) {
+                        Object.entries(client[msg.group_id]).forEach(([ahh, sock]) => {
+                            console.log(ahh)
+                            sock.send(message);
+                        });
+                    }
+                    break;
+                }
+                case "join": {
+                    let group_id = msg.group_id;
+                    let user_id = msg.user_id;
+
+                    // if group not exists, create one
+                    if (!client[group_id]) client[group_id] = {};
+
+                    // if same user makes another connection to the same group, the previous connection will be alerted then overwritten
+                    if (client[group_id][user_id]) {
+                        console.log("The user's connection to the group already exists");
+                        let data = {
+                            action: "duplicate member"
+                        };
+                        client[group_id][user_id].send(JSON.stringify(data));
+                    }
+                    client[group_id][user_id] = ws;
+                    break;
+                }
+                case "leave": {
+                    let group_id = msg.group_id;
+                    let user_id = msg.user_id;
+                    console.log(user_id, "leaving group");
+                    if (!client[group_id][user_id]) return; // not not in group do nothing
+
+                    // if the one exiting is the last one, destroy the group
+                    if (Object.keys(client[group_id]).length === 1) delete client[group_id];
+                    
+                    else delete client[group_id][user_id];// otherwise simply leave the group
+                }
+            }
+
+        });
+        ws.on("error", error => {
+            console.log("WEBSOCKET ERROR:", error);
+        });
+        ws.on("close", () => {
+            console.log("Client Connection Closed");
+        })
+    });
+};
+
+
 // handle unhandledrejection to prevent program from breaking
 process.on('unhandledRejection', error => {
     console.log('\x1b[31mWARNING! unhandledRejection\x1b[0m', error);
 });
 
 
-module.exports = app;
+module.exports = { app, socketListener };

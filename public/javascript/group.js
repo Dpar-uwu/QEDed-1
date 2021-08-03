@@ -1,83 +1,22 @@
+
 /* EVENT LISTENER */
 $(document).ready(function () {
-    // getGroupsByUser();
-
-
-    var sample = [
-        {
-            group_name: "5 Amethyst",
-            _id: "1234567890",
-            owner: "Matthew Tay",
-            latest_msg: "Hello, we will be reviewing fractions next week"
-        },
-        {
-            group_name: "4 Sapphire",
-            _id: "1234567890",
-            owner: "Annie Wong",
-            latest_msg: "Hello, we will be reviewing fractions next week"
-        },
-        {
-            group_name: "3 Emerald",
-            _id: "1234567890",
-            owner: "PSLEOnline",
-            latest_msg: "Hello, we will be reviewing fractions next week"
-        },
-        {
-            group_name: "6 Topaz",
-            _id: "0987654321",
-            owner: "Matthew Tay",
-            latest_msg: "Hello, we will be reviewing fractions next week"
-        },
-        // {
-        //     group_name: "1 Diamond",
-        //     _id: "0987654321",
-        //     owner: "Annie Wong",
-        //     latest_msg: "Hello, we will be reviewing fractions next week"
-        // },
-        // {
-        //     group_name: "5 Amethyst",
-        //     _id: "1234567890",
-        //     owner: "Genevieve Wong",
-        //     latest_msg: "Hello, we will be reviewing fractions next week"
-        // },
-        // {
-        //     group_name: "4 Sapphire",
-        //     _id: "1234567890",
-        //     owner: "Genevieve Wong",
-        //     latest_msg: "Hello, we will be reviewing fractions next week"
-        // },
-        // {
-        //     group_name: "3 Emerald",
-        //     _id: "1234567890",
-        //     owner: "Annie Wong",
-        //     latest_msg: "Hello, we will be reviewing fractions next week"
-        // },
-        // {
-        //     group_name: "6 Topaz",
-        //     _id: "0987654321",
-        //     owner: "Emily Tan",
-        //     latest_msg: "Hello, we will be reviewing fractions next week"
-        // }
-    ]
-
-    displayAllGroups(sample);
-
-    // (search) on key press event
-    $("#add-members").keyup(function() {
-        // console.log(e)
-        searchUserEmail();
-    })
-})
+    getGroupsByUser();
+});
 
 $(document).on("focusin", "#add-members", function() {
     searchUserEmail();
     $(".popover_content").toggleClass("display_popover");
-    
-})
+});
 $(document).on("focusout", "#add-members", function() {
     $(".popover_content").toggleClass("display_popover");
-})
+});
 
+$(document).on("keyup", "#add-members", function() {
+    searchUserEmail();
+});
+
+// MODAL
 // add user to member list
 $(document).on("click", ".result", function() {
     const id = this.id;
@@ -86,20 +25,34 @@ $(document).on("click", ".result", function() {
     displayAdded(id, name, email);
 });
 
+// remove member from list 
 $(document).on("click", ".remove-member", function() {
     this.parentElement.remove();
 });
 
+$(document).on("click", "#addGroup", function() {
+    createGroup();
+});
+
+// GROUP LISTING
+$(document).on("click", ".group", function() {
+    const groupId = this.id;
+    window.location.href = "/group_announcement.html?groupId="+groupId;
+});
+
+
+
 
 /* CALL APIs */
 function getGroupsByUser() {
-    var userId = localStorage.getItem("userInfo")._id;
-
+    var userId = JSON.parse(localStorage.getItem("userInfo"))._id;
+    
     $.ajax({
-        url: `/group/${userId}`,
+        url: `/group/user?userId=${userId}`,
         dataType: 'JSON',
         success: function (data, textStatus, xhr) {
-            displayAllGroups(data);
+            console.log(data)
+            displayMyGroups(data);
         },
         error: function (xhr, textStatus, errorThrown) {
             console.log(errorThrown);
@@ -122,9 +75,44 @@ function searchUserEmail() {
     });
 }
 
+function createGroup() {
+    var group_name =  document.querySelector("#group_name").value;
+    var owner = JSON.parse(localStorage.getItem("userInfo"))._id;
+    var membersList = Array.from(document.querySelector("#added-list").children);
+
+    var members = [];
+    membersList.forEach(memberElement => {
+        var id = (memberElement.id).split("added-")[1];
+        members.push({user_id: id});
+    });
+
+    var data =  {
+        group_name,
+        owner,
+        members
+    };
+    console.log(data)
+    $.ajax({
+        url: `/group`,
+        method: "POST",
+        data: JSON.stringify(data),
+        dataType: 'JSON',
+        contentType: 'application/json',
+        success: function (data, textStatus, xhr) {
+            alert("Group Created");
+            window.location.href = "";
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            console.log(errorThrown);
+        }
+    });
+}
+
+
+
 
 /* DISPLAY DATA */
-function displayAllGroups(data) {
+function displayMyGroups(data) {
     if(data.length >= 1) {
         var groupList = document.querySelector("#group-list");
 
@@ -134,16 +122,24 @@ function displayAllGroups(data) {
                 <div id="${group._id}" class="group">
                     <div class="group-body">
                         <span class="group_name">${group.group_name}</span><br>
-                        <span class="latest_msg">${group.latest_msg}</span>
+                        <div class="latest-msg-wrapper">
+                            <span class="sender_name">
+                                ${group.posts && group.posts.sender_name? group.posts.sender_name +": " : ""}
+                            </span>
+                            <span class="latest_msg">
+                                ${group.posts && group.posts.content? group.posts.content : "No Messages"}
+                            </span>
+                        </div>
                     </div>
                     <span class="group-owner">
                         <span class="group-icon">
                             <i class="fas fa-user-circle"></i>
                         </span>
-                        <span class="owner">${group.owner}</span>
+                        <span class="owner">${group.owner_name}</span>
                     </span>
                 </div>
             `;
+
         });
         groupList.innerHTML = content;
     }

@@ -55,10 +55,16 @@
                         <h5 class="member-role">Owner</h5>
                     </div>
                 </div>
-                <div id="educator">
+                <div id="parent">
                     <div class="list-header">
-                        <h5 class="member-role">Educators</h5>
-                        <span id="educator-count"></span>
+                        <h5 class="member-role">Parent</h5>
+                        <span id="parent-count"></span>
+                    </div>
+                </div>
+                <div id="teacher">
+                    <div class="list-header">
+                        <h5 class="member-role">Teachers</h5>
+                        <span id="teacher-count"></span>
                     </div>
                 </div>
                 <div id="student">
@@ -106,13 +112,33 @@
                                 <!-- ADDDED MEMBERS FO HERE -->
                             </div>
                         </div>
-                        <span id="error" style="color:red;"></span>
+                        <span id="error"></span>
                     </form>
                 </div>
                 <div class="d-flex justify-content-center pb-4">
                     <!-- <button id="updateGroup" type="button" class="btn">Update</button> -->
                     <button type="button" class="btn btn-delete" data-bs-toggle="modal"
                         data-bs-target="#delGrpModal" data-bs-dismiss="modal">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm remove member modal -->
+    <div class="modal fade" id="rmMemberModal" tabindex="-1" aria-labelledby="rmMemberModal" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="d-flex flex-column align-items-center">
+                        <i id="warning-icon" class="fas fa-exclamation-triangle"></i>
+                        <h4 class="pb-1">Are you sure you want to remove this person?</h4>
+                        <small class="text-center">You can always add the person back</small>
+                        <input id="rmUID" hidden>
+                    </div>
+                    <div class="d-flex justify-content-center pt-3">
+                        <button type="button" class="btn" data-bs-dismiss="modal">CANCEL</button>
+                        <button id="rm-member" type="button" class="btn btn-rm" data-bs-dismiss="modal">REMOVE</button>
+                    </div>
                 </div>
             </div>
         </div>

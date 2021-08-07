@@ -169,7 +169,8 @@ const groupModel = {
                     },
                     {
                         $unwind: {
-                            path: "$members"
+                            path: "$members",
+                            preserveNullAndEmptyArrays: true
                         }
                     },
                     {

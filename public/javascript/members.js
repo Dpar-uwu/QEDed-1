@@ -9,7 +9,7 @@ $(document).ready(function () {
 
 
 // on click on leave group button
-$(document).on("click", "#leaveGroup", function() {
+$(document).on("click", "#leaveGroup", function () {
     let userId = decodeToken().sub;
     removeMemberFromGroup(groupId, userId, () => {
         window.location.href = "/group.html";
@@ -17,32 +17,40 @@ $(document).on("click", "#leaveGroup", function() {
 });
 
 // search user by mail input
-$(document).on("keyup", "#group_name", function() {
+$(document).on("keyup", "#group_name", function () {
     document.querySelector("#check-icon").style.display = "block";
 });
 
 // on click check icon update group_name
-$(document).on("click", "#check-icon", function() {
+$(document).on("click", "#check-icon", function () {
     let group_name = document.querySelector("#group_name").value;
-    updateGroupName(groupId, group_name);
+    updateGroupName(groupId, group_name, function () {
+        document.querySelector("#check-icon").style.display = "none";
+    });
+});
+
+// toggle alert when removing member
+$(document).on("click", ".rmMemberToggle", function () {
+    let userId = (this.closest(".list-member").id).split("added-")[1];
+    document.querySelector("#rmUID").value = userId;
 });
 
 // toggle result popover on focus
-$(document).on("focusin", "#add-members", function() {
+$(document).on("focusin", "#add-members", function () {
     searchUserEmail();
     $(".popover_content").toggleClass("display_popover");
 });
-$(document).on("focusout", "#add-members", function() {
+$(document).on("focusout", "#add-members", function () {
     $(".popover_content").toggleClass("display_popover");
 });
 
 // search user by mail input
-$(document).on("keyup", "#add-members", function() {
+$(document).on("keyup", "#add-members", function () {
     searchUserEmail();
 });
 
 // add user to member list
-$(document).on("click", ".result", function() {
+$(document).on("click", ".result", function () {
     const id = this.id;
     const name = this.children[0].innerHTML;
     const email = this.children[1].innerHTML;
@@ -50,24 +58,24 @@ $(document).on("click", ".result", function() {
 });
 
 // remove user on click dropdown
-$(document).on("click", "#rm-member", function() {
-    let userId = (this.closest(".list-member").id).split("added-")[1];
+$(document).on("click", "#rm-member", function () {
+    let userId = document.querySelector("#rmUID").value;
     removeMemberFromGroup(groupId, userId, () => {
-        this.closest(".list-member").remove();
+        document.querySelector("#added-"+userId).remove();
     });
 });
 // make user an admin on click dropdown item
-$(document).on("click", "#mk-admin", function() {
+$(document).on("click", "#mk-admin", function () {
     let userId = (this.closest(".list-member").id).split("added-")[1];
     makeGroupAdmin(groupId, userId, this.closest(".list-member"));
 });
 // remove user an admin on click dropdown item
-$(document).on("click", "#rm-admin", function() {
+$(document).on("click", "#rm-admin", function () {
     let userId = (this.closest(".list-member").id).split("added-")[1];
     rmGroupAdmin(groupId, userId, this.closest(".list-member"));
 });
 // delete group
-$(document).on("click", "#delGroup", function() {
+$(document).on("click", "#delGroup", function () {
     deleteGroup(groupId);
 });
 
@@ -107,7 +115,7 @@ function getGroupMembers() {
 }
 
 function searchUserEmail() {
-    var q =  document.querySelector("#add-members").value;
+    var q = document.querySelector("#add-members").value;
 
     $.ajax({
         url: `/user/search?query=${q}`,
@@ -145,7 +153,7 @@ function removeMemberFromGroup(groupId, userId, successCallback) {
         dataType: 'JSON',
         success: function (data, textStatus, xhr) {
             let myId = decodeToken().sub;
-            if(myId == userId) {
+            if (myId == userId) {
                 window.location.href = "/group.html";
             }
             else {
@@ -181,8 +189,8 @@ function rmGroupAdmin(groupId, userId, parentElement) {
         dataType: 'JSON',
         success: function (data, textStatus, xhr) {
             let myId = decodeToken().sub;
-            if(myId == userId) {
-                window.location.href = "/group_members.html?groupId="+groupId;
+            if (myId == userId) {
+                window.location.href = "/group_members.html?groupId=" + groupId;
             }
             else {
                 hideAdminTag(parentElement);
@@ -210,7 +218,7 @@ function deleteGroup(groupId) {
     });
 }
 
-function updateGroupName(groupId, groupName) {
+function updateGroupName(groupId, groupName, successCallback) {
     $.ajax({
         url: `/group?groupId=${groupId}`,
         type: "PUT",
@@ -220,7 +228,7 @@ function updateGroupName(groupId, groupName) {
         dataType: 'JSON',
         contentType: "application/json",
         success: function (data, textStatus, xhr) {
-            
+            successCallback();
         },
         error: function (xhr, textStatus, errorThrown) {
             console.log(errorThrown);
@@ -242,22 +250,21 @@ function displayGroup(data) {
     let memberIndex = data.members.findIndex(member => {
         return member.user_id == decoded.sub
     });
-    
+
     let isGrpAdmin;
-    if(memberIndex != -1)
+    if (memberIndex != -1)
         isGrpAdmin = data.members[memberIndex].is_admin;
 
     let isGrpOwner = (data.owner == decoded.sub);
 
-    if(isGrpAdmin || isGrpOwner) {
+    if (isGrpAdmin || isGrpOwner) {
         $(".rightbar").prepend(`
             <div id="edit-btn" data-bs-toggle="modal" data-bs-target="#addGroupModal">
                 <i class="fas fa-pen"></i>
             </div>
         `);
     }
-    if(isGrpOwner) {
-        console.log(isGrpOwner)
+    if (isGrpOwner) {
         document.querySelector("#leaveGrpToggle").style.display = "none";
     }
 }
@@ -266,7 +273,8 @@ function displayGroup(data) {
 function displayMembers(data) {
     // main page
     let ownerList = document.querySelector("#owner");
-    let educatorList = document.querySelector("#educator");
+    let parentList = document.querySelector("#parent");
+    let teacherList = document.querySelector("#teacher");
     let studentList = document.querySelector("#student");
 
     // modal page
@@ -280,31 +288,42 @@ function displayMembers(data) {
         </div>
     `;
 
-    // display owneer in modal
+    // display owner in modal
     group_owner.value = data.owner.first_name + " " + data.owner.last_name
 
 
     // display members
-    if(data.members && data.members.length >= 1) {
+    console.log(data.members)
+    if (data.members && data.members.length >= 1) {
         data.members.forEach(member => {
-            if(member.role == "student") {
-                studentList.innerHTML += `
+            if (!jQuery.isEmptyObject(member)) {
+                if (member.role == "student") {
+                    studentList.innerHTML += `
                     <div class="member" id="${member.user_id}">
                         <span class="member-name">${member.user_name}</span>
-                        ${member.is_admin? '<span class="admin-tag">Admin</span>' : ""}
+                        ${member.is_admin ? '<span class="admin-tag">Admin</span>' : ""}
                     </div>
-                `;
-            } else {
-                educatorList.innerHTML += `
+                    `;
+                }
+                else if(member.role == "parent") {
+                    parentList.innerHTML += `
                     <div class="member" id="${member.user_id}">
                         <span class="member-name">${member.user_name}</span>
-                        ${member.is_admin? '<span class="admin-tag">Admin</span>' : ""}
+                        ${member.is_admin ? '<span class="admin-tag">Admin</span>' : ""}
                     </div>
-                `;
-            }
+                    `;
+                }
+                else {
+                    teacherList.innerHTML += `
+                    <div class="member" id="${member.user_id}">
+                        <span class="member-name">${member.user_name}</span>
+                        ${member.is_admin ? '<span class="admin-tag">Admin</span>' : ""}
+                    </div>
+                    `;
+                }
 
-            // display members in modal
-            addedList.innerHTML += `
+                // display members in modal
+                addedList.innerHTML += `
                 <div class="list-member" id="added-${member.user_id}">
                     <div class="member-details">
                         <span class="added-name">${member.user_name}</span>
@@ -312,24 +331,29 @@ function displayMembers(data) {
                         <span class="added-role">${member.role}</span>
                     </div>
                     <div class="is_admin">
-                        ${member.is_admin? '<span class="admin-tag-modal">Admin</span>' : ""}
+                        ${member.is_admin ? '<span class="admin-tag-modal">Admin</span>' : ""}
                     </div>
                     <div class="edit-member" data-bs-toggle="dropdown" aria-expanded="false">
                         <span class="fas fa-ellipsis-v"></span>
                     </div>
                     <ul class="dropdown-menu">
-                    ${member.is_admin? 
+                    ${member.is_admin ?
                         '<li class="dropdown-item" id="rm-admin">Remove Admin</li>' :
-                        '<li class="dropdown-item" id="mk-admin">Make Admin</li>' }
-                        <li class="dropdown-item" id="rm-member">Remove Member</li>
+                        '<li class="dropdown-item" id="mk-admin">Make Admin</li>'}
+                        <li class="dropdown-item rmMemberToggle"
+                            data-bs-toggle="modal"
+                            data-bs-target="#rmMemberModal">Remove Member</li>
                     </ul>
                 </div>
             `;
+
+            }
         });
     }
 
     // display count (minus 1 to exclude header)
-    document.querySelector("#educator-count").innerHTML = document.querySelector("#educator").children.length - 1 + " educators";
+    document.querySelector("#parent-count").innerHTML = document.querySelector("#parent").children.length - 1 + " parents";
+    document.querySelector("#teacher-count").innerHTML = document.querySelector("#teacher").children.length - 1 + " teachers";
     document.querySelector("#student-count").innerHTML = document.querySelector("#student").children.length - 1 + " students";
 }
 
@@ -338,7 +362,7 @@ function displaySearchResult(data) {
     let searchList = document.querySelector("#search-list");
     let content = "";
 
-    if(data.length < 1 ) {
+    if (data.length < 1) {
         content += `
             <div class="text-center p-2"><small>No result</small></div>
         `;
@@ -368,7 +392,7 @@ function displayAdded(id, name, email) {
     });
 
     // add to members list if user is not already in it
-    if(!userExists) {
+    if (!userExists) {
         addedList.innerHTML += `
         <div class="list-member" id="added-${id}">
             <div class="member-details">
@@ -380,7 +404,9 @@ function displayAdded(id, name, email) {
             </div>
             <ul class="dropdown-menu">
                 <li class="dropdown-item" id="mk-admin">Make Admin</li>
-                <li class="dropdown-item" id="rm-member">Remove Member</li>
+                <li class="dropdown-item rmMemberToggle"
+                    data-bs-toggle="modal"
+                    data-bs-target="#rmMemberModal">Remove Member</li>
             </ul>
         </div>
         `;
@@ -396,7 +422,7 @@ function displayAdminTag(parentElement) {
         <span class="admin-tag-modal">Admin</span>
     `;
     mkAdmin.remove();
-    
+
     let li = document.createElement("li");
     li.id = "rm-admin";
     li.classList.add("dropdown-item");
@@ -423,13 +449,13 @@ function hideAdminTag(parentElement) {
 /* MISC FUNCTIONS */
 function decodeToken() {
     const token = localStorage.getItem('token');
-    if(!token || token == "") window.location.href="/login.html";
-    
+    if (!token || token == "") window.location.href = "/login.html";
+
     let base64Url = token.split('.')[1]; // token you get
     let base64 = base64Url.replace('-', '+').replace('_', '/');
     let decodedData = JSON.parse(window.atob(base64));
-    
-    
+
+
 
     return decodedData;
 }

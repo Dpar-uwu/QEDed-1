@@ -22,7 +22,7 @@
 
 /* NO CONTENT */
 #noresult {
-    min-height: 60vh;
+    min-height: 70vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -66,7 +66,8 @@
 }
 
 .own .text {
-    background-color: #fefae0;
+    /* background-color: #fefae0; */
+    background-color: #eaf3ff;
 }
 
 
@@ -130,6 +131,7 @@
     border-radius: 25px;
     height: 24px;
     max-height: 100px;
+    caret-color: #ef798a;
 }
 
 ::-webkit-scrollbar {
@@ -157,7 +159,8 @@
 
 #input-msg:focus {
     box-shadow: none;
-    border-color: #ffcb45;
+    /* border-color: #ffcb45; */
+    border: 1px solid #ced4da;
 }
 
 

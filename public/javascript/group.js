@@ -1,7 +1,11 @@
 
 /* EVENT LISTENER */
 $(document).ready(function () {
+    $(".header").load("rightbar.html", function(){
+        document.getElementById("name").innerHTML = getName();
+    });
     getGroupsByUser();
+    displayForEducator();
 });
 
 $(document).on("focusin", "#add-members", function() {
@@ -195,4 +199,33 @@ function displayAdded(id, name, email) {
             </div>
         `;
     }
+}
+
+
+function displayForEducator() {
+    let role = decodeToken().issuedRole;
+
+    if(role == "teacher" || role == "parent" || role == "admin") {
+        let createGroupBtn = `
+            <button class="btn add-btn" data-bs-toggle="modal" data-bs-target="#addGroupModal">
+                Create Group
+            </button>
+        `;
+        document.querySelector(".btn-wrapper").innerHTML += createGroupBtn;
+    }
+}
+
+
+/* MISC FUNCTIONS */
+function decodeToken() {
+    const token = localStorage.getItem('token');
+    if (!token || token == "") window.location.href = "/login.html";
+
+    let base64Url = token.split('.')[1]; // token you get
+    let base64 = base64Url.replace('-', '+').replace('_', '/');
+    let decodedData = JSON.parse(window.atob(base64));
+
+
+
+    return decodedData;
 }

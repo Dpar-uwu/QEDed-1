@@ -14,7 +14,7 @@ const questionController = require("./questionController.js");
 const groupController = require("./groupController.js");
 const { router, postSocket } = require("./postController.js");
 const postController = router;
-// const assignmentController = require('./assignmentController');
+const assignmentController = require('./assignmentController');
 
 // const email = require("../email/email");
 const app = express();
@@ -108,7 +108,7 @@ app.use("/question", questionController);
 // group routes
 app.use("/group", groupController);
 app.use("/post", postController);
-// app.use('/assignment', assignmentController);
+app.use('/assignment', assignmentController);
 
 // uncaught error handling
 app.use((_error, _req, res, _next) => {

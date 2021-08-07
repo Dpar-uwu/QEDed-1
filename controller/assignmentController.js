@@ -25,9 +25,9 @@ router.get("/group",
             const result = await assignmentModel.getAsgByGrpId(groupId);
             res.status(200).send(result);
         } catch (err) {
-            // if (err == "NOT_FOUND")
-            //     res.status(404).send({ error: "Group ID not found", code: err });
-            // else 
+            if (err == "NOT_FOUND")
+                res.status(404).send({ error: "Group ID not found", code: err });
+            else 
             if (err instanceof Error || err instanceof MongoError)
                 res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
             else
@@ -38,7 +38,7 @@ router.get("/group",
     });
 
 /**
- * GET /assignment/user/:userId  get asg by user id
+ * GET /assignment/user?userId=  get asg by user id
  */
 router.get("/user",
     //validate("userId"),

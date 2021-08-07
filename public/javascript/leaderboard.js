@@ -1,5 +1,8 @@
 /* EVENT LISTENER */
 $(document).ready(function () {
+    $(".header").load("rightbar.html", function(){
+        document.getElementById("name").innerHTML = getName();
+    });
     getLeaderboard();
 });
 

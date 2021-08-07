@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
-
 ::-moz-selection {
     color: #003844;
     background-color: #ffcb45;
@@ -19,7 +18,6 @@
     margin: 0.3em 0 0.2em;
     font-weight: 700;
     color: #003844;
-    text-shadow: 2px 2px 0px #ffcb45;
 }
 
 .rightbar {
@@ -63,78 +61,123 @@
     min-height: 20vh;
 }
 
-.level, .topicWrapper, .addLevel {
+.level, .topicWrapper {
     border-radius: 15px;
     cursor: pointer;
-    width: 45%;
-    margin: 12px 0;
+    width: 40%;
+    margin: 8px 0;
     padding: 14px;
     transition: 0.2s ease-in-out;
     background-color: #fff;
     color: #000;
     border: 1px solid #dedede;
-    box-shadow: 3px 10px 20px rgba(59, 59, 59, 0.054);
-    /* box-shadow: 3px 10px 20px #fafafa; */
-
+    box-shadow: 3px 10px 10px #ffe19511;
 }
 
-.level, .addLevel {
-    border-color: #ffcb45;
-    color: #fffbf2;
-    background-color: #ffcb45;
+.level {
     display: flex;
     justify-content: center;
-    align-items: center
+    align-items: center;
+    border-color: transparent;
+    color: #003844;
+    background-color: #ffcb45;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 .level:hover {
-    background-color: #fffbf2;
-    color: #ffcb45;
+    background-color: #003844;
+    color: #fefae0;
+    box-shadow: 3px 3px 10px 1px #00384477;
 }
 
-#addLevelBtn {
-    border-color: #ffcb45;
-    background-color: #fffbf2;
-    color: #ffcb45;
-    display: flex;
-    justify-content: center;
-    align-items: center
-}
-
-.level:hover, .addLevel:hover {
-    background-color: #ffcb45;
-    color: #fff;
-}
-
-.level i {
-    padding: 6px;
+.icon {
+    position: absolute;
+    right: -26px;
+    top: -26px;
+    border-radius: 50%;
+    background: #ffe195;
+    color: #003844;
+    padding: 10px;
     transition: color 0.2s ease;
 }
 
-.level i:hover {
+.level:hover .icon {
     color: #003844;
+    background-color: #ffcb45;
+}
+
+.icon:hover {
+    color: #fefae0 !important;
+    background-color: #ef798a !important;
+}
+
+.addLevel, .addTopic {
+    background-color: #ffcb45;
+    border-radius: 25px;
+    position: fixed;
+    right: 0;
+    top: 82vh;
+    margin: 28px;
+    padding: 6px 18px;
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fefae0;
+    cursor: pointer;
+    box-shadow: 3px 10px 20px #ffcb4577;
+    transition: 0.2s ease;
+    z-index: 5;
+}
+
+.addLevel:hover, .addTopic:hover {
+    transform: translateY(-7px);
+    background-color: #ffcb45;
+    color: #fff;
+    font-size: 19px;
+}
+
+.addTopic:focus {
+    box-shadow: none;
 }
 
 .topicWrapper {
     padding: 0 0 8px;
 }
 
-
-.level p, .addLevel p {
+.level p {
     margin: 0;
     font-weight: 600;
 }
 
 .topic p {
-    margin: 14px;
+    margin: 0;
+    padding: 14px;
     font-weight: 700;
     font-size: 18px;
+}
+
+.editTopic {
+    border-radius: 15px 15px 0 0;
+    background-color: #fefae0;
     color: #003844;
+    transition: 0.2s ease;
+}
+
+.editTopic:hover {
+    background-color: #ffcb45;
+    color: #fefae0;
+}
+
+.level-container {
+    width: 100%;
+    position: relative;
 }
 
 .skill, .addSkill {
     padding: 9px;
-    /* border-radius: 15px; */
     border-top: 1px solid #ddd;
     text-align: center;
     color: #ffcb45;
@@ -142,40 +185,78 @@
 }
 
 .skill:hover, .addSkill:hover {
-    /* background-color: #fffbf2; */
-    background-color: #ffcb45;
-    color: #003844;
+    background-color: #fefae0;
+    color: #ffcb45;
 }
 
 
 /* NEW LEVEL FORM */
-.levelForm {
-    position: relative;
-}
-
-.form-btn-wrapper {
-    display: flex;
+.close {
     position: absolute;
-    top: 0;
-    /* right: 0; */
-    padding: 18px;
-    right: 24px;
-    z-index: -10px;
+    right: 16px;
+    top: 16px;
+    margin: 8px;
 }
 
-.confirmLevel, .cancelLevel {
-    color: #ffcb45;
-    padding: 3px;
-    margin: 0 4px;
+.close:focus {
+    box-shadow: none;
+}
+
+.form-control-plaintext:focus {
+    outline: none;
+}
+
+.modal-header {
+    border: none !important;
+}
+
+.modal-footer {
+    border: none !important;
+    display: flex;
+    justify-content: center;
+}
+
+.form-control, .form-select {
+    padding: 0.4rem .75rem;
+    font-size: 14px;
+    font-family: "Poppins", "Roboto", "Segoe UI", sans-serif;
+    border: 1.3px solid #f3f3f3;
+    border-radius: 15px;
+    background-color: #f3f3f3;
     transition: 0.2s ease;
 }
 
-.confirmLevel:hover, .cancelLevel:hover {
-    color: #ef798a;
+.form-control:focus, .form-select:focus {
+    border-color: #ffcb45;
+    background-color: #fff;
+    box-shadow: 2px 5px 10px 2px #ffcb4544;
+}
+
+.input-group-text {
+    font-size: 14px;
+    font-family: "Poppins", "Roboto", "Segoe UI", Arial, sans-serif;
+    color: #003844;
+    background-color: #f3f3f3;
+    border-color: #f3f3f3;
+    font-weight: 500;
+    border-radius: 0 15px 15px 0;
+}
+
+.col-form-label {
+    padding: 4px 0;
+    font-size: 14px;
+    font-family: "Poppins", "Roboto", "Segoe UI", sans-serif;
+    font-weight: 600;
+}
+
+/* ADD/EDIT LEVEL MODAL */
+#inputLevel, #inputTopic {
+    text-align: center;
 }
 
 
 /* NEW/UPDATE MODAL Content Styles */
+
 .modal-content {
     color: #003844;
 }
@@ -188,31 +269,6 @@
     padding: 0.7em 1em;
 }
 
-.updateSkillBtn {
-    border-color: #ffcb45;
-    background-color: #fffbf2;
-    color: #ffcb45;
-}
-
-.updateSkillBtn:hover {
-    background-color: #ffcb45;
-    color: #fff;
-    
-}
-
-.form-control {
-    padding: 0.25em 0.7em;
-}
-
-.form-control:focus , .btn:focus {
-    border-color: #ffcb45;
-    box-shadow: 0px 0px 0px 4px #ffe195;
-}
-
-.col-form-label {
-    padding: 2px 0;
-}
-
 #easy_num, #medium_num, #difficult_num {
     font-size: 0.8em;
     margin-bottom: 3px;
@@ -222,11 +278,49 @@
     margin-bottom: 10px;
 }
 
-.input-group-text {
-    color: #003844;
+/* button styles */
+.deleteSkillBtn, .deleteTopicBtn,
+.deleteLevelBtn {
+    border: 1.3px solid #ef798a;
+    color: #ef798a;
+    font-weight: 600;
+    border-radius: 15px;
+}
+
+.deleteSkillBtn:hover, .deleteTopicBtn:hover,
+.deleteLevelBtn:hover {
+    background-color: #ef798a;
+    color: #fff;
+    box-shadow: 4px 5px 16px #ef798a55;
+}
+
+.deleteSkillBtn:focus, .deleteTopicBtn:focus,
+.deleteLevelBtn:focus {
+    box-shadow: 0px 0px 0px 4px #ef798b8b !important;
+}
+
+.updateSkillBtn, .addTopicBtn, 
+.addLevelBtn, .addSkillBtn, .editTopicBtn,
+.editLevelBtn {
+    border: 1.3px solid #ffcb45;
+    font-weight: 600;
+    border-radius: 15px;
+    background-color: #fffbf2;
+    color: #ffcb45;
+}
+
+.updateSkillBtn:hover, .addTopicBtn:hover, 
+.addLevelBtn:hover, .addSkillBtn:hover, .editTopicBtn:hover,
+.editLevelBtn:hover {
     background-color: #ffcb45;
-    border-color: #ffcb45;
-    font-weight: 500;
+    color: #fff;
+    box-shadow: 4px 5px 16px #ffcb4555;
+}
+
+.updateSkillBtn:focus, .addTopicBtn:focus, 
+.addLevelBtn:focus, .addSkillBtn:focus, .editTopicBtn:focus,
+.editLevelBtn:focus {
+    box-shadow: none;
 }
 
 label .fas:hover {
@@ -234,16 +328,7 @@ label .fas:hover {
 }
 
 @media (max-width: 768px) {
-    .level, .topicWrapper, #addLevelBtn, .levelForm {
+    .level, .topicWrapper, .levelForm {
         width: 95%;
     }
-}
-
-.addLevel{
-    border: dashed;
-}
-
-.icon{
-    position: relative;
-    left: 39%;
 }

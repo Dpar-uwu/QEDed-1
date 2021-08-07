@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PSLEOnline | Leaderboard</title>
+    <title>PSLEOnline | Assignments</title>
 
     <!--Bootstrap-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -28,41 +28,27 @@
     <!--Javascript-->
     <script src="./javascript/auth.js"></script>
     <script src="./javascript/sidebar.js"></script>
-    <script src="./javascript/leaderboard.js"></script>
+    <script src="./javascript/assignment.js"></script>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="./css/leaderboard.css">
+    <link rel="stylesheet" href="./css/assignment.css">
 </head>
 
 <body class="container-fluid">
     <div class="row flex-nowrap">
         <div class="sidebar col-auto col-sm-4 col-md-3 col-xl-2 px-sm-2 px-0 border-end"></div>
-        <div class="rightbar col p-0 content">
+        <div class="rightbar col p-3 content">
             <div class="header"></div>
-            <h3 class="title-leaderboard">Global Leaderboard</h3>
-            <div class="filter">
-                <select class="form-select filter-select" aria-label="Filter">
-                    <option class="level-option" value="" selected>All Levels</option>
-                    <option class="level-option" value="1">Primary 1</option>
-                    <option class="level-option" value="2">Primary 2</option>
-                    <option class="level-option" value="3">Primary 3</option>
-                    <option class="level-option" value="4">Primary 4</option>
-                    <option class="level-option" value="5">Primary 5</option>
-                    <option class="level-option" value="6">Primary 6</option>
-                </select>
+            <h3 class="title-assignment">Assignments</h3>
+            <div id="assignment-list">
+                <div id="noresult">
+                    <i class="far fa-laugh-beam text-center"
+                        style="font-size: 100px;color:#ef798a;text-shadow: 4px 4px 0px #98c5ff"></i>
+                    <span class="h5 pt-4 text-center" style="color:#003844">Yay! You currently have no assignments.<br>
+                        Go play some games.</span>
+                </div>
             </div>
-            <div id="top-3">
 
-            </div>
-            <div id="leaderboard">
-                <!-- leaderboard will load here with javascript -->
-            </div>
-            <div id="noresult" style="min-height: 40vh;">
-                <i class="fas fa-trophy text-center"
-                    style="font-size: 100px;color:#ef798a;text-shadow: 5px 5px 0px #98c5ff, -5px -5px 0px #ffcb45"></i>
-                <span class="h5 pt-4 text-center" style="color:#003844">No Content. Do a quiz to join the
-                    ranks!</span>
-            </div>
         </div>
     </div>
 </body>

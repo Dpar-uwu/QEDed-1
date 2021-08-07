@@ -25,9 +25,9 @@ router.get("/group",
             const result = await assignmentModel.getAsgByGrpId(groupId);
             res.status(200).send(result);
         } catch (err) {
-            if (err == "NOT_FOUND")
-                res.status(404).send({ error: "Group ID not found", code: err });
-            else 
+            // if (err == "NOT_FOUND")
+            //     res.status(404).send({ error: "Group ID not found", code: err });
+            // else 
             if (err instanceof Error || err instanceof MongoError)
                 res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
             else
@@ -38,7 +38,31 @@ router.get("/group",
     });
 
 /**
- * GET /assignment/user?userId=  get asg by user id
+* GET /assignment/progress?userId=..
+*/
+router.get("/progress",
+    //validate("userId"),
+    async (req, res) => {
+        const { userId } = req.query;
+        try {
+            console.time("GET progress by userid");
+            const result = await assignmentModel.getUndoneAssignmentByUserId(userId);
+            res.status(200).send(result);
+        } catch (err) {
+            // if (err == "NOT_FOUND")
+            //     res.status(404).send({ error: "Group ID not found", code: err });
+            // else 
+            if (err instanceof Error || err instanceof MongoError)
+                res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+            else
+                res.status(500).send({ error: "Error getting assignment by userid", code: "UNEXPECTED_ERROR" });
+        } finally {
+            console.timeEnd("GET progress by userid");
+        }
+    });
+
+/**
+ * GET /assignment/user/:userId  get asg by user id
  */
 router.get("/user",
     //validate("userId"),

@@ -16,6 +16,7 @@ const { router, postSocket } = require("./postController.js");
 const postController = router;
 // const assignmentController = require('./assignmentController');
 
+
 // const email = require("../email/email");
 const app = express();
 
@@ -50,7 +51,6 @@ app.use(express.urlencoded({ extended: false }));
 
 /* host web pages */
 app.use(express.static('public'));
-
 
 /* Connect to MondoBD Instance */
 const localurl = isDevelopment ? ("mongodb://localhost:27017/" + process.env.DATABASE_CLUSTER) : process.env.CONNECTION_STRING;

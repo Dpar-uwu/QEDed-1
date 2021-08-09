@@ -314,7 +314,7 @@ function after(path, data) {
                 <div  class="d-flex justify-content-center">
                    <img src="images/Psleonline_logo_transparent.png" alt="Logo" style="width: 30%">
                 </div>
-                <div class="col-10 border border-round" id="content">
+                <div class="col-12 col-sm-10 border rounded" id="content">
                     <div class="row flex-nowrap noBar justify-content-center">
                         <div class="d-flex flex-column justify-content-center align-items-center p-5">       
                             <h4 class="text-center">${data.skill_name}</h4>
@@ -325,7 +325,7 @@ function after(path, data) {
                                     <p>The test will save and submit automatically when the time expires.</p>
                                 </div>
                                 <div class="text-end mt-5">
-                                    <button class="btn btn-outline-primary click" id="beginBtn">Begin Quiz</button>
+                                    <button class="btn btn-warning click" id="beginBtn">Begin Quiz</button>
                                 </div>
                             </div>
                         </div>
@@ -344,10 +344,10 @@ function displayQuestion() {
             <div class="container row">
                 <div class="col-10 container m-auto justify-content-center" id="support">
                     <div class="row align-items-center">
-                        <div class="col-1 text-end">
+                        <div class="col-2 text-end">
                             <i class="fas fa-stopwatch fa-lg"></i>
                         </div>
-                        <div class="progress col-11 p-0">
+                        <div class="progress col-10 p-0">
                             <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" id="timebar"></div>
                         </div>
                     </div>
@@ -356,7 +356,7 @@ function displayQuestion() {
             </div>`;
 
     let content = funcs[quizData.topic_name].arrangeQuestion(quizData, questionArray);
-    container.innerHTML += content + '<div class="text-center mb-3"><button class="btn-outline-danger btn returnBtn me-2">Cancel</button><button class="btn-outline-primary btn click submitBtn">Submit</button></div>';
+    container.innerHTML += content + '<div class="text-center mb-3"><button class="btn-light btn returnBtn me-2">Cancel</button><button class="btn-outline-primary btn click submitBtn">Submit</button></div>';
     
     //Starting timer
     startCountdown();

@@ -40,6 +40,7 @@
 </head>
 
 <body class="container-fluid">
+
   <div class="row flex-nowrap">
     <div class="sidebar col-auto col-sm-4 col-md-3 col-xl-2 px-sm-2 px-0 border-end"></div>
     <div class="rightbar col py-3 content">
@@ -59,16 +60,16 @@
       </div>
     </div>
     <!--Level Modal-->
-    <div class="modal fade" id="levelModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    <div class="modal fade" id="levelModal" data-bs-keyboard="false" tabindex="-1"
       aria-labelledby="levelModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="levelModalTitle">Add Level</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <h5 class="modal-title" id="levelModalTitle">New Level</h5>
+            <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form>
+            <form class="text-center">
               <div class="mb-2">
                 <label for="inputLevel" class="col-form-label">Level Name</label>
                 <input type="number" class="form-control" id="inputLevel">
@@ -77,22 +78,22 @@
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-outline-warning addLevelBtn">Submit</button>
+            <button type="button" class="btn addLevelBtn">Submit</button>
           </div>
         </div>
       </div>
     </div>
     <!--Topic Modal-->
-    <div class="modal fade" id="topicModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    <div class="modal fade" id="topicModal" data-bs-keyboard="false" tabindex="-1"
       aria-labelledby="topicModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="topicModalTitle">Add Topic</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <h5 class="modal-title" id="topicModalTitle">New Topic</h5>
+            <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form>
+            <form class="text-center">
               <input type="text" class="form-control" id="level_id" style="display: none;">
               <div class="mb-2">
                 <label for="inputTopic" class="col-form-label">Topic Name</label>
@@ -102,7 +103,7 @@
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-outline-warning addTopicBtn">Submit</button>
+            <button type="button" class="btn addTopicBtn">Submit</button>
           </div>
         </div>
       </div>
@@ -114,7 +115,7 @@
           <div class="modal-header">
             <h5 class="modal-title" id="skillModalLabel">Edit Skill
             </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <form>
@@ -126,7 +127,13 @@
               </div>
               <div class="mb-2">
                 <label for="skill_code" class="col-form-label">Skill Code</label>
-                <input type="text" class="form-control" id="skill_code">
+                <!-- <input type="text" class="form-control" id="skill_code"> -->
+                <select name="skillCode" id="skill_code" class="form-select">
+                  <option value="none" selected disabled>Choose the algorithm used for the topic</option>
+                  <option value="FRAC_SIMPLIFY">FRAC_SIMPLIFY</option>
+                  <option value="FRAC_ADD">FRAC_ADD</option>
+                  <option value="FRAC_MULTIPLY">FRAC_MULTIPLY</option>
+                </select>
               </div>
               <div class="mb-2">
                 <label for="num_of_qn" class="col-form-label">Number of Questions in a Quiz</label>
@@ -234,8 +241,8 @@
             </form>
           </div>
           <div class="d-flex justify-content-center pb-4">
-            <button type="button" class="btn btn-outline-danger me-1 deleteSkillBtn">Delete</button>
-            <button type="button" class="btn btn-outline-warning updateSkillBtn">Submit</button>
+            <button type="button" class="btn me-1 deleteSkillBtn">Delete</button>
+            <button type="button" class="btn updateSkillBtn">Submit</button>
           </div>
         </div>
       </div>

@@ -42,20 +42,117 @@ const assignmentModel = {
     // get assignment by user 
     getAsgByUserId: (userId) => {
         return new Promise(async (resolve, reject) => {
-            try{
+            try {
                 // get the group that the user is in 
-                const group = await Group.find({ "members.user_id": ObjectId(userId) }).select('_id');
-                console.log(group)
-                if (!group) throw "NOT_FOUND";
+                // const group = await Group.find({ "members.user_id": ObjectId(userId) }).select('_id');
+                // if (!group) throw "NOT_FOUND";
 
                 // get all assignment by selected grp 
-                const result = await Assignment.find({ "group_id": group });
+                // const result = await Assignment.find({ "group_id": group });
+                const result = await Assignment.aggregate([
+                    { // join to users to get name of assigned by
+                        $lookup: {
+                            from: "groups",
+                            as: "group",
+                            localField: "group_id",
+                            foreignField: "_id"
+                        }
+                    },
+                    {
+                        $match: { "group.members.user_id": ObjectId(userId) }
+                    },
+                    {
+                        $addFields: {
+                            "group_name": {
+                                $first: "$group.group_name"
+                            }
+                        }
+                    },
+                    {
+                        $project: { "group": 0 }
+                    },
+                    { // join to users to get name of assigned by
+                        $lookup: {
+                            from: "users",
+                            as: "user",
+                            localField: "assigned_by",
+                            foreignField: "_id"
+                        }
+                    },
+                    {
+                        $addFields: {
+                            assigned_by_name: {
+                                $first: {
+                                    $map: {
+                                        input: "$user",
+                                        as: "user",
+                                        in: {
+                                            $concat:
+                                                ["$$user.first_name", " ", "$$user.last_name"]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $project: { "user": 0 }
+                    },
+                    { // join to level to get skill name
+                        $lookup: {
+                            from: "levels",
+                            as: "level",
+                            localField: "skill_id",
+                            foreignField: "topics.skills._id"
+                        }
+                    },
+                    {
+                        $addFields: {
+                            topic: {
+                                $first: {
+                                    $filter: {
+                                        input: { $first: "$level.topics" },
+                                        as: "topics",
+                                        cond: {
+                                            "$eq": ["$$topics._id", "$topic_id"]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $addFields: {
+                            skill: {
+                                $first: {
+                                    $filter: {
+                                        input: "$topic.skills",
+                                        as: "skill",
+                                        cond: {
+                                            "$eq": ["$$skill._id", "$skill_id"]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $addFields: {
+                            skill_name: "$skill.skill_name"
+                        }
+                    },
+                    {
+                        $project: { level: 0, topic: 0, skill: 0 }
+                    },
+                    {
+                        $sort: { "deadline": 1 }
+                    }
+                ]);
                 if (!result) throw "NOT_FOUND";
 
                 console.log("SUCCESS! Result", result);
-                console.log(result.length);
-                resolve(result[0]);
-            }catch (err) {
+                resolve(result);
+            } catch (err) {
                 console.error(`ERROR! Could not get assignment by user id: ${err}`);
                 reject(err);
             }
@@ -65,14 +162,138 @@ const assignmentModel = {
     // get assignment by grp
     getAsgByGrpId: (groupId) => {
         return new Promise(async (resolve, reject) => {
-            try{
-                const result = await Assignment.find({ "group_id": ObjectId(groupId) }).select('-__v');
-                if (!result) throw "NOT_FOUND";
+            try {
+                // const result = await Assignment.find({ "group_id": ObjectId(groupId) }).select('-__v');
+                let result = await Assignment.aggregate([
+                    {
+                        $match: {
+                            group_id: ObjectId(groupId)
+                        }
+                    },
+                    { // join to users to get name of assigned by
+                        $lookup: {
+                            from: "users",
+                            as: "user",
+                            localField: "assigned_by",
+                            foreignField: "_id"
+                        }
+                    },
+                    {
+                        $addFields: {
+                            assigned_by_name: {
+                                $first: {
+                                    $map: {
+                                        input: "$user",
+                                        as: "user",
+                                        in: {
+                                            $concat:
+                                                ["$$user.first_name", " ", "$$user.last_name"]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $project: { "user": 0 }
+                    },
+                    { // join to level to get skill name
+                        $lookup: {
+                            from: "levels",
+                            as: "level",
+                            localField: "skill_id",
+                            foreignField: "topics.skills._id"
+                        }
+                    },
+                    {
+                        $addFields: {
+                            topic: {
+                                $first: {
+                                    $filter: {
+                                        input: { $first: "$level.topics" },
+                                        as: "topics",
+                                        cond: {
+                                            "$eq": ["$$topics._id", "$topic_id"]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $addFields: {
+                            skill: {
+                                $first: {
+                                    $filter: {
+                                        input: "$topic.skills",
+                                        as: "skill",
+                                        cond: {
+                                            "$eq": ["$$skill._id", "$skill_id"]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $addFields: {
+                            skill_name: "$skill.skill_name"
+                        }
+                    },
+                    {
+                        $project: { level: 0, topic: 0, skill: 0 }
+                    },
+                    { // join to groups to get group name
+                        $lookup: {
+                            from: "groups",
+                            as: "group",
+                            localField: "group_id",
+                            foreignField: "_id"
+                        }
+                    },
+                    {
+                        $addFields: {
+                            group_name: { $first: "$group.group_name" }
+                        }
+                    },
+                    {
+                        $project: { group: 0 }
+                    },
+                    {
+                        $sort: { deadline: 1 }
+                    },
+                    {
+                        $group: {
+                            _id: "$group_name",
+                            assignments: { $push: "$$ROOT" }
+                        }
+                    },
+                    {
+                        $project: {
+                            group_name: "$_id",
+                            assignments: 1,
 
-                console.log("SUCCESS! Result", result);
-                console.log(result.length);
-                resolve(result[0]);
-            }catch (err) {
+                            _id: 0
+                        }
+                    },
+                    {
+                        $project: { "assignments.group_name": 0 }
+                    }
+                ]);
+
+
+                if (!result[0]) {
+                    result = Group.findOne(ObjectId(groupId)).select("group_name");
+                    if (!result) throw "NOT_FOUND";
+
+                    console.log("SUCCESS! Result", result);
+                    resolve(result);
+                }
+                else {
+                    console.log("SUCCESS! Result", result[0]);
+                    resolve(result[0]);
+                }
+            } catch (err) {
                 console.error("ERROR! Could not get asg by group id:", err);
                 reject(err);
             }

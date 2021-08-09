@@ -17,9 +17,9 @@
 .title-leaderboard {
     text-align: center;
     margin: 0.3em 0 0.2em;
-    font-weight: 700;
+    /* font-weight: 700; */
     color: #003844;
-    text-shadow: 2px 2px 0px #ffcb45;
+    font-family: 'Segoe UI', Arial, sans-serif;
 }
 
 /* FILTER STYLES */
@@ -135,7 +135,7 @@
 .heading {
     max-width: 100%;
     font-size: 14px;
-    margin: 0 1rem;
+    margin: 0 0.2rem;
 }
 
 #leaderboard {
@@ -209,7 +209,7 @@
         border: none;
     }
     .heading {
-        font-size: 8px;
+        font-size: 10px;
     }
     #leaderboard {
         font-size: 11px;

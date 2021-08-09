@@ -1,3 +1,4 @@
+
 /* EVENT LISTENERS & API CALLS */
 // onload get all levels
 $(document).ready(function () {
@@ -594,24 +595,20 @@ function displayLevel(data, name) {
 
     for (let i = 0; i < data.length; i++) {
         content = `
-            <div class="${name}" id="${data[i].id}">
-                <div class="container d-flex p-0 justify-content-between align-items-center">
-                    <div></div>
-                    <div>${data[i].display}</div>
-                    <div>
-                        <i class="icon fas fa-edit"></i>
-                    </div>
-                </div>
-            </div>        
-            `
+        <div class="${name}" id="${data[i].id}">
+            <div class="text-center level-container">
+                <span>${data[i].display}</span>
+                <i class="icon fas fa-pen"></i>
+            </div>
+        </div>        
+        `
         container.innerHTML += content;
     }
-    container.innerHTML +=
-        `<div class="addLevel" data-bs-toggle="modal" data-bs-target="#levelModal">
-            <div class="text-center">
-                <p>Add Level</p>
-            </div>
-        </div>`;
+    container.innerHTML += `
+        <div class="addLevel" data-bs-toggle="modal" data-bs-target="#levelModal">
+            Add Level
+        </div>
+    `;
 }
 
 function displayTopic(data, name) {
@@ -625,14 +622,13 @@ function displayTopic(data, name) {
     let content = "";
 
     container.innerHTML = "";
-    container.innerHTML +=
-        `<div class="col-12 text-center">
-            <button class="btn btn-outline-warning addTopic " id="${data._id}" data-bs-toggle="modal" data-bs-target="#topicModal">
-                Add topic
-            </button>
-        </div>`;
-
-    for (let i = 0; i < topics.length; i++) {
+    container.innerHTML +=     
+    `<button class="btn addTopic" 
+        id="${data._id}" 
+        data-bs-toggle="modal" 
+        data-bs-target="#topicModal" 
+        onclick="resetSkillForm()">Add Topic</button>`
+    for (var i = 0; i < topics.length; i++) {
         content = `
             <div class="topicWrapper">
                 <div class="${name}" 
@@ -657,13 +653,15 @@ function displayTopic(data, name) {
                     data-bs-toggle="modal" 
                     data-bs-target="#skillModal">
                 ${element.skill_name}
-                </div>`;
-        });
-        content +=
-            `<div class="addSkill" id="${topics[i]._id}" data-bs-toggle="modal" data-bs-target="#skillModal">
-                Add skills
-            </div>
-            </div></div>`;
+                </div>
+                
+                `
+            });
+        content += 
+        `<div class="addSkill" id="${topics[i]._id}" data-bs-toggle="modal" data-bs-target="#skillModal">
+            <i class="fas fa-plus-circle"></i> Add Skills
+        </div>
+        </div></div>`;  
         container.innerHTML += content;
     }
 }
@@ -672,7 +670,7 @@ function createSlider(id, valueMin = 100, valueMax = 300) {
     $("#slider-range-" + id).slider({
         range: true,
         min: 0,
-        max: 100000000,
+        max: 1000000,
         values: [valueMin, valueMax],
         slide: function (event, ui) {
             for (let i = 0; i < ui.values.length; ++i) {
@@ -708,7 +706,7 @@ function displaySkillDetail(data) {
     $('#skillModalLabel').html('Edit Skill');
     $('.addSkillBtn').addClass('updateSkillBtn').removeClass('addSkillBtn');
     $('.deleteSkillBtn').remove();
-    $('.updateSkillBtn').before(` <button type="button" class="btn btn-outline-danger me-1 deleteSkillBtn">Delete</button>`);
+    $('.updateSkillBtn').before(` <button type="button" class="btn me-1 deleteSkillBtn">Delete</button>`);
 
     // Update the modal's content
     id.value = data.skillId;
@@ -737,10 +735,10 @@ function displaySkillDetail(data) {
     calculateQn();
 }
 
+// MISC FN
 function calculateQn() {
     // check all values in params are multiple of 10
     let num_of_qn = document.querySelector('#num_of_qn').value;
-
     let percentage_easy = document.querySelector("#percentage_easy").value;
     let percentage_medium = document.querySelector("#percentage_medium").value;
     let percentage_difficult = document.querySelector("#percentage_difficult").value;
@@ -757,7 +755,7 @@ function calculateQn() {
         document.querySelector("#difficult_num").textContent = "Difficult Questions: " + difficult_num;
         document.querySelector("#total_num").textContent = "Total Questions: " + total;
 
-        let num_of_qn = document.querySelector("#num_of_qn");
+        num_of_qn = document.querySelector("#num_of_qn");
         if (num_of_qn.value != total) {
             document.querySelector("#total_num").style.color = "red";
             document.querySelector("#total_num").textContent += " (Total not 100%)";
@@ -772,11 +770,22 @@ function calculateQn() {
 function validateNumOfQn() {
     let num_of_qn = document.querySelector('#num_of_qn').value;
     let error = document.querySelector("#num-error");
-    // alert(num_of_qn)
-    if (num_of_qn % 10 == 0) {
+    if(num_of_qn % 10 == 0) {
         error.style.display = "none";
     }
     else {
         error.style.display = "block";
     }
+}
+
+
+function resetSkillForm() {
+    document.querySelector("#skill_code").value = "none";
+    document.querySelector("#easy_num").textContent = "";
+    document.querySelector("#medium_num").textContent = "";
+    document.querySelector("#difficult_num").textContent = "";
+    document.querySelector("#total_num").textContent = "";
+    createSlider("easy", 0, 0);
+    createSlider("medium", 0, 0);
+    createSlider("difficult", 0, 0);
 }

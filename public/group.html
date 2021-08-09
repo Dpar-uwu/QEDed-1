@@ -38,10 +38,9 @@
     <div class="row flex-nowrap">
         <div class="sidebar col-auto col-sm-4 col-md-3 col-xl-2 px-sm-2 px-0 border-end"></div>
         <div class="rightbar col py-3 content">
-            <h1 class="title">My Groups</h1>
+            <div class="header"></div>
+            <h3 class="title">My Groups</h3>
             <div class="btn-wrapper">
-                <button class="btn add-btn" data-bs-toggle="modal" data-bs-target="#addGroupModal">+ Create
-                    Group</button>
             </div>
 
             <div id="group-list">
@@ -68,19 +67,23 @@
                     <form>
                         <div class="mb-3">
                             <label for="group_name" class="col-form-label">Group Name</label>
-                            <input type="text" class="form-control" id="group_name">
+                            <input type="text" class="form-control" id="group_name" placeholder="Give the group a name">
                         </div>
                         <div class="mb-3 popover_wrapper">
                             <label for="add-members" class="col-form-label">Add Members</label>
-                            <input type="text" class="form-control add-members" id="add-members" autocomplete="off">
-                            <div id="search-list" class="popover_content">
-                                <!-- SEARCH RESULTS GO HERE -->
-                            </div>
-                            <div id="added-list">
-                                <!-- ADDDED MEMBERS FO HERE -->
-                            </div>
+                                <input type="text" 
+                                    class="form-control add-members" 
+                                    id="add-members"
+                                    autocomplete="off"
+                                    placeholder="Search email here">
+                                <div id="search-list" class="popover_content">
+                                    <!-- SEARCH RESULTS GO HERE -->
+                                </div>
+                                <div id="added-list">
+                                    <!-- ADDDED MEMBERS FO HERE -->
+                                </div>
                         </div>
-                        <span id="error" style="color:red;"></span>
+                        <span id="error"></span>
                     </form>
                 </div>
                 <div class="d-flex justify-content-center pb-4">

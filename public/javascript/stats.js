@@ -1,5 +1,5 @@
 var type = "detailed";
-let userId = getUserId();
+let userId = JSON.parse(localStorage.getItem("userInfo"))._id;
 
 /* EVENT LISTENER */
 $(document).ready(function () {
@@ -10,7 +10,7 @@ $(document).ready(function () {
             document.getElementById("name").innerHTML = getName();
         })
 
-        getDetailedBenchmark("");
+        getDetailedBenchmark("","container");
         getFilter();
     }
 })
@@ -27,7 +27,7 @@ $(document).on("click", '.select', function () {
     }
     else {
         type = "detailed";
-        getDetailedBenchmark("");
+        getDetailedBenchmark("", "container");
         $(".hide").css("display", "");
     };
 
@@ -35,7 +35,7 @@ $(document).on("click", '.select', function () {
 
 $(document).on("click", '.dropdown-item', function () {
     if (type == "detailed") {
-        getDetailedBenchmark(this.id);
+        getDetailedBenchmark(this.id, "container");
     }
     else {
         getComparisonBenchmark(this.id);
@@ -43,14 +43,14 @@ $(document).on("click", '.dropdown-item', function () {
 });
 
 /* API CALLS*/
-function getDetailedBenchmark(query) {
+function getDetailedBenchmark(query, containerName) {
     $.ajax({
         url: `/quiz/benchmark?user=${userId}${query}`,
         type: 'POST',
         dataType: 'JSON',
         success: function (data, textStatus, xhr) {
             if (data.length != 0) {
-                createCanvas(5, ['Score', 'Time Taken', 'Easy Score', 'Medium Score', 'Hard Score']);
+                createCanvas(5, ['Score', 'Time Taken', 'Easy Score', 'Medium Score', 'Hard Score'], containerName);
                 extractDetailedData(data);
             }
             else {
@@ -78,7 +78,7 @@ function getComparisonBenchmark(query) {
                 extractedData.push(extractComparisonData(data[key]));
             })
 
-            createCanvas(title.length, title);
+            createCanvas(title.length, title, "container");
 
             for (let i = 0; i < extractedData.length; i++) {
                 displayChart(extractedData[i], i);
@@ -155,9 +155,8 @@ function createFilter(data) {
 }
 
 /*CREATE CANVAS*/
-function createCanvas(amount, title) {
+function createCanvas(amount, title, containerName) {
     let content = "";
-    console.log("bbb")
     
     for (let i = 0; i < amount; i++) {
         (i < 2) ? classname = 'col-lg-5' : classname = 'col-lg-4 ';
@@ -172,7 +171,7 @@ function createCanvas(amount, title) {
             content += '<div class="col-12 text-center mt-3 mb-3 h5"> The Percentage Scores </div>'
         }
     }
-    document.getElementById("container").innerHTML = content;    
+    document.getElementById(containerName).innerHTML = content;    
 }
 
 function displayChart(data, id) {  

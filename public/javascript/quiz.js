@@ -147,7 +147,7 @@ $(document).on("click", ".click", function () {
             );
 
             //Creating canvas
-            createCanvas("support");
+            createCanvas(5, ['Score', 'Time Taken', 'Easy Score', 'Medium Score', 'Hard Score'], "support");
 
             //Check if its trial
             if (!window.location.toString().includes("trial")) {
@@ -264,7 +264,7 @@ function submitQuiz(data) {
             $('.submitBtn').remove();
             $('.returnBtn').remove();
             
-            updateStats("");
+            getDetailedBenchmark("", "support");
 
             let container = document.getElementById("support");
 

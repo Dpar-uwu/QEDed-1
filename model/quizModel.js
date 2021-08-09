@@ -139,19 +139,49 @@ const quizModel = {
     getQuizByFilter: (userId, level, topic_name) => {
         return new Promise(async (resolve, reject) => {
             try {
-                let match_opt = {"done_by": ObjectId(userId)};
-                let search = "level";
+                let match_opt = {
+                    "done_by": ObjectId(userId),
+                };
 
-                if(level != undefined && level != ""){match_opt.level = level; search = "topic_name";}
-                if(topic_name != undefined && topic_name != "") {match_opt.topic_name = topic_name; search = "skill_name";}
-
-                const result = await Quiz.find(match_opt).distinct(search);
+                const result = await Quiz.aggregate([
+                    {
+                        $match: match_opt
+                    },
+                    {
+                        $group: {
+                            "_id": {
+                                "level": "$level",
+                                "topics": "$topic_name"
+                            },
+                            "skills": {
+                                $addToSet: "$skill_name"
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            "_id": "$_id.level",
+                            "topics": {
+                                $addToSet: {
+                                    "topic": "$_id.topics",
+                                    "skills": "$skills"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            "_id": "$_id",
+                            "topics": "$topics"
+                        }
+                    }
+                ])
                 if (!result) throw "NOT_FOUND";
 
                 console.log("SUCCESS! Result", result);
                 resolve(result);
             } catch (err) {
-                console.error("ERROR! Could not get quizzes by: ", err);
+                console.error("ERROR! Could not get filter: ", err);
                 reject(err);
             }
         })
@@ -215,11 +245,11 @@ const quizModel = {
     getGlobalLeaderboard: (grade) => {
         return new Promise(async (resolve, reject) => {
             try {
-                let match_options = 
+                let match_options =
                 {
-                    $match: grade? {"user.grade": grade} : ({ _id : {$ne: ""} })
+                    $match: grade ? { "user.grade": grade } : ({ _id: { $ne: "" } })
                 };
-                
+
                 const result = await Quiz.aggregate([
                     {
                         $group: {
@@ -290,47 +320,32 @@ const quizModel = {
                     "done_by": ObjectId(userId), //get all from user
                 }
 
-                if(level != undefined && level != "") recent_match_opt.level = parseInt(level);
-                if(topic != undefined && topic != "") recent_match_opt.topic_name = topic;
-                if(skill != undefined && skill != "") recent_match_opt.skill_name = skill;
+                if (level != undefined && level != "") recent_match_opt.level = parseInt(level);
+                if (topic != undefined && topic != "") recent_match_opt.topic_name = topic;
+                if (skill != undefined && skill != "") recent_match_opt.skill_name = skill;
 
-                var current = await Quiz.find(recent_match_opt).sort({_id: -1}).limit(1);
-                if(current.length > 0){
+                var current = await Quiz.find(recent_match_opt).sort({ _id: -1 }).limit(1);
+                if (current.length > 0) {
                     current = current[0], result.current = {};
-                    recent_match_opt._id = { $ne: ObjectId(current._id) }
                     result.current.easy_average_score = current.score.easy;
                     result.current.medium_average_score = current.score.medium;
                     result.current.difficult_average_score = current.score.difficult;
                     result.current.total_average_score = current.score.total;
                     result.current.average_time_taken = current.time_taken;
                 }
-                  
+
                 // recent 10
                 const recent = await Quiz.aggregate([
                     {
                         $match: recent_match_opt
                     },
                     {
-                        $group: {
-                            "_id": null,
-                            "easy_average_score": { $avg: "$score.easy" },
-                            "medium_average_score": { $avg: "$score.medium" },
-                            "difficult_average_score": { $avg: "$score.difficult" },
-                            "total_average_score": { $avg: "$score.total" },
-                            "average_time_taken": { $avg: "$time_taken" }
+                        $sort: {
+                            "_id": -1
                         }
                     },
-                    { $project: { _id: 0 } }
-                ]).limit(10);
-
-                recent_match_opt.done_by = { $ne: ObjectId(userId) };
-                delete recent_match_opt['_id'];
-
-                console.log(recent_match_opt)
-                // global except user
-                const global = await Quiz.aggregate([
                     {
-                        $match: recent_match_opt
+                        $limit: 10
                     },
                     {
                         $group: {
@@ -345,8 +360,140 @@ const quizModel = {
                     { $project: { _id: 0 } }
                 ]);
 
+                // global except user
+                const global = await Quiz.aggregate([
+                    {
+                        $group: {
+                            "_id": null,
+                            "easy_average_score": { $avg: "$score.easy" },
+                            "medium_average_score": { $avg: "$score.medium" },
+                            "difficult_average_score": { $avg: "$score.difficult" },
+                            "total_average_score": { $avg: "$score.total" },
+                            "average_time_taken": { $avg: "$time_taken" }
+                        }
+                    },
+                    { $project: { _id: 0 } }
+                ]);
+
                 result.recent = recent[0];
-                result.global = global[0];                
+                result.global = global[0];
+
+                console.log("SUCCESS! Result", result);
+                resolve(result);
+            } catch (err) {
+                console.error(`ERROR! Could not get benchmark: ${err}`);
+                reject(err);
+            }
+        })
+    },
+    getBenchmarkComparison: (userId, level, topic) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let match_opt = {
+                    "done_by": ObjectId(userId), //get all from user
+                }
+
+                let groupBy = 'level';
+
+                if (level != undefined && level != "") groupBy = 'topic_name';
+                if (topic != undefined && topic != "") groupBy = 'skill_name';
+
+                const current_data = await Quiz.aggregate([
+                    {
+                        $match: match_opt
+                    },
+                    {
+                        $sort: {
+                            "_id": 1
+                        }
+                    },
+                    {
+                        $group: {
+                            "_id": `$${groupBy}`,
+                            // "easy_average_score": { $last: "$score.easy"} ,
+                            // "medium_average_score": { $last: "$score.medium"} ,
+                            // "difficult_average_score": { $last: "$score.difficult"},
+                            "total_average_score": { $last: "$score.total" },
+                            // "average_time_taken": { $last: "$time_taken"}
+                        }
+                    },
+                ]);
+
+                const recent_data = await Quiz.aggregate([
+                    {
+                        $match: match_opt
+                    },
+                    {
+                        $group: {
+                            "_id": `$${groupBy}`,
+                            "easy": { $push: "$score.easy" },
+                            "medium": { $push: "$score.medium" },
+                            "difficult": { $push: "$score.difficult" },
+                            "total": { $push: "$score.total" },
+                            "time": { $push: "$time_taken" }
+                        }
+                    },
+                    {
+                        $project: {
+                            "_id": "$_id",
+                            // "easy_average_score": { $avg: { $slice: ["$easy", -10]}},
+                            // "medium_average_score": { $avg: { $slice: ["$medium", -10]}},
+                            // "difficult_average_score": { $avg: { $slice: ["$difficult", -10]}},
+                            "total_average_score": { $avg: { $slice: ["$total", -10] } },
+                            // "average_time_taken": { $avg: { $slice: ["$time", -10]}}
+                        }
+                    }
+                ])
+
+                const global_data = await Quiz.aggregate([
+                    {
+                        $group: {
+                            "_id": `$${groupBy}`,
+                            "easy": { $push: "$score.easy" },
+                            "medium": { $push: "$score.medium" },
+                            "difficult": { $push: "$score.difficult" },
+                            "total": { $push: "$score.total" },
+                            "time": { $push: "$time_taken" }
+                        }
+                    },
+                    {
+                        $project: {
+                            "_id": "$_id",
+                            // "easy_average_score": { $avg: "$easy"},
+                            // "medium_average_score": { $avg: "$medium"},
+                            // "difficult_average_score": { $avg: "$difficult"},
+                            "total_average_score": { $avg: "$total" },
+                            // "average_time_taken": { $avg: "$time"}
+                        }
+                    }
+                ])
+
+                let result = {};
+
+                for (let i = 0; i < current_data.length; i++) {
+                    let name = current_data[i]._id;
+                    let recent;
+                    let global;
+
+                    recent_data.forEach(data => {
+                        if (data._id == name) {
+                            recent = data.total_average_score;
+                            return false;
+                        }
+                    })
+                    global_data.forEach(data => {
+                        if (data._id == name) {
+                            global = data.total_average_score;
+                            return false;
+                        }
+                    })
+
+                    result[name] = {
+                        "current": current_data[i].total_average_score,
+                        "recent": recent,
+                        "global": global
+                    }
+                }
 
                 console.log("SUCCESS! Result", result);
                 resolve(result);
@@ -361,18 +508,18 @@ const quizModel = {
             try {
                 let result = [];
                 // WRONGGG NEED TO GROUP THEM TGT USNING AGGREGATE
-                var top2 = await Quiz.find({ done_by: userId }).select("_id").sort({ "score.total":-1, "time_taken":1}).limit(2);
+                var top2 = await Quiz.find({ done_by: userId }).select("_id").sort({ "score.total": -1, "time_taken": 1 }).limit(2);
 
-                for(var i = 0; i<top2.length; i++) {
+                for (var i = 0; i < top2.length; i++) {
                     let temp = {};
                     const skillId = top2[i]._id;
                     console.log(userId, skillId)
-                    let current = await Quiz.findOne({ done_by: userId, skill_id: skillId }).select("_id score time_taken").sort({created_at:-1});
+                    let current = await Quiz.findOne({ done_by: userId, skill_id: skillId }).select("_id score time_taken").sort({ created_at: -1 });
                     console.log(current)
                     // if(!current) throw "UNEXPECTED_ERROR";
                     temp.current = {};
                     temp.current.total_average_score = current.score.total;
-                    
+
                     // recent 10
                     const recent = await Quiz.aggregate([
                         {
@@ -393,10 +540,10 @@ const quizModel = {
                     // global except user
                     const global = await Quiz.aggregate([
                         {
-                            $match: { 
+                            $match: {
                                 "done_by": { $ne: ObjectId(userId) }, //matches everyt except user
                                 "skill_id": ObjectId(skillId)
-                            } 
+                            }
                         },
                         {
                             $group: {
@@ -504,20 +651,20 @@ const quizModel = {
                 var d = new Date();
                 d.setMonth(d.getMonth() - 1);// Set it to one month ago
                 d.setHours(0, 0, 0, 0);
-                
+
                 const result = await Quiz.aggregate([
                     {
                         $match: { "done_by": ObjectId(userId) }
                     },
                     {
                         $match: {
-                            "created_at": {$gt: d},
+                            "created_at": { $gt: d },
                         }
                     },
                     {
                         $group: {
                             // _id: { $week: '$created_at' }, 
-                            _id: {$dateToString: { format: "%Y-%m-%d", date: "$created_at" }},
+                            _id: { $dateToString: { format: "%Y-%m-%d", date: "$created_at" } },
                             "average_score": { $avg: "$score.total" },
                             "num_of_quiz": { $sum: 1 },
                             "average_time_taken": { $avg: "$time_taken" }

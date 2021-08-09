@@ -71,7 +71,6 @@ let attribute = {
             .trim().stripLow()
     },
 
-
     grade: () => {
         return body("grade")
             .optional()
@@ -133,10 +132,15 @@ exports.validate = (method) => {
                     .stripLow()
                     .escape()
                     .notEmpty(),
+                body("rememberMe", "Remember Me cannot be empty")
+                    .stripLow()
+                    .isBoolean()
+                    .escape()
+                    .notEmpty(),
                 // catches error if body has extra unexpected parameters
                 body()
                     .custom(body => {
-                        const keys = ["email", "password"];
+                        const keys = ["email", "password","rememberMe"];
                         return Object.keys(body).every(key => keys.includes(key));
                     })
                     .withMessage("Some extra parameters are sent"),
@@ -172,6 +176,40 @@ exports.validate = (method) => {
                 errorHandler
             ]
         }
+        case "email": {
+            return [
+                attribute.email(),
+                // catches error if body has extra unexpected parameters
+                param()
+                    .custom(param => {
+                        const keys = ["email"];
+                        return Object.keys(param).every(key => keys.includes(key));
+                    })
+                    .withMessage("Some extra parameters are sent"),
+                errorHandler
+            ]
+        }
+        case "resetPassword": {
+            return [
+                attribute.password(),
+                body("userId", "ERROR")
+                    .isMongoId()
+                    .notEmpty(),
+                body("token", "ERROR")
+                    .stripLow()
+                    .escape()
+                    .notEmpty(),
+                // catches error if body has extra unexpected parameters
+                param()
+                    .custom(param => {
+                        console.log("hiii")
+                        const keys = ["password","token","userId"];
+                        return Object.keys(param).every(key => keys.includes(key));
+                    })
+                    .withMessage("Some extra parameters are sent"),
+                errorHandler
+            ]
+        }        
         case "updateUser": {
             return [
                 attribute.userId(),

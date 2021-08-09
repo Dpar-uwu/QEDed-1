@@ -38,7 +38,6 @@ const isAuth = (req, res, next) => {
     }
 }
 
-
 const isAdmin = (req, res, next) => {
     const { role } = req;
     if(role=="admin") {

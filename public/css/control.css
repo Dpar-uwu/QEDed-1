@@ -87,7 +87,7 @@
     align-items: center
 }
 
-.level:hover {
+.level:hover, .addLevel:hover{
     background-color: #fffbf2;
     color: #ffcb45;
 }
@@ -99,11 +99,6 @@
     display: flex;
     justify-content: center;
     align-items: center
-}
-
-.level:hover, .addLevel:hover {
-    background-color: #ffcb45;
-    color: #fff;
 }
 
 .level i {
@@ -237,13 +232,4 @@ label .fas:hover {
     .level, .topicWrapper, #addLevelBtn, .levelForm {
         width: 95%;
     }
-}
-
-.addLevel{
-    border: dashed;
-}
-
-.icon{
-    position: relative;
-    left: 39%;
 }

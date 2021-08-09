@@ -86,7 +86,7 @@ router.put("/:skillId",
             console.time("PUT skill");
             const result = await levelModel.updateSkillById(skillId, changedFields);
 
-            res.status(200).send({ message: "Skill Updated" })
+            res.status(200).send({ message: "Skill Updated", level_id: result._id })
         } catch (err) {
             if (err == "NOT_FOUND")
                 res.status(404).send({ error: "Skill ID not found", code: err });
@@ -113,7 +113,7 @@ router.delete("/:skillId",
             console.time("DELETE skill by id");
             const result = await levelModel.deleteSkillById(skillId);
 
-            res.status(200).send({ message: "Skill Deleted" });
+            res.status(200).send({ message: "Skill Deleted", level_id: result._id });
         } catch (err) {
             if (err == "NOT_FOUND")
                 res.status(404).send({ error: "Skill ID not found", code: err });

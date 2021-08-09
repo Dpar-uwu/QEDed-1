@@ -6,6 +6,7 @@ const router = express.Router();
 
 // model with functions
 const user = require("../model/userModel");
+const tokenPassword = require("../model/tokenModel");
 
 // validation
 const { validate } = require("../validation/userValidation");
@@ -150,21 +151,22 @@ router.post("/",
 router.post("/login",
     validate("loginUser"),
     async (req, res) => {
-        const { email, password } = req.body;
-        const {cookies} = req;
+        const { email, password, rememberMe } = req.body;
+        const { cookies } = req;
         try {
             console.time("GET verify user");
             const result = await user.verifyUser(email, password);
 
             if (!result._id || !result.role) throw "NO_MATCH";
+            var expiry = (rememberMe == "true") ? 365 : 1;
 
             // grant access and refresh token
             const accessTK = createAccessToken(result._id, result.role);
-            const refreshTK = createRefreshToken(result._id, result.role);
+            const refreshTK = createRefreshToken(result._id, result.role, expiry + "d");
 
             // send refresh token as cookie & access token in body
             res.cookie("refreshTK", refreshTK, {
-                maxAge: 14 * 24 * 60 * 60 * 1000, //expires in 14 days
+                maxAge: expiry * 24 * 60 * 60 * 1000, //expires in x days
                 httpOnly: true,
                 // path: "/user" // endpoint to get new access token using refresh token
             });
@@ -200,7 +202,7 @@ router.post("/refresh_token",
     async (req, res) => {
         const token = req.cookies.refreshTK;
         console.log("cookies", req.cookies);
-        
+
         try {
             console.time("POST get access token using refresh token");
             // check if token is valid
@@ -215,16 +217,8 @@ router.post("/refresh_token",
 
             // IF TOKEN EXISTS AND IS VALID
             const accessTK = createAccessToken(result._id, result.role);
-            const refreshTK = createRefreshToken(result._id, result.role);
-
-            // send refresh token as cookie & access token in body
-            res.cookie("refreshTK", refreshTK, {
-                maxAge: 14 * 24 * 60 * 60 * 1000, //expires in 14 days
-                httpOnly: true,
-                sameSite: 'strict',
-                // path: "/user" // endpoint to get new access token using refresh token
-            });
             res.send({ "accessToken": accessTK });
+
         } catch (err) {
             console.log(err)
             return res.status(401).send({ error: "Invalid Token", code: "UNAUTHENTICATED_USER" });
@@ -234,6 +228,52 @@ router.post("/refresh_token",
 
     });
 
+    router.post("/resetPasswordRequest",
+    validate("email"),
+    async (req, res) => {
+        const { email } = req.body;
+        try {
+            console.time("POST reset password request");
+            
+            const requestPasswordResetService = await tokenPassword.requestPasswordReset(email);
+
+            res.status(200).send({ message: "Email sent" });
+        }
+        catch (err) {
+            if (err == "NOT_FOUND")
+                res.status(404).send({ error: "Email does not exists", code: "NOT_FOUND" });
+            else if (err instanceof Error || err instanceof MongoError)
+                res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+            else
+                res.status(500).send({ error: "Error in reset password request", code: "UNEXPECTED_ERROR" });
+        } finally {
+            console.timeEnd("POST reset password request");
+        }
+    }
+)
+router.put("/resetPassword",
+    validate("resetPassword"),
+    async (req, res) => {
+        try {
+            const resetPasswordService = await tokenPassword.resetPassword(
+                req.body.userId,
+                req.body.token,
+                req.body.password
+            );
+            res.status(200).send({ message: "Password Updated" });
+        }
+        catch (err) {
+            console.log(err)
+            if(err == "ERROR") res.status(422).send({ error: err.message, code: "DATABASE_ERROR" });
+            else if (err instanceof Error || err instanceof MongoError)
+                res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+            else
+                res.status(500).send({ error: "Error in reseting password", code: "UNEXPECTED_ERROR" });
+        } finally {
+            console.timeEnd("PUT reset password");
+        }
+    }
+)
 
 /**
  * PUT /user/:userId - update user by id

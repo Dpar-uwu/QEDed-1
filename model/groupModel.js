@@ -308,8 +308,8 @@ const groupModel = {
     createGroup: (group_name, owner, members) => {
         return new Promise(async (resolve, reject) => {
             try {
-                const newGroup = new Group({ group_name, "owner": ObjectId(owner), members });
-                const result = await newGroup.save();
+                const newGame = new Group({ group_name, "owner": ObjectId(owner), members });
+                const result = await newGame.save();
 
                 if (!result) throw "UNEXPECTED_ERROR";
 
@@ -476,7 +476,13 @@ const groupModel = {
                             as: "quiz",
                             localField: "user_id",
                             foreignField: "done_by"
-                        }
+                        },
+                        $lookup: {
+                            from: "quizzes",
+                            as: "quiz",
+                            localField: "_id",
+                            foreignField: "group_id"
+                        },
                     },
                     {
                         $project: { "quiz.questions": 0 }
@@ -531,7 +537,172 @@ const groupModel = {
             }
         })
     },
+    viewBenchmarkByUser: (groupId, userId, level, topic) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                console.log("hi")
+                let match_opt = {
+                    "group_id": ObjectId(groupId) //get all from group
+                }
 
+                let groupBy = 'level';
+
+                if(level != undefined && level != "") groupBy = 'topic_name';
+                if(topic != undefined && topic != "")  groupBy = 'skill_name';
+
+                const group_data = await Quiz.aggregate([
+                    {
+                        $match: match_opt
+                    },
+                    {
+                        $group: {
+                            "_id": `$${groupBy}`,
+                            // "easy_average_score": { $last: "$score.easy"} ,
+                            // "medium_average_score": { $last: "$score.medium"} ,
+                            // "difficult_average_score": { $last: "$score.difficult"},
+                            "total_average_score": { $avg: "$score.total"},
+                            // "average_time_taken": { $last: "$time_taken"}
+                        }
+                    },
+                ]); 
+                
+                match_opt["done_by"] = ObjectId(userId);
+                
+                const recent_data = await Quiz.aggregate([
+                    {
+                        $match: match_opt
+                    },
+                    {
+                        $group: {
+                            "_id": `$${groupBy}`,
+                            "easy": { $push: "$score.easy"},
+                            "medium": { $push: "$score.medium"},
+                            "difficult": { $push: "$score.difficult"},
+                            "total": { $push: "$score.total"},
+                            "time": { $push: "$time_taken"}
+                        }                    
+                    },
+                    {
+                        $project: {
+                            "_id": "$_id",
+                            // "easy_average_score": { $avg: { $slice: ["$easy", -10]}},
+                            // "medium_average_score": { $avg: { $slice: ["$medium", -10]}},
+                            // "difficult_average_score": { $avg: { $slice: ["$difficult", -10]}},
+                            "total_average_score": { $avg: { $slice: ["$total", -10]}},
+                            // "average_time_taken": { $avg: { $slice: ["$time", -10]}}
+                        }
+                    }                    
+                ])
+
+                const global_data = await Quiz.aggregate([
+                    {
+                        $group: {
+                            "_id": `$${groupBy}`,
+                            "easy": { $push: "$score.easy"},
+                            "medium": { $push: "$score.medium"},
+                            "difficult": { $push: "$score.difficult"},
+                            "total": { $push: "$score.total"},
+                            "time": { $push: "$time_taken"}
+                        }                    
+                    },
+                    {
+                        $project: {
+                            "_id": "$_id",
+                            // "easy_average_score": { $avg: "$easy"},
+                            // "medium_average_score": { $avg: "$medium"},
+                            // "difficult_average_score": { $avg: "$difficult"},
+                            "total_average_score": { $avg: "$total"},
+                            // "average_time_taken": { $avg: "$time"}
+                        }
+                    }                    
+                ])
+                
+                let result = {};
+
+                for(let i = 0; i<group_data.length; i++){
+                    let name = group_data[i]._id;
+                    let recent;
+                    let global;
+
+                    recent_data.forEach(data =>{
+                        if(data._id == name){
+                           recent = data.total_average_score;
+                           return false;
+                        } 
+                    })
+                    global_data.forEach(data =>{
+                        if(data._id == name){
+                           global = data.total_average_score;
+                           return false;
+                        } 
+                    })
+
+                    result[name] = {
+                        "group": group_data[i].total_average_score,
+                        "recent": recent,
+                        "global": global
+                    }
+                }
+
+                console.log("SUCCESS! Result", result);
+                resolve(result);
+            } catch (err) {
+                console.error(`ERROR! Could not get benchmark: ${err}`);
+                reject(err);
+            }
+        })
+    },
+    getBenchmarkFilter: (groupId, userId) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let match_opt = {
+                    "done_by": ObjectId(userId),
+                    "group_id": ObjectId(groupId)
+                };
+
+                const result = await Quiz.aggregate([
+                    {
+                        $match: match_opt
+                    },   
+                    {
+                        $group: {
+                            "_id": {
+                                "level" : "$level",
+                                "topics": "$topic_name"
+                            },
+                            "skills": {
+                                $addToSet: "$skill_name"
+                            }
+                        }
+                    }, 
+                    {
+                        $group:{
+                            "_id": "$_id.level",
+                            "topics": {
+                                $addToSet: {
+                                    "topic": "$_id.topics",
+                                    "skills": "$skills"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            "_id": "$_id",
+                            "topics": "$topics"
+                        }
+                    }
+                ])
+                if (!result) throw "NOT_FOUND";
+
+                console.log("SUCCESS! Result", result);
+                resolve(result);
+            } catch (err) {
+                console.error("ERROR! Could not get quizzes by: ", err);
+                reject(err);
+            }
+        })
+    },
     // get leaderboard
     viewGroupLeaderboard: (groupId) => {
         return new Promise(async (resolve, reject) => {

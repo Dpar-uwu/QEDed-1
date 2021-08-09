@@ -4,7 +4,6 @@
  */
 const { sign } = require("jsonwebtoken");
 
-
 const createAccessToken = (sub, issuedRole) => {
     const payload = {
         sub,
@@ -16,18 +15,16 @@ const createAccessToken = (sub, issuedRole) => {
     return sign(payload, process.env.ACCESS_TK_MIMI, options);
 };
 
-const createRefreshToken = (sub, issuedRole) => {
+const createRefreshToken = (sub, issuedRole, rememberMe) => {
     const payload = {
         sub,
         issuedRole
     };
     const options = {
-        expiresIn: '14d'
+        expiresIn: rememberMe
     };
     return sign(payload, process.env.REFRESH_TK_MIMI, options);
 };
-
-
 
 module.exports = {
     createAccessToken,

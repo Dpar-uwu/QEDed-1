@@ -62,20 +62,20 @@ router.get("/user",
 router.get("/filter",
     validate("benchmark"),
     async (req, res) => {
-        const { user, level, topic } = req.query;
+        const { user } = req.query;
         try {
-            console.time("GET quiz by ");
-            const result = await quizModel.getQuizByFilter(user, level, topic);
+            console.time("GET filter");
+            const result = await quizModel.getQuizByFilter(user);
             res.status(200).send(result);
         } catch (err) {
             if (err == "NOT_FOUND")
-                res.status(404).send({ error: "User ID not found", code: err });
+                res.status(404).send({ error: "None found", code: err });
             else if (err instanceof Error || err instanceof MongoError)
                 res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
             else
-                res.status(500).send({ error: "Error getting quiz by user id", code: "UNEXPECTED_ERROR" });
+                res.status(500).send({ error: "Error getting filter", code: "UNEXPECTED_ERROR" });
         } finally {
-            console.timeEnd("GET quiz by user id");
+            console.timeEnd("GET filter");
         }
     });
 /**
@@ -263,6 +263,28 @@ router.post("/leaderboard",
     }
 )
 
+router.post("/benchmarkComparison",
+    validate("benchmark"),
+    async (req, res) => {
+        const { user, level, topic } = req.query;
+        try {
+            console.log("asdsdn`12")
+            console.time("POST compare benchmark");
+            const result = await quizModel.getBenchmarkComparison(user, level, topic);
+            res.status(200).send(result);
+        } catch (err) {
+            if (err == "NOT_FOUND")
+                res.status(404).send({ error: "User ID not found", code: err });
+            else if (err instanceof Error || err instanceof MongoError)
+                res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+            else
+                console.log(err)
+                res.status(500).send({ error: "Error getting compare benchmark", code: "UNEXPECTED_ERROR" });
+        } finally {
+            console.timeEnd("POST compare benchmark");
+        }
+    }
+)
 
 /**
  * POST /quiz/benchmark

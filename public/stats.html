@@ -1,42 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PSLEOnline</title>
 
-     <!--Bootstrap-->
-     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
- 
-     <!--Fontawesome-->
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-     
-     <!--JQuery-->
-     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!--Bootstrap-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+        integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+        integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+        crossorigin="anonymous"></script>
 
-     <!--ChartJs-->
-     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!--Fontawesome-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+        integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-     <!--Javascript-->
-     <script src="./javascript/sidebar.js"></script>
-     <script src="./javascript/stats.js"></script>
+    <!--JQuery-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!--ChartJs-->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!--Javascript-->
+    <script src="./javascript/sidebar.js"></script>
+    <script src="./javascript/stats.js"></script>
+
+    <!--CSS-->
+    <link rel="stylesheet" href="./css/stats.css">
 
 </head>
+
 <body class="container-fluid">
     <div class="row flex-nowrap">
         <div class="sidebar col-auto col-sm-4 col-md-3 col-xl-2 px-sm-2 px-0 border-end"></div>
         <div class="col py-3">
             <div class="header"></div>
             <div id="title" class="text-center h3">Statistics</div>
-            <div class="row mt-4">
-                <ul id="filter" class="pagination justify-content-center"></ul>
+            <ul class="pagination mb-0 justify-content-center">
+                <li class="select page-item small active" ><a class="page-link">Detailed</a></li>
+                <li class="select page-item small"><a class="page-link">Comparison</a></li>
+            </ul>
+            <div class="d-flex justify-content-center">
+                <div class="dropdown">
+                    <button class="dropdown-toggle btn filter" href="#" id="mainDropdown" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-sliders-h"></i>
+                        <span>filter</span>
+                    </button>
+                    <ul class="dropdown-menu" id="firstDropList" aria-labelledby="mainDropdown">
+                    </ul>
+                </div>
             </div>
-            <div class="pt-2 justify-content-center" id="container">
+            <div class="pt-2 justify-content-center row" id="container">
             </div>
         </div>
     </div>
-</body> 
+</body>
+
 </html>
+<!-- <div class="tab-content" id="myTabContent">
+    <div class="pt-2 container d-flex align-items-center justify-content-center tab-pane fade show active" id="detailedContainer" role="tabpanel" aria-labelledby="detail-tab">
+        <div class="row mt-4">
+            <ul id="filter-detail" class="pagination justify-content-center"></ul>
+        </div>
+    </div>
+    <div class="pt-2 container d-flex align-items-center justify-content-center tab-pane fade " id="comparisonContainer" role="tabpanel" aria-labelledby="comparison-tab">
+        <div class="row mt-4">
+            <ul id="filter-comparison" class="pagination justify-content-center"></ul>
+        </div>
+    </div>
+</div> -->

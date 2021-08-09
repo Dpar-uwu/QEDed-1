@@ -256,6 +256,47 @@ router.post("/benchmark",
         }
     });
  
+/**
+ * POST /group/benchmarkByUser?groupId=..
+*/
+router.post("/benchmarkByUser",
+async (req, res) => {
+    const { groupId, user, level, topic } = req.query;
+    try {
+        console.time("POST group benchmark by user");
+        const result = await groupModel.viewBenchmarkByUser(groupId, user, level, topic);
+
+        res.status(200).send(result);
+    } catch (err) {
+        if (err instanceof Error || err instanceof MongoError)
+            res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+        else
+            res.status(500).send({ error: "Error getting group benchmark by user", code: "UNEXPECTED_ERROR" });
+    } finally {
+        console.timeEnd("POST group benchmark by user");
+    }
+});
+
+/**
+ * POST /group/benchmarkFilter?groupId=..
+*/
+router.post("/benchmarkFilter",
+async (req, res) => {
+    const { groupId, user} = req.query;
+    try {
+        console.time("POST group benchmark filter");
+        const result = await groupModel.getBenchmarkFilter(groupId, user);
+
+        res.status(200).send(result);
+    } catch (err) {
+        if (err instanceof Error || err instanceof MongoError)
+            res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+        else
+            res.status(500).send({ error: "Error getting group benchmark filter", code: "UNEXPECTED_ERROR" });
+    } finally {
+        console.timeEnd("POST group benchmark filter");
+    }
+});
 
 /**
  * POST /group/leaderboard?groupId=..

@@ -1,0 +1,41 @@
+.card {
+    border-color: #98C5FF;
+    color: #ffffff;
+    background-color: #98C5FF;
+    border-radius: 15px;
+}
+
+.card:hover {
+    border-color: #98C5FF;
+    color:#98C5FF;
+    background-color: #ffffff;
+}
+
+.btn-outline-primary{
+    border-color: #98C5FF;
+    color: #98C5FF;
+}
+
+.btn-outline-primary:hover{
+    border-color: #ffffff;
+    background-color: #98C5FF;
+    color: #ffffff;
+}
+
+.notAvailable{
+    min-height: 30vh;
+}
+
+.border-round{
+    width: 75%;
+    border-radius: 50px;
+}
+
+ul {
+    list-style: none;
+}
+
+.icon-blue{
+    color: #98C5FF;
+    text-shadow: 2px 2px 0px #4842f1;
+}

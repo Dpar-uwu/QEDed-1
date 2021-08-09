@@ -85,7 +85,7 @@ router.put("/:topicId",
             console.time("PUT topic by id");
             const result = await levelModel.updateTopicById(topicId, changedFields);
 
-            res.status(200).send({ message: "Topic Updated" });
+            res.status(200).send({ message: "Topic Updated", level_id: result._id });
         } catch (err) {
             if (err == "NOT_FOUND")
                 res.status(404).send({ error: "Topic ID not found", code: err });
@@ -111,7 +111,7 @@ router.delete("/:topicId",
             console.time("DELETE topic by id");
             const result = await levelModel.deleteTopicById(topicId);
 
-            res.status(200).send({ message: "Topic Deleted" });
+            res.status(200).send({ message: "Topic Deleted", level_id: result._id });
         } catch (err) {
             if (err == "NOT_FOUND")
                 res.status(404).send({ error: "Topic ID not found", code: err });

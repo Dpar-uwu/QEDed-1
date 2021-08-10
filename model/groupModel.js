@@ -919,7 +919,7 @@ const groupModel = {
                 };
 
                 // console.log("SUCCESS! Result: ", result);
-                // resolve(result);
+                resolve(result);
             } catch (err) {
                 console.error(`ERROR! Could not view group benchmark with id ${groupId}: ${err}`);
                 reject(err);

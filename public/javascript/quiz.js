@@ -269,7 +269,7 @@ function submitQuiz(data) {
             let container = document.getElementById("support");
 
             container.className = "row m-0 m-auto justify-content-center";
-            container.innerHTML += '<h4 class="my-5 text-center">Review Quiz</h4>';
+            $(container).after('<h4 class="my-5 text-center">Review Quiz</h4>');
         },
         error: function (xhr, textStatus, errorThrown) {
             console.log(xhr);
@@ -341,7 +341,7 @@ function displayQuestion() {
     
     container.innerHTML =
         `<div class="h5 text-center my-3" id="skillName">${quizData.skill_name}</div>
-            <div class="container row">
+            <div class="container row m-auto">
                 <div class="col-10 container m-auto justify-content-center" id="support">
                     <div class="row align-items-center">
                         <div class="col-2 text-end">
@@ -356,7 +356,8 @@ function displayQuestion() {
             </div>`;
 
     let content = funcs[quizData.topic_name].arrangeQuestion(quizData, questionArray);
-    container.innerHTML += content + '<div class="text-center mb-3"><button class="btn-light btn returnBtn me-2">Cancel</button><button class="btn-outline-primary btn click submitBtn">Submit</button></div>';
+    container.innerHTML += content + '<div class=" justify-content-center d-flex text-center mb-3"><button class="btn-light btn returnBtn me-2">Cancel</button><button class="btn-outline-primary btn click submitBtn">Submit</button></div>';
+    $(".reviewClass").css("display","none");
     
     //Starting timer
     startCountdown();
@@ -626,7 +627,7 @@ const fraction = {
                         </div>`;
                 }
             }
-            content += `<div class='col-md-2'><span id='review${i}'></span></div></div>`;
+            content += `<div class='col-md-2 reviewClass'><span id='review${i}'></span></div></div>`;
         }
 
         return content;
@@ -656,6 +657,8 @@ const fraction = {
             if (input != undefined) studentAns['ans'] = input;
             if (inputA != undefined) studentAns['ansA'] = inputA;
             if (inputB != undefined) studentAns['ansB'] = inputB;
+
+            $(".reviewClass").css("display","block");
 
             if (inputA == questionArray[i].ansA && inputB == questionArray[i].ansB && input == questionArray[i].ans) {
                 if (i < numOfEasy) {

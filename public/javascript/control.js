@@ -520,7 +520,7 @@ $(document).on("click", ".deleteSkillBtn", function () {
 //Level
 $(document).on("click", ".icon", function (event) {
     let level = ($(this).parent().prev().text()).replace(/[^0-9]/g, '');
-    let id = $(this).parent().parent().parent().attr('id');
+    let id = $(this).parent().parent().attr('id');
 
     $('#inputLevel').val(level);
     $('#levelModal').modal('show');

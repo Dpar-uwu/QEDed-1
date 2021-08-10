@@ -20,7 +20,6 @@ $(document).on("click", "#forget", function(){
 
 $(document).on("click", "#reset", function(){
     let password = $('#input').val();
-    console.log("d")
     resetPassword(password);
 })
 
@@ -46,6 +45,7 @@ function requestPasswordReset(email){
                 document.getElementById("errMessage").innerHTML = err.error;
             }
 
+            $('#input').focus();
         }
     });
 }
@@ -68,7 +68,7 @@ function resetPassword(password){
           
         },
         error: function (xhr, textStatus, errorThrown) {
-             onsole.log(xhr)
+            console.log(xhr)
             const err = xhr.responseJSON;
 
             if(err.code == "INVALID_REQUEST"){
@@ -77,6 +77,8 @@ function resetPassword(password){
             else{
                 document.getElementById("errMessage").innerHTML = err.error;
             }
+
+            $('#input').focus();
 
         }
     });

@@ -165,7 +165,7 @@ $(document).on('click', '#signupBtn', function (event) {
                 let key;
 
                 if (JSON.parse(xhr.responseText).code == "INVALID_REQUEST") {
-                    let error = JSON.parse(xhr.responseText).error[0];
+                    var error = JSON.parse(xhr.responseText).error[0];
 
                     switch (error.split(" ")[0]) {
                         case 'First':
@@ -192,6 +192,7 @@ $(document).on('click', '#signupBtn', function (event) {
                     }
                 }
                 else {
+                    console.log(JSON.parse(xhr.responseText).error +"hiiiiiiiii")
                     error = JSON.parse(xhr.responseText).error;
                 }
                 showError(error, key);

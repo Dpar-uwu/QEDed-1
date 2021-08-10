@@ -1,0 +1,132 @@
+
+body{
+    background-image: url("/images/bgimg.jpg");
+    height: 100%; 
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.profileimg{
+    border: 10px solid #ffcb45;
+    border-radius: 15px;
+    padding: 5px;
+    width: 20%;
+}
+
+.profileoverview{
+    padding-left: 270px;
+    padding-top: 30px;
+}
+
+.recommendedquiz{
+    padding-left: 270px;
+    padding-top: 20px;
+}
+
+
+.trynowbox{
+    /* border: 2px solid  darkblue; */
+    border-radius: 15px;
+    padding: 20px;
+    width: 20%;
+    text-align: center;
+    line-height: 200%;
+    background-color: #98C5FF;
+    height: 170px;
+
+}
+
+.trynowbox a{
+    text-decoration: none;
+    color: black;
+}
+
+.trynowbox a:hover{
+    color: darkblue;
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg id='squiggle-link' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns:ev='http://www.w3.org/2001/xml-events' viewBox='0 0 20 4'%3E%3Cstyle type='text/css'%3E.squiggle{animation:shift .3s linear infinite;}@keyframes shift {from {transform:translateX(0);}to {transform:translateX(-20px);}}%3C/style%3E%3Cpath fill='none' stroke='%23453886' stroke-width='2' class='squiggle' d='M0,3.5 c 5,0,5,-3,10,-3 s 5,3,10,3 c 5,0,5,-3,10,-3 s 5,3,10,3'/%3E%3C/svg%3E");
+    background-position: bottom;
+    background-repeat: repeat-x;
+    background-size: 10%;
+    border-bottom: 0;
+    padding-bottom: .4em;
+    text-decoration: none;
+}
+
+.trynowbutton{
+    border-radius: 20px;
+    background-color: lightslategrey;
+    size: 20px;
+    padding: 2px 24px;
+    margin-top: 20px;
+    transition-duration: 0.4s;
+    border: 0;
+}
+
+.trynowbutton:hover{
+    background-color:  grey; 
+}
+
+.trynowbutton:active{
+        position:relative;
+        top:1px;
+}
+
+.dailyquiz{
+   background-color: #98C5FF;
+   margin: -490px 0px 0px 600px;
+   width: 40%;
+   height: 180px;
+   border-radius: 20px;
+   padding: 40px;
+   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 6px 20px 0 rgba(0, 0, 0, 0.10);
+}
+
+.dailyquiz h4{
+    text-align: center;
+    font-family: "roboto", sans-serif;
+    justify-content: center;
+}
+
+/* top | right | bottom | left */
+
+.dailyquizbutton{
+    border-radius: 20px;
+    background-color: lightslategrey;
+    size: 20px;
+    padding: 6px 48px;
+    transition-duration: 0.4s;
+    border: 0;
+    margin: 30px 0px 0px 150px;
+}
+
+.dailyquizbutton:hover{
+    background-color:  grey; 
+}
+
+.dailyquizbutton:active{
+    position:relative;
+    top:1px;
+}
+
+.outstanding{
+   background-color: #98C5FF;
+   margin: 210px 0px 0px 600px;
+   width: 40%;
+   height: 100px;
+   border-radius: 20px;
+   padding: 30px;
+    
+}
+
+.outstanding h5{
+    text-align: center;
+    font-family: "roboto", sans-serif;
+    margin-top: -5px;
+}
+
+.outstanding h6{
+    text-align: center;
+    font-family: "roboto", sans-serif;
+    color: #696969	;
+}

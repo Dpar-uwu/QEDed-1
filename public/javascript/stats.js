@@ -49,11 +49,12 @@ function getDetailedBenchmark(query, containerName) {
         type: 'POST',
         dataType: 'JSON',
         success: function (data, textStatus, xhr) {
-            if (data.length != 0) {
+            if (data.recent != undefined) {
                 createCanvas(5, ['Score', 'Time Taken', 'Easy Score', 'Medium Score', 'Hard Score'], containerName);
                 extractDetailedData(data);
             }
             else {
+                $('#zoom').css("display","none");
                 displayNth();
             }
 

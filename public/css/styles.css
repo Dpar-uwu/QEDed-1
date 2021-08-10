@@ -184,7 +184,6 @@ a:hover {
 	text-decoration: none;
 	transition: all 0.2s;
 	text-align: center;
-	float: center;
 }
 
 .btn-solid-trialquiz:hover {
@@ -504,10 +503,8 @@ input[type='checkbox'] {
 	background-color: transparent;
 }
 
-
-.nav-item .btn-primary {}
-
-padding-left: 10px;
+.nav-item .btn-primary {
+	padding-left: 10px;
 }
 
 @keyframes fadeDropdown {
@@ -548,7 +545,6 @@ padding-left: 10px;
 .header {
 	text-align: center;
 	background-color: #fffff2;
-
 }
 
 /* Slideshow container */
@@ -606,7 +602,6 @@ padding-left: 10px;
 		opacity: 1
 	}
 }
-
 
 /**********************************/
 
@@ -894,9 +889,9 @@ padding-left: 10px;
 /**************************/
 
 .contactus .contactuscontainer {
-		background: url('/public/PSLEOnline/Images/contactusbackgroundimage.jpg') no-repeat;     
-	    background-size: 100%;
-		padding: 50px;
+	background: url('/public/PSLEOnline/Images/contactusbackgroundimage.jpg') no-repeat;
+	background-size: 100%;
+	padding: 50px;
 }
 
 .contactusheader p {
@@ -970,7 +965,9 @@ input[type=submit]:hover {
 }
 
 /***************************/
+
 /*     Thank You Page    */
+
 /***************************/
 
 .thankyoupage {
@@ -978,7 +975,6 @@ input[type=submit]:hover {
 	padding: 150px;
 	text-align: center;
 }
-
 
 /************************/
 
@@ -1055,7 +1051,6 @@ input[type=submit]:hover {
 	color: #252c38;
 }
 
-
 /********************************/
 
 /*   Learning Resources Level   */
@@ -1066,48 +1061,48 @@ input[type=submit]:hover {
 	padding: 50px 0px 0px 100px;
 }
 
- #levelbuttons {
-	 margin-top: 80px;
-	 margin-left: 440px;
- }
+#levelbuttons {
+	margin-top: 80px;
+	margin-left: 440px;
+}
 
- a.button3 {
-	 display: inline-block;
-	 padding: 1em 1em;
-	 margin: 0.5em 0.5em 1.5em 0;
-	 border-radius: 2em;
-	 box-sizing: border-box;
-	 text-decoration: none;
-	 font-family: 'Roboto', sans-serif;
-	 font-weight: 300;
-	 color: #FFFFFF;
-	 background-color: #4eb5f1;
-	 text-align: center;
-	 transition: all 0.2s;
- }
+a.button3 {
+	display: inline-block;
+	padding: 1em 1em;
+	margin: 0.5em 0.5em 1.5em 0;
+	border-radius: 2em;
+	box-sizing: border-box;
+	text-decoration: none;
+	font-family: 'Roboto', sans-serif;
+	font-weight: 300;
+	color: #FFFFFF;
+	background-color: #4eb5f1;
+	text-align: center;
+	transition: all 0.2s;
+}
 
- a.button3:hover {
-	 background-color: #4095c6;
-	 text-decoration: none;
- }
+a.button3:hover {
+	background-color: #4095c6;
+	text-decoration: none;
+}
 
- .disabled {
-	 opacity: 0.6;
-	 cursor: not-allowed;
- }
+.disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
 
- @media all and (max-width:30em) {
-	 a.button3 {
-		 display: block;
-		 margin: 0.2em auto;
-	 }
- }
+@media all and (max-width:30em) {
+	a.button3 {
+		display: block;
+		margin: 0.2em auto;
+	}
+}
 
- .lrtitle {
-	 padding-top: 150px;
-	 text-align: center;
-	 font-size: 15px;
- }
+.lrtitle {
+	padding-top: 150px;
+	text-align: center;
+	font-size: 15px;
+}
 
 /********************************/
 
@@ -1115,24 +1110,14 @@ input[type=submit]:hover {
 
 /********************************/
 
-table.dataTable thead .sorting:after,
-table.dataTable thead .sorting:before,
-table.dataTable thead .sorting_asc:after,
-table.dataTable thead .sorting_asc:before,
-table.dataTable thead .sorting_asc_disabled:after,
-table.dataTable thead .sorting_asc_disabled:before,
-table.dataTable thead .sorting_desc:after,
-table.dataTable thead .sorting_desc:before,
-table.dataTable thead .sorting_desc_disabled:after,
-table.dataTable thead .sorting_desc_disabled:before {
-  bottom: .5em;
+table.dataTable thead .sorting:after, table.dataTable thead .sorting:before, table.dataTable thead .sorting_asc:after, table.dataTable thead .sorting_asc:before, table.dataTable thead .sorting_asc_disabled:after, table.dataTable thead .sorting_asc_disabled:before, table.dataTable thead .sorting_desc:after, table.dataTable thead .sorting_desc:before, table.dataTable thead .sorting_desc_disabled:after, table.dataTable thead .sorting_desc_disabled:before {
+	bottom: .5em;
 }
 
- .lresources a{
+.lresources a {
 	text-decoration: none;
 }
 
- 
 /******************/
 
 /*     Footer     */
@@ -1613,9 +1598,9 @@ a:hover.back-to-top {
 	padding-bottom: 200px;
 }
 
-.conclusion {    
-    background: url('/public/PSLEOnline/Images/conclusionbackgroundimage.jpg') no-repeat center fixed;     
-    background-size: cover;
+.conclusion {
+	background: url('/public/PSLEOnline/Images/conclusionbackgroundimage.jpg') no-repeat center fixed;
+	background-size: cover;
 }
 
 .conclusion h4 {
@@ -1625,7 +1610,6 @@ a:hover.back-to-top {
 
 .conclusionsignup {
 	padding: 30px 0px 10px 480px;
-
 }
 
 .conclusionsignup .btn-solid-signup {
@@ -1636,7 +1620,7 @@ a:hover.back-to-top {
 	color: #ffffff;
 	line-height: 0;
 	text-decoration: none;
-	border:0;
+	border: 0;
 	text-align: center;
 }
 
@@ -1661,17 +1645,17 @@ a:hover.back-to-top {
 	color: #737373;
 }
 
-.site-footer img{
+.site-footer img {
 	width: 50px;
 	height: 50px;
 }
 
-.site-footer .footerlogocolum{
+.site-footer .footerlogocolum {
 	padding-left: 40px;
 	padding-right: 50px;
 }
 
-.site-footer .copyright-text{
+.site-footer .copyright-text {
 	font-size: 13px;
 }
 
@@ -1735,7 +1719,6 @@ a:hover.back-to-top {
 	border-radius: 100%;
 	background-color: #33353d
 }
-
 
 @media (max-width:991px) {
 	.site-footer [class^=col-] {

@@ -87,7 +87,7 @@ router.get("/recommendation",
     async (req, res) => {
         const { userId } = req.query;
         try {
-            console.time("POST recommend quiz");
+            console.time("GET recommend quiz");
             const result = await quizModel.recommendQuiz(userId);
             res.status(200).send(result);
         } catch (err) {
@@ -97,9 +97,29 @@ router.get("/recommendation",
             else if (err instanceof Error || err instanceof MongoError)
                 res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
             else
-                res.status(500).send({ error: "Error getting benchmark", code: "UNEXPECTED_ERROR" });
+                res.status(500).send({ error: "Error getting recommendation", code: "UNEXPECTED_ERROR" });
         } finally {
             console.timeEnd("POST recommend quiz");
+        }
+    }
+)
+/**
+ * GET /quiz/popular
+ */
+router.get("/popular",
+    async (req, res) => {
+        try {
+            console.time("GET popular quiz");
+            const result = await quizModel.popularQuiz();
+            res.status(200).send(result);
+        } catch (err) {
+            console.log(err)
+            if (err instanceof Error || err instanceof MongoError)
+                res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+            else
+                res.status(500).send({ error: "Error getting popular quiz", code: "UNEXPECTED_ERROR" });
+        } finally {
+            console.timeEnd("GET popular quiz");
         }
     }
 )
@@ -279,7 +299,7 @@ router.post("/benchmarkComparison",
                 res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
             else
                 console.log(err)
-                res.status(500).send({ error: "Error getting compare benchmark", code: "UNEXPECTED_ERROR" });
+            res.status(500).send({ error: "Error getting compare benchmark", code: "UNEXPECTED_ERROR" });
         } finally {
             console.timeEnd("POST compare benchmark");
         }

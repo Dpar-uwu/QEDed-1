@@ -66,7 +66,7 @@ let attribute = {
     school: () => {
         return body("school")
             .optional()
-            .matches(/^(?=.*[a-zA-Z])([a-zA-Z -']+)$/)
+            .matches(/^(?=.*[a-zA-Z])([a-zA-Z -.']+)$/)
             .withMessage("School must only contain alphabets, spaces, ' and -").bail()
             .trim().stripLow()
     },

@@ -104,31 +104,38 @@ $(document).on("click", "#setDefault", function () {
 //Level
 $(document).on("click", ".addLevelBtn", function () {
     let level = $('#inputLevel').val();
-
-    $.ajax({
-        url: `/level`,
-        type: 'POST',
-        data: { 'level': level },
-        dataType: 'JSON',
-        headers: {
-            Authorization: (localStorage.getItem("token") != null) ? "Bearer " + localStorage.getItem("token") : ""
-        },
-        success: function (data, textStatus, xhr) {
-            location.reload();
-        },
-        error: function (xhr, textStatus, errorThrown) {
-            $('#inputLevelErr').html(JSON.parse(xhr.responseText).error);
-
-            const res = xhr.responseJSON;
-
-            if (res.code == "UNAUTHENTICATED_USER") {
-                window.location.href = "/login.html";
+    console.log(level);
+    if(level > 0){
+        $.ajax({
+            url: `/level`,
+            type: 'POST',
+            data: { 'level': level },
+            dataType: 'JSON',
+            headers: {
+                Authorization: (localStorage.getItem("token") != null) ? "Bearer " + localStorage.getItem("token") : ""
+            },
+            success: function (data, textStatus, xhr) {
+                location.reload();
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                $('#inputLevelErr').html(JSON.parse(xhr.responseText).error);
+                $('#inputLevel').focus();
+    
+                const res = xhr.responseJSON;
+    
+                if (res.code == "UNAUTHENTICATED_USER") {
+                    window.location.href = "/login.html";
+                }
+                else if (res.code == "UNAUTHORIZED_USER") {
+                    window.location.href = "/403.html";
+                }
             }
-            else if (res.code == "UNAUTHORIZED_USER") {
-                window.location.href = "/403.html";
-            }
-        }
-    });
+        });
+    }
+    else{
+        $('#inputLevelErr').html("Level cannot be a negative number.");
+        $('#inputLevel').focus();
+    }
 })
 
 $(document).on("click", ".editLevelBtn", function () {
@@ -148,6 +155,7 @@ $(document).on("click", ".editLevelBtn", function () {
         },
         error: function (xhr, textStatus, errorThrown) {
             $('#inputLevelErr').html(JSON.parse(xhr.responseText).error);
+            $('#inputLevel').focus();
 
             const res = xhr.responseJSON;
 
@@ -226,7 +234,8 @@ $(document).on("click", ".addTopicBtn", function () {
             $(`#${data.new_id}`).trigger('click');
         },
         error: function (xhr, textStatus, errorThrown) {
-            $('#inputLevelErr').html(JSON.parse(xhr.responseText).error);
+            $('#inputTopicErr').html(JSON.parse(xhr.responseText).error);
+            $('#inputTopic').focus();
 
             const res = xhr.responseJSON;
 
@@ -257,7 +266,8 @@ $(document).on("click", ".editTopicBtn", function () {
             $(`#${data.level_id}`).trigger('click');
         },
         error: function (xhr, textStatus, errorThrown) {
-            $('#inputLevelErr').html(JSON.parse(xhr.responseText).error);
+            $('#inputTopicErr').html(JSON.parse(xhr.responseText).error);
+            $('#inputTopic').focus();
 
             const res = xhr.responseJSON;
 
@@ -519,7 +529,7 @@ $(document).on("click", ".deleteSkillBtn", function () {
 /* Editing modal title and btn */
 //Level
 $(document).on("click", ".icon", function (event) {
-    let level = ($(this).parent().prev().text()).replace(/[^0-9]/g, '');
+    let level = ($(this).parent().text()).replace(/[^0-9]/g, '');
     let id = $(this).parent().parent().attr('id');
 
     $('#inputLevel').val(level);
@@ -547,8 +557,8 @@ $(document).on("click", ".addLevel", function () {
 // Topics
 $(document).on("click", ".addTopic", function () {
     $('#level_id').val(this.id);
-    $('#inputLevel').val('');
-    $('#TopicModalTitle').html('Add Topic');
+    $('#inputTopic').val('');
+    $('#topicModalTitle').html('Add Topic');
     $('#inputTopicErr').html('');
     $('.editTopicBtn').addClass('addTopicBtn').removeClass('editTopicBtn');
     $('.addTopicBtn').attr('id', '');

@@ -889,7 +889,7 @@ input[type='checkbox'] {
 /**************************/
 
 .contactus .contactuscontainer {
-	background: url('/public/PSLEOnline/Images/contactusbackgroundimage.jpg') no-repeat;
+	background: url('../images/contactusbackgroundimage.jpg') no-repeat;
 	background-size: 100%;
 	padding: 50px;
 }
@@ -1195,7 +1195,7 @@ a.back-to-top {
 	width: 42px;
 	height: 42px;
 	border-radius: 30px;
-	background: #A9A9A9 url("/Images/arrowup.png") no-repeat center 47%;
+	background: #A9A9A9 url("../images/arrowup.png") no-repeat center 47%;
 	background-size: 18px 18px;
 	text-indent: -9999px;
 }
@@ -1599,7 +1599,7 @@ a:hover.back-to-top {
 }
 
 .conclusion {
-	background: url('/public/PSLEOnline/Images/conclusionbackgroundimage.jpg') no-repeat center fixed;
+	background: url('../images/conclusionbackgroundimage.jpg') no-repeat center fixed;
 	background-size: cover;
 }
 

@@ -645,6 +645,32 @@ const quizModel = {
             }
         })
     },
+    popularQuiz: () => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const popular = await Quiz.aggregate([
+                    {
+                        $group: {
+                            "_id": "$skill_id",
+                            "skill_name": { $last: "$skill_name" },
+                            "num_of_quiz": { $sum: 1 },
+                        }
+                    },
+                    {
+                        $sort: {
+                            "num_of_quiz": -1, // descending
+                        }
+                    }
+                ]).limit(3);
+
+                console.log("SUCCESS! Result", popular);
+                resolve(popular);
+            } catch (err) {
+                console.error(`ERROR! Could not get popular quizzes`);
+                reject(err);
+            }
+        })
+    },
     getWeeklyProgress: (userId) => {
         return new Promise(async (resolve, reject) => {
             try {

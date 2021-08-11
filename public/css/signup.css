@@ -1,9 +1,17 @@
 html, body{
     height: 100%;
-    background-color: rgb(254,250,224); 
+    /* background-color: rgb(254,250,224);  */
+    background-color: #003744;
     font-family: "cambria";   
     font-size: 15px;
+    color: white;
 }
+
+.signuplogo{
+    width: 400px;
+    height: 140px;
+}
+
 .rounded-pills{
     border-radius: 40px;
 }

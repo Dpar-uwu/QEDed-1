@@ -15,6 +15,7 @@ const groupController = require("./groupController.js");
 const { router, postSocket } = require("./postController.js");
 const postController = router;
 const assignmentController = require('./assignmentController');
+const notificationController = require('./notificationController');
 
 
 // const email = require("../email/email");
@@ -109,6 +110,9 @@ app.use("/question", questionController);
 app.use("/group", groupController);
 app.use("/post", postController);
 app.use('/assignment', assignmentController);
+
+// notification routes
+app.use("/notification", notificationController);
 
 // uncaught error handling
 app.use((_error, _req, res, _next) => {

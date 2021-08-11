@@ -12,6 +12,12 @@ html, body{
     height: 140px;
 }
 
+.loginlogo{
+    width: 400px;
+    height: 140px;
+}
+
+
 .rounded-pills{
     border-radius: 40px;
 }

@@ -26,6 +26,7 @@ $(document).on("click", "#check-icon", function () {
     let group_name = document.querySelector("#group_name").value;
     updateGroupName(groupId, group_name, function () {
         document.querySelector("#check-icon").style.display = "none";
+        document.querySelector("#error").innerHTML = "";
     });
 });
 
@@ -52,16 +53,24 @@ $(document).on("keyup", "#add-members", function () {
 // add user to member list
 $(document).on("click", ".result", function () {
     const id = this.id;
-    const name = this.children[0].innerHTML;
-    const email = this.children[1].innerHTML;
-    addMemberToGroup(groupId, id, name, email);
+    const owner_id = document.querySelector("#group_owner").dataset.owner_id;
+    console.log(id, owner_id)
+    if(owner_id && (id != owner_id)) {
+        const name = this.children[0].innerHTML;
+        const email = this.children[1].innerHTML;
+        const role = this.children[2].innerHTML;
+        addMemberToGroup(groupId, id, name, email, role);
+    } else {
+        document.querySelector("#error").innerHTML = "User is already the owner of the group";
+    }
 });
 
 // remove user on click dropdown
 $(document).on("click", "#rm-member", function () {
     let userId = document.querySelector("#rmUID").value;
     removeMemberFromGroup(groupId, userId, () => {
-        document.querySelector("#added-"+userId).remove();
+        document.querySelector("#added-" + userId).remove();
+        document.querySelector("#error").innerHTML = "";
     });
 });
 // make user an admin on click dropdown item
@@ -129,15 +138,16 @@ function searchUserEmail() {
     });
 }
 
-function addMemberToGroup(groupId, id, name, email) {
+function addMemberToGroup(groupId, id, name, email, role) {
     $.ajax({
         url: `/group/addMember?groupId=${groupId}&userId=${id}`,
         method: "POST",
         dataType: 'JSON',
         success: function (data, textStatus, xhr) {
-            displayAdded(id, name, email);
+            displayAdded(id, name, email, role);
             let adddedList = document.querySelector("#added-list");
             adddedList.scrollTo(0, adddedList.scrollHeight);
+            document.querySelector("#error").innerHTML = "";
         },
         error: function (xhr, textStatus, errorThrown) {
             console.log(errorThrown);
@@ -174,6 +184,7 @@ function makeGroupAdmin(groupId, userId, parentElement) {
         dataType: 'JSON',
         success: function (data, textStatus, xhr) {
             displayAdminTag(parentElement);
+            document.querySelector("#error").innerHTML = "";
         },
         error: function (xhr, textStatus, errorThrown) {
             console.log(errorThrown);
@@ -189,6 +200,7 @@ function rmGroupAdmin(groupId, userId, parentElement) {
         dataType: 'JSON',
         success: function (data, textStatus, xhr) {
             let myId = decodeToken().sub;
+            document.querySelector("#error").innerHTML = "";
             if (myId == userId) {
                 window.location.href = "/group_members.html?groupId=" + groupId;
             }
@@ -219,22 +231,27 @@ function deleteGroup(groupId) {
 }
 
 function updateGroupName(groupId, groupName, successCallback) {
-    $.ajax({
-        url: `/group?groupId=${groupId}`,
-        type: "PUT",
-        data: JSON.stringify({
-            "group_name": groupName
-        }),
-        dataType: 'JSON',
-        contentType: "application/json",
-        success: function (data, textStatus, xhr) {
-            successCallback();
-        },
-        error: function (xhr, textStatus, errorThrown) {
-            console.log(errorThrown);
-            document.querySelector("#error").innerHTML = xhr.responseJSON.error;
-        }
-    });
+    if (groupName != "" && groupName != null && groupName != undefined) {
+        $.ajax({
+            url: `/group?groupId=${groupId}`,
+            type: "PUT",
+            data: JSON.stringify({
+                "group_name": groupName
+            }),
+            dataType: 'JSON',
+            contentType: "application/json",
+            success: function (data, textStatus, xhr) {
+                successCallback();
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(errorThrown);
+                document.querySelector("#error").innerHTML = xhr.responseJSON.error;
+            }
+        });
+    }
+    else {
+        document.querySelector("#error").innerHTML = "Group Name cannot be empty";
+    }
 }
 
 
@@ -290,10 +307,10 @@ function displayMembers(data) {
 
     // display owner in modal
     group_owner.value = data.owner.first_name + " " + data.owner.last_name
+    group_owner.dataset.owner_id = data.owner._id;
 
 
     // display members
-    console.log(data.members)
     if (data.members && data.members.length >= 1) {
         data.members.forEach(member => {
             if (!jQuery.isEmptyObject(member)) {
@@ -305,7 +322,7 @@ function displayMembers(data) {
                     </div>
                     `;
                 }
-                else if(member.role == "parent") {
+                else if (member.role == "parent") {
                     parentList.innerHTML += `
                     <div class="member" id="${member.user_id}">
                         <span class="member-name">${member.user_name}</span>
@@ -373,6 +390,7 @@ function displaySearchResult(data) {
                 <div class="result" id="${result._id}">
                     <span class="member-name">${result.first_name} ${result.last_name}</span>
                     <span class="email">${result.email}</span>
+                    <span class="email">${result.role}</span>
                 </div>
             `;
             // <span class="role">${result.role}</span>
@@ -382,7 +400,7 @@ function displaySearchResult(data) {
     searchList.innerHTML = content;
 }
 
-function displayAdded(id, name, email) {
+function displayAdded(id, name, email, role) {
     var addedList = document.querySelector("#added-list");
     var children = Array.from(addedList.children); //convert children to array
 
@@ -398,6 +416,10 @@ function displayAdded(id, name, email) {
             <div class="member-details">
                 <span class="added-name">${name}</span>
                 <span class="added-email">${email}</span>
+                <span class="added-role">${role}</span>
+            </div>
+            <div class="is_admin">
+                
             </div>
             <div class="edit-member" data-bs-toggle="dropdown" aria-expanded="false">
                 <span class="fas fa-ellipsis-v"></span>
@@ -408,8 +430,7 @@ function displayAdded(id, name, email) {
                     data-bs-toggle="modal"
                     data-bs-target="#rmMemberModal">Remove Member</li>
             </ul>
-        </div>
-        `;
+        </div>`;
     }
 }
 

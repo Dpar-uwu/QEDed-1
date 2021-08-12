@@ -25,7 +25,7 @@ function getAssignmentByUser() {
 }
 
 $(document).on("click", ".assignment", function() {
-    window.location.href = "/quiz.html?skill=" + this.id;
+    window.location.href = "/quiz.html?skill=" + this.id + "&assignment=" + this.dataset.assignment;
 });
 
 
@@ -35,16 +35,18 @@ function displayAssignments(assignments) {
 
     let content = "";
     assignments.forEach(assignment => {
-        content += `
-            <div class="assignment" id="${assignment.skill_id}">
-                <div class="assignment-details">
-                    <span class="assignment-title">${assignment.title}</span>
-                    <small class="assign-by">Assigned By: ${assignment.assigned_by_name} (${assignment.group_name})</small>
-                    <span class="assign-skill">${assignment.skill_name}</span>
+        if(assignment.completed_quiz == false) {
+            content += `
+                <div class="assignment" id="${assignment.skill_id}" data-assignment="${assignment._id}">
+                    <div class="assignment-details">
+                        <span class="assignment-title">${assignment.title}</span>
+                        <small class="assign-by">Assigned By: ${assignment.assigned_by_name} (${assignment.group_name})</small>
+                        <span class="assign-skill">${assignment.skill_name}</span>
+                    </div>
+                    <small class="deadline">${displayDate(assignment.deadline)}</small>
                 </div>
-                <small class="deadline">${displayDate(assignment.deadline)}</small>
-            </div>
-        `;
+            `;
+        }
     });
     if(content != "") assignmentList.innerHTML = content;
 }
@@ -66,7 +68,7 @@ function decodeToken() {
 function displayDate(dt) {
     let date = new Date(dt);
     let today = new Date(Date.now());
-    console.log(date.toDateString(), today.toDateString())
+
     let result = (date.toDateString() == today.toDateString()) ?
         "Today" :
         date.toDateString()

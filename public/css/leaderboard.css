@@ -43,7 +43,6 @@
 }
 
 /* NO RESULT */
-
 #noresult {
     min-height: 40vh;
     display: flex;
@@ -51,25 +50,27 @@
     justify-content: center;
 }
 
-/* TOP 3 Students */
 
+/* TOP 3 Students */
 #top-3 {
-    display: grid;
-    grid-template-columns: auto auto auto;
-    grid-column-gap: 16px;
+    display: flex;
+    justify-content: center;
     text-align: center;
-    margin: 19px 1rem;
+    max-width: 992px;
+    margin: 24px auto;
 }
 
 .top-rank {
     background-color: #003844;
     color: #fefae0;
-    padding: 24px 5px 18px;
+    margin: 0 8px;
+    padding: 24px 20px 20px;
     display: flex;
+    flex: 1 1 0px;
     flex-direction: column;
     align-self: flex-start;
     border-radius: 15px;
-    box-shadow: 0px 6px 14px #cecdd5;
+    box-shadow: 0px 6px 14px #26262635;
 }
 
 .top-rank-num {
@@ -139,14 +140,15 @@
 }
 
 #leaderboard {
-    margin: 19px 1rem;
+    max-width: 996px;
     font-size: 15px;
+    margin: 19px auto;
 }
 
 .student-row {
     border: 1.3px solid #ffcb45;
     padding: 12px 0;
-    margin: 17px 0;
+    margin: 17px 10px;
     border-radius: 15px;
     color: #003844;
     transition: 0.2s ease-in;
@@ -165,7 +167,6 @@
 
 .rank {
     border-radius: 25px;
-    /* background-color: #ffcb45; */
     padding: 14px !important;
     margin-right: 6px;
     width: 0;
@@ -183,14 +184,11 @@
 }
 
 @media (max-width: 768px) {
-    #top-3 {
-        /* grid-template-columns: auto; */
-        grid-column-gap: 8px;
-        grid-row-gap: 8px;
-    }
     .top-rank {
         font-size: 11px;
         padding: 14px 5px;
+        margin-left: 3px;
+        margin-right: 2px;
     }
     .top-rank i {
         font-size: 24px !important;
@@ -213,6 +211,7 @@
     }
     #leaderboard {
         font-size: 11px;
+        margin: 19px 8px;
     }
     .student-row span {
         padding: 4px;
@@ -231,11 +230,5 @@
     }
     .name {
         font-size: 13px;
-    }
-}
-
-@media (min-width: 1200px) {
-    #top-3 {
-        grid-column-gap: 3em !important;
     }
 }

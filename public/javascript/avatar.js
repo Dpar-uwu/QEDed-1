@@ -1,4 +1,3 @@
-
 $(".profile .icon_wrap").click(function(){
     $(this).parent().toggleClass("active");
     $(".notifications").removeClass("active");

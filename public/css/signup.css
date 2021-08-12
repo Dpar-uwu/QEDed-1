@@ -71,7 +71,7 @@ hr{
     width: 100%;
 }
 
-.w3-sidebar {
+/* .w3-sidebar {
     height: 100%;
     width: 220px;
     background-color: #98C5FF;
@@ -95,7 +95,7 @@ hr{
     white-space: normal;
     float: none;
     outline: 0;
-}
+} */
 
 .button {
     border: none;

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -20,36 +21,44 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
         integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
     <!--JQuery-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
-
-    <!--ChartJs-->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!--Javascript-->
-    <script src="./javascript/auth.js"></script>
-    <script src="./javascript/quiz.js"></script>
-    <script src="./javascript/stats.js"></script>
-    <script src="./javascript/sidebar.js"></script>
 
     <!--CSS-->
-    <link href="./css/quiz.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/signup.css">
 
-</head>
+    <!--Javascript-->
+    <script src="./javascript/signup.js"></script>
 
-<body class="container-fluid">
-    <div class="row flex-nowrap" id="withBars">
-        <div class="sidebar col-auto col-sm-4 col-md-3 col-xl-2 px-sm-2 px-0 border-end"></div>
-        <div class="col py-3">
-            <div class="header"></div>
-            <h3 id="title" class="text-center h3">Quiz</h3>
-            <div id="subtitle" class="text-center pt-2 h6"></div>
-            <div class="pt-2 row container justify-content-center m-auto" id="container"></div>
+
+<body class="d-flex align-items-center">
+    <div class="d-flex container flex-column col-sm-4 align-items-center justify-content-center">
+        <img src="./images/QEDed.jpg" alt="QEDed" class="mt-2">
+
+        <h5 class="mb-4">Forget Password ?</h5>
+
+        <h6 class="mb-4">Enter the email address associated with your
+            account and we'll send you a link to reset your password </h6>
+
+        <form class="row g-2">
+            <div class="alert alert-dismissible fade show rounded-pill p-2 m-0" role="alert" id="alertBox">
+                <small id="errorMessage" class="text-danger"></small>
+            </div>
+
+        </form>
+
+        <div class=text>
+            <input type="email" class="form-control rounded-pill" id="email" placeholder="Email" required>
         </div>
+
+        <div class="text">
+            <button type="submit" class="btn btn-primary btn-block" id="submitBtn">Submit</button>
+        </div>
+        
+        <p class="small mb-2">Dont have an account? <a href="signup.html">Create a new one!</a></p>
+
     </div>
 </body>
-
-</html>
+</head>

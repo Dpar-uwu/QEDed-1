@@ -1,0 +1,356 @@
+
+body {
+    font-family: "Open Sans", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 1em;
+    background-image:linear-gradient(#fffbeb, #fff6ff);
+    
+  }
+
+
+  
+.w3-sidebar {
+    width: 150px;
+    
+    z-index: 1;
+    overflow: auto;
+    border-radius: 25px;
+    position: absolute;               /* 2 */
+   top: 10%; 
+   left: 3%; 
+}
+
+.form-control, .btn {
+  min-height: 8px;
+  border-radius: 0px;
+  padding: 10px;
+  width: 100%;
+}
+
+.form-select{
+  min-height: 8px;
+  border-radius: 0px;
+  padding: 10px;
+  width: 100%;
+}
+
+.form-check{
+  padding: 10px;
+  min-height: 8px;
+
+}
+.form-check .form-check-input {
+  float: left;
+  margin-left: -1.5em;
+}
+
+.test{
+  padding-left: 300px;
+  margin-top: 100px;
+
+
+}
+
+
+.unum--account {
+  position: absolute;
+  right: 1em;  
+}
+
+button {
+  background:none;
+  border: none;
+  color: #333;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: .85rem;
+  padding: .5em;
+  position: relative;
+}
+
+.account--messages,
+.account--name {
+  margin-left: .75em;
+  float:right;
+  margin-top: -100px;
+  margin-right: 14px;
+  
+ 
+}
+
+.account--name .arrow--down {
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #000; 
+  content: "";
+  display: inline-block;
+  margin: .25em 0 .25em 1em;
+  vertical-align: middle;
+  
+}
+
+.account--panel {
+  background-color: #fff;
+  border: 1px solid #dddbda;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 1px 1px 1px #dddbda;
+  box-shadow: 0 1px 1px 1px #dddbda;
+  color: #333;
+  display: none;
+  font-size: .85rem;
+  margin-top: 1em;
+  position: absolute;
+  right: 0;
+  width: 300px;
+  margin-top: -60px;
+}
+
+.account--panel::before {
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 12px solid #dddbda;
+  content: "";
+  position: absolute;
+  right: 5%;
+  top: -12px;
+}
+
+.account--panel::after {
+  content: "";
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  border-bottom: 11px solid #fff;
+  position: absolute;
+  right: calc(5% + 1px);
+  top: -11px;
+}
+
+.account--panel.on {
+  display: block;
+  -webkit-animation: show-account-panel .15s ease-in-out;
+  animation: show-account-panel .15s ease-in-out;
+}
+
+.account--container .account--settings {
+  float: right;
+  margin-right: .5em;
+  margin-top: .5em;
+}
+
+.account--container ul {
+  margin: 0;
+  padding: 0;
+}
+
+.account--container li {
+  list-style-type: none;
+}
+
+.account--container h1 {
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #dddbda;
+  border-top: 1px solid #dddbda;
+  color: #5c5c5c;
+  font-size: .65rem;
+  font-weight: 400;
+  letter-spacing: 1px;
+  margin: 0;
+  padding: .6em 1.25em;
+  text-transform: uppercase;
+}
+
+.account--container .company,
+.account--container .user {
+  margin-bottom: 1em;
+}
+
+.account--container .company ul,
+.account--container .user ul {
+  padding: 0;
+}
+
+.account--container .company li,
+.account--container .user li {
+  padding: .75em 1.25em 0;
+}
+
+.account--container .email {
+  color: #5a7084;
+}
+
+.account--container .context li:not(:last-child) {
+  border-bottom: 1px solid #dddbda;
+}
+
+.account--container .context a {
+  color: #333;
+  display: block;
+  margin: 0;
+  padding: 1em;
+  text-decoration: none;
+}
+
+.account--container .context a:hover {
+  background-color: #f5f5f5;
+  color: #0376bb;
+  text-decoration: underline;
+}
+
+.account--container .select {
+  background-color: #fff;
+  border: 1px solid #999;
+  border-radius: 50%;
+  display: inline-block;
+  height: 10px;
+  margin-right: 1em;
+  vertical-align: middle;
+  width: 10px;
+}
+
+
+.corp span {
+  line-height: 1.75;
+  display: block;
+}
+
+.account--container .logout {
+  border-top: 1px solid #dddbda;
+  color: #2988c4;
+  text-align: center;
+}
+
+.account--container .logout a {
+  color: #0376bb;
+  display: block;
+  padding: .75em;
+}
+
+.account--container .logout a:hover {
+  background-color: #f5f5f5;
+}
+
+
+
+.d-inline{
+    display: flex;
+    position: absolute;
+    vertical-align: middle;
+}
+
+.notif{
+  display: inline-block;      
+  position: relative;
+  vertical-align: middle;
+  padding-bottom: 70px;
+  font-size: 50px;
+  padding-left: 30px;
+}
+
+.heading1{
+    padding-top: 150px;
+    padding-left: 310px;
+    font-size: 25px;
+}
+
+
+.switch  {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    margin-left: 310px;
+    margin-top: 10px;
+  }
+  
+  .switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  input:checked + .slider {
+    background-color: #2196F3;
+  }
+  
+  input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
+  
+  input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+  }
+  
+  /* Rounded sliders */
+  .slider.round {
+    border-radius: 34px;
+  }
+  
+  .slider.round:before {
+    border-radius: 50%;
+  }
+
+
+  .heading2{
+    padding-top: 40px;
+    padding-left: 310px;
+    font-size: 25px;  
+  }
+
+  .p{
+    
+    padding-left: 310px;  
+  }
+  .fa-envelope{
+    padding-left: 310px;  
+    vertical-align: middle;
+   
+  }
+
+.email{
+    padding-left: 150px;
+    margin-left: 10px;
+    vertical-align: middle;
+   
+    
+}
+
+
+
+.btn-dark{
+    width: 100px;
+    border-radius: 5px;
+    margin-left: 38%;
+    margin-top: 10px;
+    margin-bottom: 50px;
+ 
+   
+    
+  
+}

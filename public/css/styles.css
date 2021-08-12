@@ -615,7 +615,9 @@ input[type='checkbox'] {
 	text-align: left;
 	padding-left: 5rem;
 	padding-right: 5rem;
-	background-color: #fffff2;
+	/* background-color: #fffff2; */
+	background: url('../images/conclusionbackgroundimage.jpg') no-repeat center fixed;
+	background-size: cover;
 }
 
 .aboutus p {
@@ -1636,7 +1638,6 @@ a:hover.back-to-top {
 /*    Footer     */
 
 /*****************/
-
 
 .site-footer {
 	background-color: #f1f9fc;

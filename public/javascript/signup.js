@@ -159,6 +159,10 @@ $(document).on('click', '#signupBtn', function (event) {
                 withCredentials: true
             },
             success: function (data, textStatus, xhr) {
+                console.log(data)
+                if(data.result.role == "student"){
+                    createGameInfo(data.result._id);
+                }
                 window.location.href = './login.html';
             },
             error: function (xhr, textStatus, errorThrown) {
@@ -229,17 +233,6 @@ function getSchool() {
     });
 }
 
-function showError(message, key) {
-    let errorBox = document.getElementById("alertBox");
-    let errorText = document.getElementById("errorMessage");
-
-    //Focus on the empty field
-    $('#' + key).focus();
-
-    errorText.innerHTML = message;
-    errorBox.style.display = "block";
-}
-
 function tokenExist(){
     $.ajax({
         url: '/user/refresh_token',
@@ -269,4 +262,29 @@ function tokenExist(){
             document.getElementsByClassName('lds-ellipsis')[0].style.display = "none";
         }
     });
+}
+
+function createGameInfo(id){
+    $.ajax({
+        url: `/game?user_id=${id}`,
+        method: 'POST',
+        dataType: 'JSON',
+        success: function(data, textStatus, xhr) {
+            console.log("Game Info Successfully Created!")
+        },
+        error: function(xhr, textStatus, errorThrown){
+            console.log("Error: " + xhr.responseText);
+        }
+    });
+}
+
+function showError(message, key) {
+    let errorBox = document.getElementById("alertBox");
+    let errorText = document.getElementById("errorMessage");
+
+    //Focus on the empty field
+    $('#' + key).focus();
+
+    errorText.innerHTML = message;
+    errorBox.style.display = "block";
 }

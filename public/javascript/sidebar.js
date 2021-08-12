@@ -42,17 +42,11 @@ const navItems = [
         access: ["parent", "teacher", "student", "admin"]
     },
     {
-        name: "Learning Resources",
-        link: ".html",
-        icon: "far fa-newspaper",
-        access: ["student"]
-    },
-    {
-        name: "Assign Quiz",
-        link: "assign.html",
-        icon: "fas fa-folder",
-        access: ["parent", "teacher"]
-    },
+        name : "Learning Resources",
+        link : ".html",
+        icon : "far fa-newspaper",
+        access : ["student", "teacher", "parent"]
+    }
 ]
 
 /* EVENT LISTENER */

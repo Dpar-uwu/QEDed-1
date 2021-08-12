@@ -43,12 +43,6 @@ const assignmentModel = {
     getAsgByUserId: (userId) => {
         return new Promise(async (resolve, reject) => {
             try {
-                // get the group that the user is in 
-                // const group = await Group.find({ "members.user_id": ObjectId(userId) }).select('_id');
-                // if (!group) throw "NOT_FOUND";
-
-                // get all assignment by selected grp 
-                // const result = await Assignment.find({ "group_id": group });
                 const result = await Assignment.aggregate([
                     { // join to users to get name of assigned by
                         $lookup: {
@@ -145,6 +139,45 @@ const assignmentModel = {
                         $project: { level: 0, topic: 0, skill: 0 }
                     },
                     {
+                        $lookup: {
+                            from: "quizzes",
+                            localField: "_id",
+                            foreignField: "assignment_id",
+                            as: "quiz"
+                        }
+                    },
+                    {
+                        $addFields: {
+                            "quiz": {
+                                $first: {
+                                    $filter: {
+                                        input: "$quiz",
+                                        as: "quiz",
+                                        cond: {
+                                            "$eq": ["$$quiz.done_by", ObjectId(userId)]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $addFields: {
+                            completed_quiz: {
+                                $cond: {// check if user has completed assignmnent
+                                    if: { $eq: ["$quiz.done_by", ObjectId(userId)] },
+                                    then: "$quiz._id",
+                                    else: false
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            "quiz": 0
+                        }
+                    },
+                    {
                         $sort: { "deadline": 1 }
                     }
                 ]);
@@ -160,7 +193,7 @@ const assignmentModel = {
     },
 
     // get assignment by grp
-    getAsgByGrpId: (groupId) => {
+    getAsgByGrpId: (groupId, userId) => {
         return new Promise(async (resolve, reject) => {
             try {
                 // const result = await Assignment.find({ "group_id": ObjectId(groupId) }).select('-__v');
@@ -263,6 +296,45 @@ const assignmentModel = {
                         $sort: { deadline: 1 }
                     },
                     {
+                        $lookup: {
+                            from: "quizzes",
+                            localField: "_id",
+                            foreignField: "assignment_id",
+                            as: "quiz"
+                        }
+                    },
+                    {
+                        $addFields: {
+                            "quiz": {
+                                $first: {
+                                    $filter: {
+                                        input: "$quiz",
+                                        as: "quiz",
+                                        cond: {
+                                            "$eq": ["$$quiz.done_by", ObjectId(userId)]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $addFields: {
+                            completed_quiz: {
+                                $cond: {// check if user has completed assignmnent
+                                    if: { $eq: ["$quiz.done_by", ObjectId(userId)] },
+                                    then: "$quiz._id",
+                                    else: false
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            "quiz": 0
+                        }
+                    },
+                    {
                         $group: {
                             _id: "$group_name",
                             assignments: { $push: "$$ROOT" }
@@ -272,13 +344,12 @@ const assignmentModel = {
                         $project: {
                             group_name: "$_id",
                             assignments: 1,
-
                             _id: 0
                         }
                     },
                     {
                         $project: { "assignments.group_name": 0 }
-                    }
+                    },
                 ]);
 
 
@@ -317,46 +388,236 @@ const assignmentModel = {
         })
     },
 
-    // get outstanding assignment 
-    // its not save in the quiz page
-    //howwwwww
-    // getUndoneAssignmentByUserId: (userId) => {
-    //     return new Promise(async (resolve, reject) => {
-    //         try{
-    //             // get the group that the user is in 
-    //             const group = await Group.find({ "members.user_id": ObjectId(userId) }).select('_id');
-    //             console.log(group)
-    //             if (!group) throw "NOT_FOUND";
+    
+    getAllAsgProgressByGrpId: (group_id) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const result = await Group.aggregate([
+                    {
+                        $match: {
+                            _id: ObjectId(group_id)
+                        }
+                    },
+                    {
+                        $project: { posts: 0 }
+                    },
 
-    //             // get all assignment by grp 
-    //             const assignment = await Assignment.find({ "group_id": group }).select('_id');
-    //             if (!result) throw "NOT_FOUND";
+                    {
+                        $unwind: "$members"
+                    },
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "members.user_id",
+                            foreignField: "_id",
+                            as: "user_details"
+                        }
+                    },
+                    {
+                        $addFields: { 
+                            user_details: { $first: "$user_details" }
+                        }
+                    },
+                    {
+                        $addFields: {
+                            "members.name": { $concat: ["$user_details.first_name", " ", "$user_details.last_name"] },
+                            "members.role": "$user_details.role",
+                            "members.grade": "$user_details.grade"
+                        }
+                    },
+                    {
+                        $match: {
+                            "members.role": "student"
+                        }
+                    },
+                    {
+                        $project: {
+                            user_details: 0,
+                            "members._id": 0,
+                            "members.role": 0
+                        }
+                    },
+                    {   // members left outer join quizzes
+                        $lookup: {
+                            from: "quizzes",
+                            localField: "members.user_id",
+                            foreignField: "done_by",
+                            as: "quiz"
+                        }
+                    },
+                    {
+                        $project: {
+                            "quiz.questions": 0,
+                            "quiz.done_by": 0,
+                            "quiz.level": 0,
+                            "quiz.skill_id": 0,
+                            "quiz.skill_name": 0,
+                            "quiz.topic_name": 0,
+                        }
+                    },
 
-    //             const result = await Assignment.aggregate([
-    //                 {
-    //                     $lookup: {
-    //                         from: "quizzes",
-    //                         localField: "_id",
-    //                         foreignField: "assignment_id",
-    //                         as: "quiz"
-    //                     }
-    //                 },
-    //                 {
-    //                     $match: { "quiz.assignment_id": assignment }
-    //                 },
-    //                 {
-    //                     $match: { "quiz.isCompleted": false }
-    //                 }
-    //             ])
+                    {
+                        $lookup: { // get only quizzes that are assigned using join
+                            from: "assignments",
+                            localField: "_id",
+                            foreignField: "group_id",
+                            as: "assignment"
+                        }
+                    },
+                    {
+                        $unwind: "$assignment"
+                    },
 
-    //             console.log("SUCESS! Result", result);
-    //             resolve(result);
-    //         }catch (err) {
-    //             console.error(`ERROR! Could not get undone assignment by user id: ${err}`);
-    //             reject(err);
-    //         }
-    //     })
-    // },
+                    {
+                        $addFields: {
+                            completed: {
+                                $first: {
+                                    $filter: {
+                                        input: "$quiz",
+                                        as: "quiz",
+                                        cond: {
+                                            "$eq": ["$$quiz.assignment_id", "$assignment._id"]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+
+                    {
+                        $addFields: {
+                            member_assignment: { 
+                                $mergeObjects: [ "$members", "$completed" ]
+                            },
+                        }
+                    },
+                    {
+                        $project: {
+                            quiz: 0,
+                            completed: 0,
+                            members: 0
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$assignment._id",
+                            group_name: { $first: "$group_name" },
+                            member_assignment: { $push: "$member_assignment" },
+                            title: { $first: "$assignment.title" },
+                            level_id: { $first: "$assignment.level_id" },
+                            topic_id: { $first: "$assignment.topic_id" },
+                            skill_id: { $first: "$assignment.skill_id" },
+                            assigned_by: { $first: "$assignment.assigned_by" },
+                            group_id: { $first: "$assignment.group_id" },
+                            deadline: { $first: "$assignment.deadline" },
+                            // completed: { $push: "$completed" },
+                        }
+                    },
+                    
+                    { // join to level to get skill name
+                        $lookup: {
+                            from: "levels",
+                            as: "level",
+                            localField: "skill_id",
+                            foreignField: "topics.skills._id"
+                        }
+                    },
+                    {
+                        $addFields: {
+                            topic: {
+                                $first: {
+                                    $filter: {
+                                        input: { $first: "$level.topics" },
+                                        as: "topics",
+                                        cond: {
+                                            "$eq": ["$$topics._id", "$topic_id"]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $addFields: {
+                            skill: {
+                                $first: {
+                                    $filter: {
+                                        input: "$topic.skills",
+                                        as: "skill",
+                                        cond: {
+                                            "$eq": ["$$skill._id", "$skill_id"]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $addFields: {
+                            skill_name: "$skill.skill_name",
+                            topic_name: "$topic.topic_name",
+                            level_num: { $first: "$level.level" }
+                        }
+                    },
+                    {
+                        $project: { level: 0, topic: 0, skill: 0 }
+                    },
+                    { // sort deadline by ascending order
+                        $sort: {
+                            deadline: 1
+                        }
+                    },
+                    { // join to users to get name of assigned by
+                        $lookup: {
+                            from: "users",
+                            as: "user",
+                            localField: "assigned_by",
+                            foreignField: "_id"
+                        }
+                    },
+                    {
+                        $addFields: {
+                            assigned_by_name: {
+                                $first: {
+                                    $map: {
+                                        input: "$user",
+                                        as: "user",
+                                        in: {
+                                            $concat:
+                                                ["$$user.first_name", " ", "$$user.last_name"]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $project: { "user": 0 }
+                    },
+                    {
+                        $group: {
+                            _id: "$group_name",
+                            assignments: { $push: "$$ROOT" }
+                        }
+                    },
+                    {
+                        $project: {
+                            group_name: "$_id",
+                            assignments: 1,
+                            _id: 0
+                        }
+                    },
+
+                ]);
+                console.log("SUCCESS! Result", result)
+                resolve(result[0]);
+            } catch(err) {
+                console.error(`ERROR! Could not get assignment progress by id ${group_id}: ${err}`);
+                reject(err);
+            }
+        })
+    },
+
 
     // create assignment 
     createAsgbyGrpId: (title, level_id, topic_id, skill_id, assigned_by, group_id, deadline) => {

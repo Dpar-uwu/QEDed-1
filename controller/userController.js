@@ -236,7 +236,6 @@ router.post("/refresh_token",
             console.time("POST reset password request");
             
             const requestPasswordResetService = await tokenPassword.requestPasswordReset(email);
-
             res.status(200).send({ message: "Email sent" });
         }
         catch (err) {

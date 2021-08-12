@@ -32,22 +32,65 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!--Javascript-->
-    <script src="./javascript/auth.js"></script>
     <script src="./javascript/quiz.js"></script>
     <script src="./javascript/stats.js"></script>
     <script src="./javascript/sidebar.js"></script>
 
     <!--CSS-->
+    <link href="./css/framework/bootstrap.css" rel="stylesheet">
+    <link href="./css/styles.css" rel="stylesheet">
     <link href="./css/quiz.css" rel="stylesheet">
+
 
 </head>
 
-<body class="container-fluid">
-    <div id="withBars">
-        <div class="col py-3">
-            <h3 id="title" class="text-center h3">Quiz</h3>
-            <div id="subtitle" class="text-center pt-2 h6"></div>
-            <div class="pt-2 row container justify-content-center m-auto" id="container"></div>
+<body class="container-fluid" style="background-color: white;">
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg fixed-top navbar-light">
+
+        <div class="container">
+
+            <!-- Image Logo -->
+            <a class="navbar-brand logo-image" href="index.html"><img src="Images/Psleonline_logo_transparent.png"
+                    alt="Logo"></a>
+
+            <button class="navbar-toggler p-0 border-0" type="button" data-toggle="offcanvas">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="navbar-collapse offcanvas-collapse" id="navbarsExampleDefault">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link page-scroll" href="./#home">Home <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link page-scroll" href="./#aboutus">About Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link page-scroll" href="./#howitworks">How It Works</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link page-scroll" href="./#contactus">Contact Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link page-scroll" href="learningresourceslevels.html">Learning Resources</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="signup.html"><button type="button" class="btn btn-primary btn-sm">SIGN UP</button></a>
+                        <a href="login.html"><button type="button" class="btn btn-primary btn-sm">LOG IN</button></a>
+                    </li>
+                </ul>
+            </div> <!-- end of navbar-collapse -->
+        </div> <!-- end of container -->
+    </nav> <!-- end of navbar -->
+    <!-- end of navigation -->
+    <div class="site-footer" style="background-color: white;">
+        <div id="withBars" class="pt-4">
+            <div class="col py-3">
+                <h3 id="title" class="text-center h3">Quiz</h3>
+                <div id="subtitle" class="text-center pt-2 h6"></div>
+                <div class="pt-2 row container justify-content-center m-auto" id="container"></div>
+            </div>
         </div>
     </div>
 </body>

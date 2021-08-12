@@ -64,6 +64,29 @@ router.get("/members",
     });
 
 /**
+ * GET /group/members?groupId= &userId=
+ */
+router.get("/isGrpAdmin",
+    async (req, res) => {
+        const { groupId, userId } = req.query;
+        try {
+            console.time("GET check if user is group admin");
+            const grpRole = await groupModel.checkIfGrpAdmin(groupId, userId);
+            res.status(200).send({"group_role": grpRole});
+        } catch (err) {
+            // if (err == "NOT_FOUND")
+            //     res.status(404).send({ error: "Group ID not found", code: err });
+            // else 
+            if (err instanceof Error || err instanceof MongoError)
+                res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+            else
+                res.status(500).send({ error: "Error checking if user is group admin", code: "UNEXPECTED_ERROR" });
+        } finally {
+            console.timeEnd("GET check if user is group admin");
+        }
+    });
+
+/**
 * GET /group/:groupId - get grp by id
 */
 router.get("/:groupId",

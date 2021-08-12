@@ -37,13 +37,15 @@
 }
 
 .btn-wrapper {
-    margin: 0 10px;
+    max-width: 996px;
+    margin: 0 auto;
     display: flex;
     justify-content: flex-end;
 }
 
 .add-btn {
     /* position: absolute; */
+    margin-right: 12px;
     padding: 6px 20px;
     border-radius: 12px;
     background-color: #f3f3f3;
@@ -63,23 +65,28 @@
 
 /* GROUP WRAPPER */
 #group-list {
+    max-width: 996px;
+    margin: 0 auto;
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
 }
 
 .group {
+    --margin: 12px;
+    --col-num: 3;
     cursor: pointer;
     width: 31%;
+    width: calc((100% / var(--col-num)) - (2*var(--margin)));
     background-color: #fff;
     color: #003844;
     background-repeat: no-repeat;
     border: 1px solid rgba(0,0,0,.07);
     border-radius: 15px;
-    margin: 15px 1%;
+    margin: 8px var(--margin);
     display: flex;
     flex-direction: column;
-    box-shadow: 3px 10px 20px rgba(59, 59, 59, 0.054);
+    box-shadow: 3px 8px 14px rgba(59, 59, 59, 0.054);
     transition: 0.2s ease-in-out;
 }
 
@@ -91,8 +98,9 @@
 
 .group-body {
     border-bottom: 1px solid rgba(0,0,0,.07);
-    margin: 14px 14px 0;
+    margin: 16px 14px 0;
     padding-bottom: 14px;
+    flex: 1 1 0px;
 }
 
 .group_name{
@@ -121,7 +129,7 @@
 }
 
 .group-owner {
-    padding: 4px 12px;
+    padding: 6px 12px;
     font-size: 12px;
     display: flex;
     align-items: center;
@@ -305,14 +313,16 @@
 
 @media (max-width: 768px) {
     .group {
-        width: 46%;
-        margin: 2%;
+        --margin: 6px;
+        --col-num: 2;
+        /* width: 46%; */
+        /* margin: 2%; */
     }
 }
 
 @media (max-width: 576px) {
     .group {
-        width: 100%;
-        margin: 6px 0;
+        --margin: 6px;
+        --col-num: 1;
     }
 }

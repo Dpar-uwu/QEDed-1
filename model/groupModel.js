@@ -304,6 +304,71 @@ const groupModel = {
         })
     },
 
+    
+    checkIfGrpAdmin: (group_id, user_id) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                // const admin = await Group.aggregate([
+                //     {
+                //         $match: {
+                //             "_id": ObjectId(group_id)
+                //         },
+                //     },
+                //     {
+                //         $project: {
+                //             posts: 0,
+                //             __v: 0
+                //         }
+                //     },
+                //     {
+                //         $unwind: "$members"
+                //     },
+                //     {
+                //         $match: {
+                //             $or: [
+                //                 { "members.user_id": ObjectId(user_id) },
+                //                 { "owner": ObjectId(user_id) }
+                //             ]
+                //         }
+                //     }
+                // ]);
+                const admin = await Group.findOne(
+                    {
+                        "_id": ObjectId(group_id),
+                        "members": { 
+                            $elemMatch: {
+                                "user_id": ObjectId(user_id),
+                                "is_admin": true 
+                            }
+                        }
+                    }
+                ).select("-posts -__v");
+
+                let owner = null;
+                if(!admin) {
+                    owner = await Group.findOne({
+                        "_id": ObjectId(group_id),
+                        "owner": ObjectId(user_id)
+                    }).select("-posts -__v");
+                }
+                
+                if(owner) {
+                    resolve("owner");
+                }
+                else if(admin) {
+                    resolve("admin");
+                }
+                else {
+                    resolve(false);
+                }
+            } catch(err) {
+                console.error(`ERROR! Could not check if user ${user_id} is a group admin in ${group_id}: ${err}`);
+                reject(err);
+            }
+        });
+    },
+
+
     // create group with members  DONE
     createGroup: (group_name, owner, members) => {
         return new Promise(async (resolve, reject) => {
@@ -421,17 +486,15 @@ const groupModel = {
         return new Promise(async (resolve, reject) => {
             try {
                 const group = await Group.findOne({ "_id": ObjectId(groupId) });
-                console.log(group)
                 if (!group) throw "NOT_FOUND";
 
                 // find if members exist in the grp
                 const found = group.members.find(element => element.user_id == user_id);
-                console.log(found)
                 if (!found) throw "NOT_FOUND";
 
                 // find if member is an admin
                 const isAdmin = found.is_admin;
-                console.log(isAdmin)
+                
                 if (isAdmin == false) throw "UNEXPECTED_ERROR"
 
                 found.is_admin = !found.is_admin;
@@ -446,402 +509,6 @@ const groupModel = {
         })
     },
 
-    getProgressForGrpsByUserId: (user_id) => {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const allMembers = await Group.aggregate([
-                    {
-                        $match: {
-                            $or: [
-                                { "members.user_id": ObjectId(user_id) },
-                                { "owner": ObjectId(user_id) }
-                            ]
-                        }
-                    },
-                    {
-                        $unwind: {
-                            path: "$members"
-                        }
-                    },
-                    {
-                        $project: {
-                            _id: 1,
-                            user_id: "$members.user_id",
-                            group_name: 1,
-                        }
-                    },
-                    {
-                        $lookup: {
-                            from: "users",
-                            localField: "user_id",
-                            foreignField: "_id",//<field from the documents of the "from" collection>
-                            as: "user" //<output array field>
-                        }
-                    },
-                    {
-                        $project: {
-                            _id: 1,
-                            user_id: 1,
-                            "members.user_name": {
-                                $first: {
-                                    $map: {
-                                        input: "$user",
-                                        as: "user",
-                                        in: {
-                                            $concat:
-                                                ["$$user.first_name", " ", "$$user.last_name"]
-                                        }
-                                    }
-                                }
-                            },
-                            "members.role": {
-                                $first: {
-                                    $map: {
-                                        input: "$user",
-                                        as: "user",
-                                        in: "$$user.role"
-                                    }
-                                }
-                            },
-                            group_name: 1,
-                        }
-                    },
-                    {
-                        $match: { "members.role": "student" }
-                    },
-                    {
-                        $lookup: {
-                            from: "assignments",
-                            localField: "_id",
-                            foreignField: "group_id",
-                            as: "assignment"
-                        }
-                    },
-                    {
-                        $project: {
-                            _id: 1,
-                            group_name: 1,
-                            user_id: 1,
-                            members: 1,
-                            assignment_id: {
-                                $map: {
-                                    input: "$assignment",
-                                    as: "assignment",
-                                    in: "$$assignment._id"
-                                }
-                            },
-                        }
-                    },
-                    {
-                        $unwind: "$assignment_id"
-                    },
-                    {
-                        $lookup: {
-                            from: "assignments",
-                            localField: "assignment_id",
-                            foreignField: "_id",
-                            as: "assignment"
-                        }
-                    },
-                    {
-                        $project: {
-                            _id: 1,
-                            group_name: 1,
-                            user_id: 1,
-                            members: 1,
-                            assignment_id: 1,
-                            assignment_title: {
-                                $first: {
-                                    $map: {
-                                        input: "$assignment",
-                                        as: "assignment",
-                                        in: "$$assignment.title"
-                                    }
-                                }
-                            },
-                            skill_id: {
-                                $first: {
-                                    $map: {
-                                        input: "$assignment",
-                                        as: "assignment",
-                                        in: "$$assignment.skill_id"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    {
-                        $lookup: {
-                            from: "levels",
-                            localField: "skill_id",
-                            foreignField: "topics.skills._id",
-                            as: "level"
-                        }
-                    },
-                    // how to make it display skillname by skill id?
-                    {
-                        $project: {
-                            _id: 1,
-                            group_name: 1,
-                            members: 1,
-                            user_id: 1,
-                            assignment_id: 1,
-                            assignment_title: 1,
-                            skill_id: 1,
-                            skill_name: {
-                                $first: {
-                                    $first: {
-                                        $map: {
-                                            input: "$level",
-                                            as: "level",
-                                            in: "$$level.topics.skills.skill_name"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    {
-                        $lookup: {
-                            from: "quizzes",
-                            localField: "user_id",
-                            foreignField: "done_by",
-                            as: "quiz"
-                        }
-                    },
-                    {
-                        $project: {
-                            _id: 1,
-                            group_name: 1,
-                            members: 1,
-                            user_id: 1,
-                            assignment_id: 1,
-                            assignment_title: 1,
-                            skill_id: 1,
-                            skill_name: 1,
-                            "done.assignment_id": {
-                                $first: {
-                                    $map: {
-                                        input: "$quiz",
-                                        as: "quiz",
-                                        in: "$$quiz.assignment_id"
-                                    }
-                                }
-                            },
-                            "done.user_id": {
-                                $first: {
-                                    $map: {
-                                        input: "$quiz",
-                                        as: "quiz",
-                                        in: "$$quiz.done_by"
-                                    }
-                                }
-                            },
-                        }
-                    },
-                ])
-                console.log(allMembers)
-                console.log(allMembers.length)
-
-            } catch (err) {
-                console.error("ERROR! Could not get undone asg by group id:", err);
-                reject(err);
-            }
-        })
-    },
-
-    // view all undone assignment 
-    getUndoneAsgByUserId: (user_id) => {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const asg = await Group.aggregate([
-                    {
-                        $match: {
-                            "members.user_id": ObjectId(user_id)
-                        }
-                    },
-                    {
-                        $unwind: {
-                            path: "$members"
-                        }
-                    },
-                    {
-                        $match: {
-                            "members.user_id": ObjectId(user_id)
-                        }
-                    },
-                    {
-                        $project: {
-                            _id: 1,
-                            user_id: "$members.user_id",
-                        }
-                    },
-                    {
-                        $lookup: {
-                            from: "assignments",
-                            localField: "_id",
-                            foreignField: "group_id",
-                            as: "assignment"
-                        }
-                    },
-                    {
-                        $project: {
-                            _id: 1,
-                            user_id: 1,
-                            assignment_id: {
-                                $map: {
-                                    input: "$assignment",
-                                    as: "assignment",
-                                    in: "$$assignment._id"
-                                }
-                            }
-                        }
-                    },
-                    {
-                        $unwind: "$assignment_id"
-                    },
-                    {
-                        $lookup: {
-                            from: "assignments",
-                            localField: "assignment_id",
-                            foreignField: "_id",
-                            as: "assignment"
-                        }
-                    },
-                    {
-                        $project: {
-                            _id: 1,
-                            user_id: 1,
-                            assignment_id: 1,
-                            assignment_title: {
-                                $first: {
-                                    $map: {
-                                        input: "$assignment",
-                                        as: "assignment",
-                                        in: "$$assignment.title"
-                                    }
-                                }
-                            },
-                            assigned_by: {
-                                $first: {
-                                    $map: {
-                                        input: "$assignment",
-                                        as: "assignment",
-                                        in: "$$assignment.assigned_by"
-                                    }
-                                }
-                            },
-                            assignment_deadline: {
-                                $first: {
-                                    $map: {
-                                        input: "$assignment",
-                                        as: "assignment",
-                                        in: "$$assignment.deadline"
-                                    }
-                                }
-                            },
-                            skill_id: {
-                                $first: {
-                                    $map: {
-                                        input: "$assignment",
-                                        as: "assignment",
-                                        in: "$$assignment.skill_id"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    {
-                        $lookup: {
-                            from: "users",
-                            localField: "assigned_by",
-                            foreignField: "_id",
-                            as: "user"
-                        }
-                    },
-                    {
-                        $lookup: {
-                            from: "levels",
-                            localField: "skill_id",
-                            foreignField: "topics.skills._id",
-                            as: "level"
-                        }
-                    },
-                    // how to make it display skillname by skill id?
-                    {
-                        $project: {
-                            _id: 1,
-                            user_id: 1,
-                            assignment_id: 1,
-                            assignment_title: 1,
-                            assignment_deadline: 1,
-                            skill_id: 1,
-                            skill_name: {
-                                $first: {
-                                    $first: {
-                                        $map: {
-                                            input: "$level",
-                                            as: "level",
-                                            in: "$$level.topics.skills.skill_name"
-                                        }
-                                    }
-                                }
-                            },
-                            "assigned_by.user_name": {
-                                $first: {
-                                    $map: {
-                                        input: "$user",
-                                        as: "user",
-                                        in: {
-                                            $concat:
-                                                ["$$user.first_name", " ", "$$user.last_name"]
-                                        }
-                                    }
-                                }
-                            },
-                        }
-                    },
-                    {
-                        $lookup: {
-                            from: "quizzes",
-                            localField: "user_id",
-                            foreignField: "done_by",
-                            as: "quiz"
-                        }
-                    },
-                    {
-                        $lookup: {
-                            from: "quizzes",
-                            localField: "assignment_id",
-                            foreignField: "assignment_id",
-                            as: "quiz1"
-                        }
-                    },
-                    // {$unwind: "$quiz1"}
-                    // {
-                    //     $project: {
-                    //         _id: 1,
-                    //         user_id: 1,
-                    //         assignment_id: 1,
-                    //         assignment_title: 1,
-                    //         assignment_deadline: 1,
-                    //         assigned_by: 1,
-                    //         skill_id: 1,
-                    //         skill_name: 1,
-                    //         quiz: 1
-                    //     }
-                    // },
-                ])
-
-                console.log(asg)
-                console.log(asg.length)
-
-            } catch (err) {
-                console.error("ERROR! Could not get undone asg by user id:", err);
-                reject(err);
-            }
-        })
-    },
 
     viewGroupBenchmark: (groupId) => {
         return new Promise(async (resolve, reject) => {
@@ -929,7 +596,6 @@ const groupModel = {
     viewBenchmarkByUser: (groupId, userId, level, topic) => {
         return new Promise(async (resolve, reject) => {
             try {
-                console.log("hi")
                 let match_opt = {
                     "group_id": ObjectId(groupId) //get all from group
                 }
@@ -1297,11 +963,12 @@ const groupModel = {
 
                 // append new post to db array and save to db
                 group.posts.push(post);
+                let new_id = group.posts.slice(-1)[0]._id;
                 const result = await group.save();
 
                 if (!result) throw "UNEXPECTED_ERROR";
                 console.log("SUCESS! Result", result);
-                resolve(result);
+                resolve(new_id);
             } catch (err) {
                 console.error(`ERROR! Could not add post using grp id ${groupId}, ${err}`);
                 reject(err);
@@ -1316,11 +983,10 @@ const groupModel = {
                 if (!group) throw "NOT_FOUND";
 
                 // find the topic in the array that matches the id
-                const found = group.posts.find(element => element._id == postId);
+                const found = group.posts.findIndex(element => element._id == postId);
 
                 // update changed fields to group
-                group.posts.content = content;
-                console.log(group.posts.content)
+                group.posts[found].content = content;
 
                 // save changes to db
                 const result = await group.save();

@@ -17,18 +17,17 @@
       <script src="javascript/framework/scripts.js"></script> <!-- Custom scripts -->
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> <!-- For Table Search -->
       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> <!-- For Table Search  -->
-      
-       <!--Javascript-->
-    <script src="./javascript/sidebar.js"></script>
-    <script src="./javascript/auth.js"></script>
-    <script src="./javascript/overview.js"></script>
-
       <!-- End of scripts -->
 
-      <!--Fontawesome-->
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-      integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
-      crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- OG Meta Tags to improve the way the post looks when you share the page on Facebook, Twitter, LinkedIn -->
+    <meta property="og:site_name" content="" /> <!-- website name -->
+    <meta property="og:site" content="" /> <!-- website link -->
+    <meta property="og:title" content="" /> <!-- title shown in the actual shared post -->
+    <meta property="og:description" content="" /> <!-- description shown in the actual shared post -->
+    <meta property="og:image" content="" /> <!-- image link, make sure it's jpg -->
+    <meta property="og:url" content="" /> <!-- where do you want your post to link to -->
+    <meta name="twitter:card" content="summary_large_image"> <!-- to have large image post format in Twitter -->
 
     <!-- Favicon  -->
     <link rel="icon" href="Images/Favicon.png" alt="Favicon">
@@ -42,7 +41,47 @@
     <h2> Learning Resources </h2>
 </div>
 
-<body data-spy="scroll">
+<body data-spy="scroll" data-target=".fixed-top">
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg fixed-top navbar-light">
+
+        <div class="container">
+
+            <!-- Image Logo -->
+            <a class="navbar-brand logo-image" href="index.html"><img src="Images/Psleonline_logo_transparent.png" alt="to be inserted"></a>
+
+            <button class="navbar-toggler p-0 border-0" type="button" data-toggle="offcanvas">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="navbar-collapse offcanvas-collapse" id="navbarsExampleDefault">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link page-scroll" href="index.html#home">Home <span
+                                class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link page-scroll" href="index.html#aboutus">About Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link page-scroll" href="index.html#howitworks">How It Works</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link page-scroll" href="index.html#contactus">Contact Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link page-scroll" href="learningresourceslevelspublic.html">Learning Resources</a>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button" class="btn btn-primary btn-sm">SIGN UP</button>
+                        <button type="button" class="btn btn-primary btn-sm">LOG IN</button>
+                    </li>
+                </ul>
+            </div> <!-- end of navbar-collapse -->
+        </div> <!-- end of container -->
+    </nav> <!-- end of navbar -->
+    <!-- end of navigation -->
 
 
     <div class="lresources">
@@ -112,6 +151,17 @@
         </div>
     </div>
 
+
+    <!-- <script>
+        $(document).ready(function () {
+            $("#myInput").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#myTable tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+    </script> -->
 
 </body>
 

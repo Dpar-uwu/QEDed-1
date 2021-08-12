@@ -14,6 +14,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 
@@ -30,9 +31,8 @@
 
 /* CHAT ANNOUNCEMENT LIST UI */
 #announcement-list {
-    padding: 0 18% 4px;
+    padding: 0 30px 4px;
     width: 100%;
-    /* max-width: 800px; */
     overflow-y: scroll;
     position: relative;
     flex: 1 1 0;/* Firefox */
@@ -43,7 +43,8 @@
 
 
 .text-row {
-    margin: 6px 0 0;
+    max-width: 675px;
+    margin: 6px auto 0;
 }
 
 .date {
@@ -65,24 +66,75 @@
     justify-content: flex-end;
 }
 
-.own .text {
-    /* background-color: #fefae0; */
-    background-color: #eaf3ff;
-}
-
-
 .text {
-    border-radius: 15px;
+    border-radius: 12px;
     background-color: #f7f7f7;
-    padding: 6px 12px;
+    padding: 8px 14px;
     color: #000;
     font-size: 13px;
     width: -moz-fit-content; /* Firefox */
     width: fit-content;
     min-width: initial;
-    max-width: 65%;
+    max-width: 75%;
     word-wrap: break-word;
     
+}
+
+.own .text {
+    background-color: #eaf3ff;
+    position: relative;
+    padding: 6px 30px 6px 10px;
+}
+
+.own .text:hover .text-dropdown {
+    /* display: block; */
+    opacity: 1;
+    transform: translateX(0px);
+}
+
+.text-dropdown {
+    /* display: none; */
+    opacity: 0;
+    transform: translateX(6px);
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    top: 0;
+    color: #828282;
+    padding: 10px;
+    transition: opacity 0.1s;
+    transition: transform 0.1s;
+}
+
+.dropdown-menu {
+    min-width: 6rem !important;
+    padding: 0 !important;
+}
+
+.dropdown-item:first-child {
+    border-radius: 0.25rem 0.25rem 0 0;
+}
+
+.dropdown-item:last-child {
+    border-radius: 0 0 0.25rem 0.25rem;
+}
+
+.dropdown-item:active {
+    background-color: #f7f7f7;
+    color: #000;
+}
+
+.edit-post {
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    font-size: 14px;
+}
+
+.delete-post {
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    font-size: 14px;
+    color: #ef798a;
 }
 
 .sender_name {
@@ -127,9 +179,9 @@
 }
 
 #input-msg {
-    width: 95%;
-    border-radius: 25px;
-    height: 24px;
+    width: 92%;
+    border-radius: 15px;
+    height: 38px;
     max-height: 100px;
     caret-color: #ef798a;
 }
@@ -148,7 +200,7 @@
 }
 
 #input-submit {
-    width: 5%;
+    width: 8%;
     padding: 0;
     border-radius: 25px;
 }
@@ -192,12 +244,74 @@
 }
 
 
+/* EDIT POST WRAPPER */
+.edit-post-wrapper {
+    background-color: #eaeaea;
+    color: #464646;
+}
+
+.edit-post-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 675px;
+    margin: 0 auto;
+    padding: 5px;
+}
+
+.edit-post-details {
+    display: flex;
+    flex-direction: column;
+    word-break: break-word;
+    font-size: 14px;
+}
+
+.edit-post-title {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.edit-post-content {
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+.post-escape {
+    padding: 10px;
+    cursor: pointer;
+}
+
+/* MODAL BUTTONS */
+#deletePost {
+    border-color: #ef798a;
+    color: #ef798a;
+    border-radius: 15px;
+}
+
+#deletePost:hover {
+    border-color: #ef798a;
+    background-color: #ef798a;
+    color: #fff;
+    box-shadow: 4px 5px 16px #ef798a55;
+}
+
+#deletePost:focus {
+    border-color: #ef798a;
+    background-color: #ef798a;
+    color: #fff;
+    box-shadow: 4px 5px 16px #ef798a55;
+}
+
+#closeModal:focus {
+    box-shadow: none;
+}
+
 @media (max-width: 768px) {
     #announcement-list {
         padding: 0 10px 4px;
     }
     .text {
-        max-width: 70%;
+        max-width: 85%;
     }
 }
 

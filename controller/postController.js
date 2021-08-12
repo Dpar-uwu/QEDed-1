@@ -148,9 +148,18 @@ router.delete("/:postId",
  */
 const postSocket = async (message) => {
     const { group_id, post } = message;
-    console.log(group_id, post);
-    const result = await groupModel.createPostByGrpId(group_id, post);
+    const new_id = await groupModel.createPostByGrpId(group_id, post);
+    return new_id;
+}
+
+const updatePostSocket = async (postId, content, _group_id) => {
+    const result = await groupModel.updatePostById(postId, content);
     return result;
 }
 
-module.exports = { router, postSocket };
+const deletePostSocket = async (postId) => {
+    const result = await groupModel.deletePostById(postId);
+    return result;
+}
+
+module.exports = { router, postSocket, updatePostSocket, deletePostSocket };

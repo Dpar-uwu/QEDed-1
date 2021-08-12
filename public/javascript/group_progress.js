@@ -89,6 +89,8 @@ function getUserGroupBenchmark(userId, params) {
             let isAvailable = true;
             let extractedData = [];
 
+            isAvailable = jQuery.isEmptyObject({data});;
+
             Object.keys(data).forEach(key => {
                 if (data[key].recent != undefined) {
                     title.push(key)
@@ -221,15 +223,6 @@ function displayMembers(data) {
                 `;
             }
         });
-    }
-
-    let user = JSON.parse(localStorage.getItem('userInfo'))
-    if (user.role == "student") {
-        studentList.innerHTML += `
-            <div class="member" id="${user._id}">
-                <span class="member-name">${user.first_name}</span>
-            </div>
-        `;
     }
 
     // display count (minus 1 to exclude header)

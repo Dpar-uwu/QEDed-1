@@ -16,12 +16,13 @@ $(document).ready(function () {
         location.href = '404.html';
     }
 
-    //Checking for valid url query
-    if (params != null) {
-        for (key in params) {
-            if (params[key] != "" && params[key] != undefined && params[key] != null) {
-                path = key;
-                id = params[key];
+    if(params != null){
+        for(key in params){
+            if( params[key]!="" && params[key]!=undefined && params[key] != null){
+                if(key != "assignment") {
+                    path = key;
+                    id = params[key];
+                }
             }
             else {
                 alert('ERROR!');
@@ -154,18 +155,23 @@ $(document).on("click", ".click", function () {
 
                 //Preparing data for posting quiz
                 const data = {
-                    "skill_id": quizData.skillId,
+                    "skill_id": quizData.skillId, 
                     "level": quizData.level,
-                    "skill_name": quizData.skill_name,
-                    "topic_name": quizData.topic_name,
+                    "skill_name": quizData.skill_name, 
+                    "topic_name": quizData.topic_name, 
                     "done_by": user._id,
-                    "score": result[1],
+                    "score": result[1], 
                     "questions": result[0],
                     "num_of_qn": quizData.num_of_qn,
-                    "percent_difficulty": quizData.percent_difficulty,
+                    "percent_difficulty": quizData.percent_difficulty, 
                     "time_taken": time,
-                    "isCompleted": true,
+                    "isCompleted": true, 
                     "created_at": Date.now,
+                }
+                var urlSearchParams = new URLSearchParams(window.location.search);
+                var assignment_id = urlSearchParams.get("assignment");
+                if(assignment_id != null && assignment_id != undefined) {
+                    data.assignment_id = assignment_id;
                 }
                 submitQuiz(data);
             }

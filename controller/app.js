@@ -12,7 +12,7 @@ const skillController = require("./skillController.js");
 const quizController = require("./quizController.js");
 const questionController = require("./questionController.js");
 const groupController = require("./groupController.js");
-const { router, postSocket } = require("./postController.js");
+const { router, postSocket, updatePostSocket, deletePostSocket } = require("./postController.js");
 const postController = router;
 const assignmentController = require('./assignmentController');
 const notificationController = require('./notificationController');
@@ -141,15 +141,20 @@ const socketListener = (server) => {
 
         ws.on("message", async message => {
             let msg = JSON.parse(message);
+            console.log("Socket Request", msg);
             switch (msg.action) {
                 case "message": {
-                    const result = await postSocket(msg);
-
-                    if (result) {
-                        Object.entries(client[msg.group_id]).forEach(([ahh, sock]) => {
-                            console.log(ahh)
-                            sock.send(message);
-                        });
+                    try {
+                        const new_id = await postSocket(msg);
+                        
+                        if (new_id) {
+                            msg.post._id = new_id;
+                            Object.entries(client[msg.group_id]).forEach(([ahh, sock]) => {
+                                sock.send(JSON.stringify(msg));
+                            });
+                        }
+                    } catch(err) {
+                        console.log(err)
                     }
                     break;
                 }
@@ -169,6 +174,34 @@ const socketListener = (server) => {
                         client[group_id][user_id].send(JSON.stringify(data));
                     }
                     client[group_id][user_id] = ws;
+                    break;
+                }
+                case "update message": {
+                    try {
+                        const result = await updatePostSocket(msg.postId, msg.content);
+
+                        if (result) {
+                            Object.entries(client[msg.group_id]).forEach(([ahh, sock]) => {
+                                sock.send(message);
+                            });
+                        }
+                    } catch(err) {
+                        console.log(err)
+                    }
+                    break;
+                }
+                case "delete message": {
+                    try {
+                        const result = await deletePostSocket(msg.postId);
+
+                        if (result) {
+                            Object.entries(client[msg.group_id]).forEach(([ahh, sock]) => {
+                                sock.send(message);
+                            });
+                        }
+                    } catch(err) {
+                        console.log(err)
+                    }
                     break;
                 }
                 case "leave": {

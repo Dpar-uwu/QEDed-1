@@ -69,14 +69,8 @@ const QuizSchema = new Schema({
         default: Date.now
     },
     // the following are only needed for assignments
-    assigned_by: {
+    assignment_id: {
         type: ObjectId
-    },
-    group_id: {
-        type: ObjectId
-    },
-    deadline: {
-        type: Date
     }
 });
 // skill_id, skill_name, topic_name, done_by, 
@@ -146,6 +140,19 @@ const quizModel = {
                 const result = await Quiz.aggregate([
                     {
                         $match: match_opt
+                    },
+                    {
+                        $lookup: {
+                            from: "levels",
+                            localField: "skill_id",
+                            foreignField: "topics.skills._id",
+                            as: "levels"
+                        }
+                    },
+                    {
+                        $match: {
+                            levels:{ $not: {$size: 0} }
+                        }
                     },
                     {
                         $group: {
@@ -408,6 +415,19 @@ const quizModel = {
                         }
                     },
                     {
+                        $lookup: {
+                            from: "levels",
+                            localField: "skill_id",
+                            foreignField: "topics.skills._id",
+                            as: "levels"
+                        }
+                    },
+                    {
+                        $match: {
+                            levels:{ $not: {$size: 0} }
+                        }
+                    },
+                    {
                         $group: {
                             "_id": `$${groupBy}`,
                             // "easy_average_score": { $last: "$score.easy"} ,
@@ -422,6 +442,19 @@ const quizModel = {
                 const recent_data = await Quiz.aggregate([
                     {
                         $match: match_opt
+                    },
+                    {
+                        $lookup: {
+                            from: "levels",
+                            localField: "skill_id",
+                            foreignField: "topics.skills._id",
+                            as: "levels"
+                        }
+                    },
+                    {
+                        $match: {
+                            levels:{ $not: {$size: 0} }
+                        }
                     },
                     {
                         $group: {
@@ -446,6 +479,19 @@ const quizModel = {
                 ])
 
                 const global_data = await Quiz.aggregate([
+                    {
+                        $lookup: {
+                            from: "levels",
+                            localField: "skill_id",
+                            foreignField: "topics.skills._id",
+                            as: "levels"
+                        }
+                    },
+                    {
+                        $match: {
+                            levels:{ $not: {$size: 0} }
+                        }
+                    },
                     {
                         $group: {
                             "_id": `$${groupBy}`,

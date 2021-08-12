@@ -33,24 +33,62 @@ $(document).on("click", "#btn-create", function() {
 $(document).on("click", ".assignment", function() {
     let role = decodeToken().issuedRole;
     if(role == "student") {
-        window.location.href = "/quiz.html?skill=" + this.id;
+        window.location.href = "/quiz.html?skill=" + this.id +"&assignment=" + this.dataset.assignment;
+    }
+    else if(role == "teacher" || role == "parent" || role == "admin") {
+        this.nextElementSibling.classList.toggle("visible");
     }
 });
 
 /* API CALLS */
 function getAssignmentByGrp() {
-    $.ajax({
-        url: `/assignment/group?groupId=${groupId}`,
-        dataType: 'JSON',
-        success: function (data, textStatus, xhr) {
-            displayGroupName(data.group_name);
-            displayAssignments(data.assignments);
-        },
-        error: function (xhr, textStatus, errorThrown) {
-            console.log(errorThrown);
-        }
-    });
+    let role = decodeToken().issuedRole;
+
+    if(role == "student") {
+        $.ajax({
+            url: `/assignment/group?groupId=${groupId}&userId=${decodeToken().sub}`,
+            dataType: 'JSON',
+            success: function (data, textStatus, xhr) {
+                displayGroupName(data.group_name);
+                displayAssignments(data.assignments);
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(errorThrown);
+            }
+        });
+    }
+    else {
+        $.ajax({
+            url: `/assignment/outstanding?groupId=${groupId}&userId=${decodeToken().sub}`,
+            dataType: 'JSON',
+            success: function (data, textStatus, xhr) {
+                displayGroupName(data.group_name);
+                console.log(data);
+                displayAssignments(data.assignments);
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(errorThrown);
+            }
+        });
+    }
 }
+
+function checkIfGrpAdmin() {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: `/group/isGrpAdmin?groupId=${groupId}&userId=${decodeToken().sub}`,
+            dataType: 'JSON',
+            success: function (data, textStatus, xhr) {
+                console.log(data.group_role)
+                resolve(data.group_role);
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(errorThrown);
+                reject(errorThrown)            }
+        });
+    })
+}
+
 
 function getLevelSelect() {
     $.ajax({
@@ -118,17 +156,22 @@ function createAssignment() {
 
 
 /* DISPLAY FUNCTIONS */
-function displayEducatorUI() {
-    let role = decodeToken().issuedRole;
-
-    if(role == "teacher" || role == "parent" || role == "admin") {
-        let content = `
-            <button id="edit-btn" data-bs-toggle="modal" data-bs-target="#assignQuizModal">
-                Assign Quiz
-            </button>
-        `;
-        document.querySelector("#btn-wrapper").innerHTML = content;
+async function displayEducatorUI() {
+    try {
+        let role = await checkIfGrpAdmin();
+        console.log("HEYYYY", role)
+        if(role == "admin" || role == "owner") {
+            let content = `
+                <button id="edit-btn" data-bs-toggle="modal" data-bs-target="#assignQuizModal">
+                    Assign Quiz
+                </button>
+            `;
+            document.querySelector("#btn-wrapper").innerHTML = content;
+        }
+    } catch(err) {
+        window.location.href = "/403.html";
     }
+    
 }
 
 function displayGroupName(group_name) {
@@ -140,16 +183,82 @@ function displayAssignments(assignments) {
 
     let content = "";
     assignments.forEach(assignment => {
-        content += `
-            <div class="assignment" id="${assignment.skill_id}">
-                <div class="assignment-details">
-                    <span class="assignment-title">${assignment.title}</span>
-                    <small class="assign-by">Assigned By: ${assignment.assigned_by_name}</small>
-                    <span class="assign-skill">${assignment.skill_name}</span>
+        // student view
+        if(assignment.completed_quiz == false) {
+            content += `
+                <div class="assignment" id="${assignment.skill_id}" data-assignment="${assignment._id}">
+                    <div class="assignment-details">
+                        <span class="assignment-title">${assignment.title}</span>
+                        <small class="assign-by">Assigned By: ${assignment.assigned_by_name}</small>
+                        <span class="assign-skill">${assignment.skill_name}</span>
+                    </div>
+                    <small class="deadline">${displayDate(assignment.deadline)}</small>
                 </div>
-                <small class="deadline">${displayDate(assignment.deadline)}</small>
-            </div>
-        `;
+            `;
+        }
+        else if(assignment.member_assignment) {
+            let fullyCompleted = true;
+            let statusContent = "";
+            statusContent += `
+                <div class="status-header">
+                    <div>Student</div>
+                    <div>Status</div>
+                    <div>Score</div>
+                    <div>Time Taken</div>
+                </div>
+            `;
+            for(let i = 0; i < assignment.member_assignment.length; i++) {
+                let status = assignment.member_assignment[i];
+                statusContent += `
+                    <div class="member-assign-status">
+                        <div class="member-name">${status.name}</div>
+                        
+                        ${status.isCompleted == undefined || status.isCompleted == null ? 
+                            '<div class="status"><span class="assignment-status uncomplete"><i class="fas fa-times-circle"></i> Not Started</span></div>' : ""}
+
+                        ${status.isCompleted == false ? 
+                            '<div class="status"><span class="assignment-status ongoing"><i class="fas fa-minus-circle"></i> In Progress<span></div>' : ""}
+
+                        ${status.isCompleted == true ? 
+                            '<div class="status"><span class="assignment-status complete"><i class="fas fa-check-circle"></i> Completed</span></div>' : ""}
+
+                        <div class="score">
+                            ${
+                                status.isCompleted == true?
+                                status.score.total.toFixed(1) + "%" :
+                                ""
+                            }
+                        </div>
+
+                        <div class="time_taken">
+                            ${
+                                status.isCompleted == true?
+                                status.time_taken + "s" :
+                                ""
+                            }
+                        </div>
+                    </div>
+                `
+                //display only is members have not fullyCompleted
+                fullyCompleted = fullyCompleted && assignment.member_assignment.isCompleted;
+
+            }
+            if(!fullyCompleted) {
+                content += `
+                    <div class="assignment" id="${assignment.skill_id}" data-assignment="${assignment._id}">
+                        <div class="assignment-details">
+                            <span class="assignment-title">${assignment.title}</span>
+                            <small class="assign-by">Assigned By: ${assignment.assigned_by_name}</small>
+                            <span class="assign-skill">${assignment.skill_name}</span>
+                        </div>
+                        <small class="deadline">${displayDate(assignment.deadline)}</small>
+                    </div>
+                    <div class="toggleContent">
+                        ${statusContent}
+                    </div>
+                `;
+            }
+        }
     });
     if(content != "") assignmentList.innerHTML = content;
 }
@@ -202,7 +311,7 @@ function decodeToken() {
 function displayDate(dt) {
     let date = new Date(dt);
     let today = new Date(Date.now());
-    console.log(date.toDateString(), today.toDateString())
+    
     let result = (date.toDateString() == today.toDateString()) ?
         "Today" :
         date.toDateString()

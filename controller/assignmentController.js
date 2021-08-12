@@ -14,15 +14,15 @@ const { Error } = require("mongoose");
 
 
 /**
- * GET /assignment/group?groupId=
+ * GET /assignment/group?groupId= &userId=
  */
 router.get("/group",
     //validate("userId"),
     async (req, res) => {
-        const { groupId } = req.query;
+        const { groupId, userId } = req.query;
         try {
             console.time("GET all assignments by grpid");
-            const result = await assignmentModel.getAsgByGrpId(groupId);
+            const result = await assignmentModel.getAsgByGrpId(groupId, userId);
             res.status(200).send(result);
         } catch (err) {
             // if (err == "NOT_FOUND")
@@ -84,6 +84,27 @@ router.get("/user",
             console.timeEnd("GET assignments by userid");
         }
     });
+
+    
+/**
+ * GET /assignment/outstanding?groupId=
+ */
+router.get("/outstanding",
+async (req, res) => {
+    const { groupId } = req.query;
+    try {
+        console.time("GET assignment progress by grpid");
+        const result = await assignmentModel.getAllAsgProgressByGrpId(groupId);
+        res.status(200).send(result);
+    } catch (err) {
+        if (err instanceof Error || err instanceof MongoError)
+            res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+        else
+            res.status(500).send({ error: "Error getting members by grpid", code: "UNEXPECTED_ERROR" });
+    } finally {
+        console.timeEnd("GET assignment progress by grpid");
+    }
+});
 
 /**
  * GET /assignment/:assignmentId  get asg by id

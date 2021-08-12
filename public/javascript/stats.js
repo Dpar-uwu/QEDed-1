@@ -74,11 +74,12 @@ function getComparisonBenchmark(query) {
             let title = []
             let extractedData = [];
 
+            console.log(data)
             Object.keys(data).forEach(key => {
+                
                 title.push(key);
                 extractedData.push(extractComparisonData(data[key]));
-            })
-
+            });
             createCanvas(title.length, title, "container");
 
             for (let i = 0; i < extractedData.length; i++) {

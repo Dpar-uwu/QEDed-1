@@ -179,16 +179,10 @@ router.get("/:quizId",
 router.post("/",
     validate("createQuiz"),
     async (req, res) => {
-        const { skill_id, level, skill_name, topic_name, done_by,
-            score, questions, num_of_qn, percent_difficulty, time_taken,
-            isCompleted, assigned_by, group_id, deadline } = req.body;
+        
         try {
             console.time("POST quiz");
-            const result = await quizModel.createQuiz({
-                skill_id, level, skill_name, topic_name, done_by,
-                score, questions, num_of_qn, percent_difficulty, time_taken,
-                isCompleted, assigned_by, group_id, deadline
-            });
+            const result = await quizModel.createQuiz(req.body);
 
             res.status(201).send({ new_id: result._id });
         } catch (err) {

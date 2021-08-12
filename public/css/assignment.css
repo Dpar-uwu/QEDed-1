@@ -30,10 +30,16 @@
     justify-content: center;
 }
 
+#btn-wrapper {
+    max-width: 996px;
+    margin: 0 auto;
+}
+
 #assignment-list {
+    max-width: 996px;
     display: flex;
     flex-direction: column;
-    margin-top: 14px;
+    margin: 14px auto;
 }
 
 .assignment {
@@ -93,8 +99,8 @@
     color: #ef798a;
     background-color: #fff;
     border-radius: 15px;
-    border: 1.4px solid #ef798a;
-    margin: 20px 22px 0;
+    border: 1.3px solid #ef798a;
+    margin: 20px 24px 0;
     padding: 5px 12px;
     font-weight: 700;
     transition: 0.2s ease;
@@ -204,12 +210,114 @@
 }
 
 
+/* EDUCATOR VIEW: ASSIGNMENT STATUS FOR EACH STUDENT MEMBER */
+.status-header {
+    margin: 10px 17% 2px 8%;
+    display: flex;
+    font-size: 12px;
+}
+
+.status-header div {
+    width: 25%;
+    text-align: center;
+}
+
+.member-assign-status {
+    border-left: 2px dashed #eee;
+    margin: 0 17% 2px 8%;
+    padding: 8px 12px;
+    /* width: 70%; */
+    font-size: 14px;
+    display: flex;
+}
+.member-assign-status div {
+    width: 25%;
+}
+
+.assignment-status {
+    /* display: flex;
+    justify-content: center; */
+    background-color: #f3f8ff;
+    color: #98c5ff;
+    border-radius: 15px;
+    padding: 3px 7px;
+    font-size: 12px;
+}
+
+.status, .score, .time_taken {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.ongoing {
+    color: #ffcb45;
+    background-color: #fff6de;
+}
+
+.complete {
+    background-color: #e4fad8;
+    color: #5ba93a;
+}
+
+.uncomplete {
+    background-color: #ffe1e5;
+    color: #ef798a;
+}
+
+.toggleContent {
+    margin: 0 22px 0 0;
+    opacity: 0;
+    max-height: 0;
+    overflow-y: scroll;
+    transition: 0.2s ease-in-out;
+
+}
+
+.visible {
+    opacity: 1;
+    max-height: 1000px;
+}
+
 @media (max-width: 768px) {
+    #edit-btn {
+        margin: 8px 10px 0;
+        font-size: 14px;
+    }
+    #assignment-list {
+        margin: 0 0 14px;
+    }
+    .assignment {
+        padding: 14px;
+        font-size: 14px;
+    }
+    .assign-skill {
+        font-size: 11px;
+        margin: 4px 0 0;
+        padding: 2px 6px;
+    }
     .level, .topicWrapper, .levelForm {
         width: 95%;
     }
 
     .assignment {
-        margin: 0 10px 8px;
+        margin: 8px 8px 0;
+    }
+
+    .member-assign-status  {
+        font-size: 11px;
+        margin: 0 0 2px 16px;
+        padding: 8px 5px;
+    }
+
+    .status-header  {
+        font-size: 10px;
+        margin: 10px 6% 2px 6%;
+        /* padding: 8px; */
+    }
+
+    .assignment-status {
+        font-size: 9px;
     }
 }

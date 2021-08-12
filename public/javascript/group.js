@@ -103,10 +103,10 @@ function createGroup() {
         dataType: 'JSON',
         contentType: 'application/json',
         success: function (data, textStatus, xhr) {
-            alert("Group Created");
             window.location.href = "";
         },
         error: function (xhr, textStatus, errorThrown) {
+            alert("Sorry, an unexpected error occured");
             console.log(errorThrown);
         }
     });

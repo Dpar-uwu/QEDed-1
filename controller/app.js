@@ -16,6 +16,7 @@ const { router, postSocket } = require("./postController.js");
 const postController = router;
 const assignmentController = require('./assignmentController');
 const notificationController = require('./notificationController');
+const gameController = require('./gameController.js');
 
 
 // const email = require("../email/email");
@@ -113,6 +114,7 @@ app.use('/assignment', assignmentController);
 
 // notification routes
 app.use("/notification", notificationController);
+app.use("/game", gameController);
 
 // uncaught error handling
 app.use((_error, _req, res, _next) => {

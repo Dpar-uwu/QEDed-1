@@ -163,6 +163,21 @@ exports.validate = (method) => {
                 errorHandler
             ]
         }
+        case "gameInfo": {
+            return [
+                query("user_id", "User ID given is not a valid ID")
+                    .notEmpty().withMessage("User ID cannot be empty").bail()
+                    .isMongoId().withMessage("User ID given is not a valid ID"),
+                // catches error if body has extra unexpected parameters
+                body()
+                    .custom(body => {
+                        const keys = ["points", "life", "high_score", "character_health", "character_speed", "bullet_speed", "bullet_strength", "reload_time", "magazine", "shooting_speed"];
+                        return Object.keys(body).every(key => keys.includes(key));
+                    })
+                    .withMessage("Some extra parameters are sent"),
+                errorHandler
+            ]
+        }
         case "userId": {
             return [
                 attribute.userId(),
@@ -202,7 +217,6 @@ exports.validate = (method) => {
                 // catches error if body has extra unexpected parameters
                 param()
                     .custom(param => {
-                        console.log("hiii")
                         const keys = ["password","token","userId"];
                         return Object.keys(param).every(key => keys.includes(key));
                     })

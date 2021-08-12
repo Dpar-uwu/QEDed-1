@@ -129,7 +129,6 @@ $(document).on("click", ".click", function () {
             let result = funcs[quizData.topic_name].markQuiz(quizData, questionArray);
             let user = JSON.parse(localStorage.getItem("userInfo"));
             let status = (result[1].total >= 50) ? 'pass' : 'fail';
-
             //Displaying results
             $('#skillName').remove();
             $('#support').before(
@@ -168,6 +167,9 @@ $(document).on("click", ".click", function () {
                     "created_at": Date.now,
                 }
                 submitQuiz(data);
+
+                updateUserInfo(result[2]);
+                updateGameInfo(result[2]);
             }
             else {
 
@@ -276,6 +278,83 @@ function submitQuiz(data) {
         }
     })
 };
+function updateUserInfo(points) {
+    let userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
+    let data = {
+        "exp_points": points + userInfo.exp_points
+    }
+
+    userInfo.exp_points = data.exp_points;
+
+    let max = false;
+    let mulitplier = 1;
+    let final = 0;
+
+    while(!max){
+        let x = Math.floor(data.exp_points/ (1000 * mulitplier));
+        if(x >= 1){
+            final ++;
+            mulitplier ++;
+            data.exp_points -= (1000 * mulitplier);
+        }
+        else{
+            max = true;
+        }
+    }
+
+    userInfo.rank_level = final;
+    localStorage.setItem('userInfo', JSON.stringify(userInfo));
+
+    data["rank_level"] = final;
+
+    $.ajax({
+        url: `/user/${userInfo._id}`,
+        type: 'PUT',
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        success: function (data, textStatus, xhr) {
+            console.log(data)
+            // localStorage.setItem('userInfo', JSON.stringify(data.result));
+            console.log("Successfully Updated User Info")
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            console.log(xhr);
+        }
+    })
+};
+
+function updateGameInfo(points) {
+    let userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
+    $.ajax({
+        url: `/game?user_id=${userInfo._id}`,
+        type: 'GET',
+        success: function (data, textStatus, xhr) {
+            points += data.points;
+
+            let updated = {
+                "points": points
+            }
+        
+            $.ajax({
+                url: `/game?user_id=${userInfo._id}`,
+                type: 'PUT',
+                data: updated,
+                dataType: 'JSON',
+                success: function (data, textStatus, xhr) {
+                    console.log('Successfully Updated Game Info');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log('Error!');
+                }
+            });
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            console.log(xhr);
+        }
+    })
+};
 
 function after(path, data) {
     let vname;
@@ -325,7 +404,7 @@ function after(path, data) {
                                     <p>The test will save and submit automatically when the time expires.</p>
                                 </div>
                                 <div class="text-end mt-5">
-                                    <button class="btn btn-warning click" id="beginBtn">Begin Quiz</button>
+                                    <button class="btn btn-outline-primary click" id="beginBtn">Begin Quiz</button>
                                 </div>
                             </div>
                         </div>
@@ -700,7 +779,8 @@ const fraction = {
         }
         score["total"] = ((score.easy / 100) * numOfEasy + (score.medium / 100) * numOfMedium + (score.difficult / 100) * numOfDifficult) / numOfQ * 100;
         
-        return [questions, score];
+        let points = easy * 5 + medium * 10 + difficult * 15;
+        return [questions, score, points];
     }
 }
 

@@ -3,6 +3,12 @@ $(document).ready(function(){
         document.getElementById("name").innerHTML = getName();
     });
     getRecommendation();
+
+    let user = JSON.parse(localStorage.getItem("userInfo"));
+    let width = (user.exp_points / ((user.rank_level + 1) * 1000)) * 100;
+
+    $('.progress-bar').css("width", width + '%');
+    $('.progress-bar').html(Math.floor(width) + "%");
 })
 
 function getRecommendation(){

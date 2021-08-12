@@ -1,31 +1,4 @@
 
-// var schoolOption = '';
-
-// $(document).ready(function(){
-//     getSchool();
-// })
-
-// function getSchool(){
-//     var data = {
-//         resource_id: 'ede26d32-01af-4228-b1ed-f05c45a1d8ee', // the resource id
-//         q: 'primary', // query for 'primary'
-//         limit: 200
-//     };
-//     $.ajax({
-//         url: 'https://data.gov.sg/api/action/datastore_search',
-//         data: data,
-//         dataType: 'JSON',
-//         success: function(data, textStatus, xhr) {
-//             for(var i =0; i<data.result.records.length; i++){
-//                 schoolOption += `<option value='${data.result.records[i].school_name}'>${data.result.records[i].school_name}</option>`;
-//             }   
-//         },
-//         error: function(xhr, textStatus, errorThrown){
-//             console.log(errorThrown);
-//         }
-//     });
-// }
-
 //notification ish
 // using $x as the jQuery object for version 1.7.2
 $(document).ready(function () {
@@ -129,49 +102,28 @@ $(document).ready(function () {
 
 
 
-//Profile 
 
 
-//declearing html elements
-
-const imgDiv = document.querySelector('.profile-pic-div');
-const img = document.querySelector('#photo');
-const file = document.querySelector('#file');
-const uploadBtn = document.querySelector('#uploadBtn');
-
-//if user hover on img div 
-
-imgDiv.addEventListener('mouseenter', function () {
-  uploadBtn.style.display = "block";
-});
-
-//if we hover out from img div
-
-imgDiv.addEventListener('mouseleave', function () {
-  uploadBtn.style.display = "none";
-});
-
-//lets work for image showing functionality when we choose an image to upload
-
-//when we choose a foto to upload
-
-file.addEventListener('change', function () {
-  //this refers to file
-  const choosedFile = this.files[0];
-
-  if (choosedFile) {
-
-    const reader = new FileReader(); //FileReader is a predefined function of JS
-
-    reader.addEventListener('load', function () {
-      img.setAttribute('src', reader.result);
-    });
-
-    reader.readAsDataURL(choosedFile);
 
 
+
+
+//profile
+
+
+
+
+document.getElementById('getval').addEventListener('change', readURL, true);
+function readURL(){
+  var file = document.getElementById("getval").files[0];
+  var reader = new FileReader();
+  reader.onloadend = function(){
+      document.getElementById('profile-upload').style.backgroundImage = "url(" + reader.result + ")";        
   }
-});
-
+  if(file){
+      reader.readAsDataURL(file);
+  }else{
+  }
+}
 
 

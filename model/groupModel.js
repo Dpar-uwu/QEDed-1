@@ -304,7 +304,7 @@ const groupModel = {
         })
     },
 
-    
+
     checkIfGrpAdmin: (group_id, user_id) => {
         return new Promise(async (resolve, reject) => {
             try {
@@ -335,33 +335,33 @@ const groupModel = {
                 const admin = await Group.findOne(
                     {
                         "_id": ObjectId(group_id),
-                        "members": { 
+                        "members": {
                             $elemMatch: {
                                 "user_id": ObjectId(user_id),
-                                "is_admin": true 
+                                "is_admin": true
                             }
                         }
                     }
                 ).select("-posts -__v");
 
                 let owner = null;
-                if(!admin) {
+                if (!admin) {
                     owner = await Group.findOne({
                         "_id": ObjectId(group_id),
                         "owner": ObjectId(user_id)
                     }).select("-posts -__v");
                 }
-                
-                if(owner) {
+
+                if (owner) {
                     resolve("owner");
                 }
-                else if(admin) {
+                else if (admin) {
                     resolve("admin");
                 }
                 else {
                     resolve(false);
                 }
-            } catch(err) {
+            } catch (err) {
                 console.error(`ERROR! Could not check if user ${user_id} is a group admin in ${group_id}: ${err}`);
                 reject(err);
             }
@@ -494,7 +494,7 @@ const groupModel = {
 
                 // find if member is an admin
                 const isAdmin = found.is_admin;
-                
+
                 if (isAdmin == false) throw "UNEXPECTED_ERROR"
 
                 found.is_admin = !found.is_admin;
@@ -532,12 +532,6 @@ const groupModel = {
                             as: "quiz",
                             localField: "user_id",
                             foreignField: "done_by"
-                        },
-                        $lookup: {
-                            from: "quizzes",
-                            as: "quiz",
-                            localField: "_id",
-                            foreignField: "group_id"
                         },
                     },
                     {
@@ -602,27 +596,82 @@ const groupModel = {
 
                 let groupBy = 'level';
 
-                if(level != undefined && level != "") groupBy = 'topic_name';
-                if(topic != undefined && topic != "")  groupBy = 'skill_name';
+                if (level != undefined && level != "") groupBy = 'topic_name';
+                if (topic != undefined && topic != "") groupBy = 'skill_name';
 
-                const group_data = await Quiz.aggregate([
+                const group_data = await Group.aggregate([
                     {
-                        $match: match_opt
+                        $match: { _id: ObjectId(groupId) }
+                    },
+                    {
+                        $unwind: "$members"
+                    },
+                    {
+                        $project: {
+                            user_id: "$members.user_id",
+                            group_name: 1,
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "quizzes",
+                            as: "quiz",
+                            localField: "user_id",
+                            foreignField: "done_by"
+                        },
+                    },
+                    {
+                        $project: { "quiz.questions": 0 }
+                    },
+                    {
+                        $unwind: "$quiz"
+                    },
+                    {
+                        $addFields: {
+                            "quiz.group_name": "$group_name",
+                            "quiz.group_id": "$_id",
+                        }
+                    },
+                    { $replaceRoot: { newRoot: "$quiz" } },
+                    {
+                        $group: {
+                            "_id": {
+                                "groupid": "$group_id",
+                                "match": `$${groupBy}`
+                            },
+                            // "group_name": { $first: "$group_name" },
+                            // "easy_average_score": { $avg: "$score.easy" },
+                            // "medium_average_score": { $avg: "$score.medium" },
+                            // "difficult_average_score": { $avg: "$score.difficult" },
+                            "average_score": { $avg: "$score.total" },
+                            // "average_time_taken": { $avg: "$time_taken" }
+                        }
                     },
                     {
                         $group: {
-                            "_id": `$${groupBy}`,
-                            // "easy_average_score": { $last: "$score.easy"} ,
-                            // "medium_average_score": { $last: "$score.medium"} ,
-                            // "difficult_average_score": { $last: "$score.difficult"},
-                            "total_average_score": { $avg: "$score.total"},
-                            // "average_time_taken": { $last: "$time_taken"}
+                            "_id": "$_id.groupid",
+                            "total_average_score":{
+                                $push: {
+                                    "_id": "$_id.match",
+                                    "total_average_score":"$average_score"
+                                }
+                            }
                         }
                     },
-                ]); 
-                
+                    {
+                        $unwind: "$total_average_score"
+                    },
+                    {
+                        $project: {
+                            "_id": "$total_average_score._id",
+                            "total_average_score": "$total_average_score.total_average_score"
+                        }
+                    }
+                ]);
+
                 match_opt["done_by"] = ObjectId(userId);
-                
+                delete match_opt["group_id"];
+
                 const recent_data = await Quiz.aggregate([
                     {
                         $match: match_opt
@@ -630,12 +679,12 @@ const groupModel = {
                     {
                         $group: {
                             "_id": `$${groupBy}`,
-                            "easy": { $push: "$score.easy"},
-                            "medium": { $push: "$score.medium"},
-                            "difficult": { $push: "$score.difficult"},
-                            "total": { $push: "$score.total"},
-                            "time": { $push: "$time_taken"}
-                        }                    
+                            "easy": { $push: "$score.easy" },
+                            "medium": { $push: "$score.medium" },
+                            "difficult": { $push: "$score.difficult" },
+                            "total": { $push: "$score.total" },
+                            "time": { $push: "$time_taken" }
+                        }
                     },
                     {
                         $project: {
@@ -643,22 +692,22 @@ const groupModel = {
                             // "easy_average_score": { $avg: { $slice: ["$easy", -10]}},
                             // "medium_average_score": { $avg: { $slice: ["$medium", -10]}},
                             // "difficult_average_score": { $avg: { $slice: ["$difficult", -10]}},
-                            "total_average_score": { $avg: { $slice: ["$total", -10]}},
+                            "total_average_score": { $avg: { $slice: ["$total", -10] } },
                             // "average_time_taken": { $avg: { $slice: ["$time", -10]}}
                         }
-                    }                    
+                    }
                 ])
 
                 const global_data = await Quiz.aggregate([
                     {
                         $group: {
                             "_id": `$${groupBy}`,
-                            "easy": { $push: "$score.easy"},
-                            "medium": { $push: "$score.medium"},
-                            "difficult": { $push: "$score.difficult"},
-                            "total": { $push: "$score.total"},
-                            "time": { $push: "$time_taken"}
-                        }                    
+                            "easy": { $push: "$score.easy" },
+                            "medium": { $push: "$score.medium" },
+                            "difficult": { $push: "$score.difficult" },
+                            "total": { $push: "$score.total" },
+                            "time": { $push: "$time_taken" }
+                        }
                     },
                     {
                         $project: {
@@ -666,30 +715,29 @@ const groupModel = {
                             // "easy_average_score": { $avg: "$easy"},
                             // "medium_average_score": { $avg: "$medium"},
                             // "difficult_average_score": { $avg: "$difficult"},
-                            "total_average_score": { $avg: "$total"},
+                            "total_average_score": { $avg: "$total" },
                             // "average_time_taken": { $avg: "$time"}
                         }
-                    }                    
+                    }
                 ])
-                
-                let result = {};
 
-                for(let i = 0; i<group_data.length; i++){
+                let result = {};
+                for (let i = 0; i < group_data.length; i++) {
                     let name = group_data[i]._id;
                     let recent;
                     let global;
 
-                    recent_data.forEach(data =>{
-                        if(data._id == name){
-                           recent = data.total_average_score;
-                           return false;
-                        } 
+                    recent_data.forEach(data => {
+                        if (data._id == name) {
+                            recent = data.total_average_score;
+                            return false;
+                        }
                     })
-                    global_data.forEach(data =>{
-                        if(data._id == name){
-                           global = data.total_average_score;
-                           return false;
-                        } 
+                    global_data.forEach(data => {
+                        if (data._id == name) {
+                            global = data.total_average_score;
+                            return false;
+                        }
                     })
 
                     result[name] = {
@@ -712,26 +760,25 @@ const groupModel = {
             try {
                 let match_opt = {
                     "done_by": ObjectId(userId),
-                    "group_id": ObjectId(groupId)
                 };
 
                 const result = await Quiz.aggregate([
                     {
                         $match: match_opt
-                    },   
+                    },
                     {
                         $group: {
                             "_id": {
-                                "level" : "$level",
+                                "level": "$level",
                                 "topics": "$topic_name"
                             },
                             "skills": {
                                 $addToSet: "$skill_name"
                             }
                         }
-                    }, 
+                    },
                     {
-                        $group:{
+                        $group: {
                             "_id": "$_id.level",
                             "topics": {
                                 $addToSet: {

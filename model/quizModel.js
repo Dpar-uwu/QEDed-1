@@ -367,8 +367,12 @@ const quizModel = {
                     { $project: { _id: 0 } }
                 ]);
 
-                // global except user
+                delete recent_match_opt["done_by"];
+
                 const global = await Quiz.aggregate([
+                    {
+                        $match: recent_match_opt
+                    },
                     {
                         $group: {
                             "_id": null,

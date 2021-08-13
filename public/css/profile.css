@@ -4,7 +4,8 @@ body {
   line-height: 1.5;
   margin: 1em;
   background-image:linear-gradient(#fffbeb, #fff6ff);
-  
+  background-attachment: fixed;
+
 }
 
   
@@ -534,5 +535,4 @@ input, select, textarea {
   padding-left: 300px;
 }
 
-
-
+.

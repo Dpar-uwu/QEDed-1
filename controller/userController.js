@@ -130,7 +130,7 @@ router.post("/",
             console.time("POST new user");
             const result = await user.addNewUser(first_name, last_name, email, password, gender, role, school, grade);
 
-            res.status(201).send({ message: "User Created" });
+            res.status(201).send({ message: "User Created", "result": result });
         } catch (err) {
             if (err == "EMAIL_EXISTS")
                 res.status(422).send({ error: "Email already exists", code: err });

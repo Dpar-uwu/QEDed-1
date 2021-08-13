@@ -89,7 +89,7 @@ function getUserGroupBenchmark(userId, params) {
             let isAvailable = true;
             let extractedData = [];
 
-            isAvailable = jQuery.isEmptyObject({data});;
+            isAvailable = !jQuery.isEmptyObject({data});;
 
             Object.keys(data).forEach(key => {
                 if (data[key].recent != undefined) {
@@ -103,7 +103,7 @@ function getUserGroupBenchmark(userId, params) {
                     return false;
                 }
             })
-
+            console.log(isAvailable)
             if (isAvailable) {
                 createCanvas(title.length, title);
 

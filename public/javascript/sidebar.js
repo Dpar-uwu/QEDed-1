@@ -43,7 +43,7 @@ const navItems = [
     },
     {
         name : "Learning Resources",
-        link : ".html",
+        link : "learningresourceslevel.html",
         icon : "far fa-newspaper",
         access : ["student", "teacher", "parent"]
     }

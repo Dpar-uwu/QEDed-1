@@ -4,12 +4,11 @@ body {
   line-height: 1.5;
   margin: 1em;
   background-image:linear-gradient(#fffbeb, #fff6ff);
-  
+  background-attachment: fixed;
+
 }
 
-  
- 
-  
+
 
   .w3-sidebar {
     width: 150px;
@@ -265,19 +264,19 @@ button .icon {
 
 /* prfile */
 
-.sttngs p{color:pink;}
+/* .sttngs p{color:pink;}
 
 .sttngs{max-width:1064px;margin: 50px auto;background:#fff;padding:15px;height:auto;font-family:"HelveticaNeue","Helvetica Neue",Helvetica,Arial,sans-serif;border-radius:3px;padding-top:30px;
  -webkit-box-shadow: 0 0 50px 0 rgba(0, 0, 0, 0.2);}
-.sttngs h2{letter-spacing:2px;margin:20px;color:#000;}
+.sttngs h2{letter-spacing:2px;margin:20px;color:#000;} */
 
 
 .sttngs .tabordion {
   color: #FFF;
   display: block;
-  mardgin: auto;
+  margin: auto;
   position: relative;height:670px;
-  width: 100%;backgrdound:red;
+  width: 100%;background:red;
 }
 
 .sttngs.tabordion input[name="sections"] {display:none;}
@@ -302,11 +301,11 @@ button .icon {
 
 .ver{color:limegreen;}
 .tabordion section article {
-  display: none;backgdround:red;
+  display: none;background:red;
   padding-left: 200px;
   max-width: 100%;
   position: absolute;  
-  top: -50px;opascity:.7;
+  top: -50px;opacity:.7;
 }
 
 
@@ -325,7 +324,7 @@ button .icon {
 */
 .tabordion input[name="sections"]:checked + label { 
   border-right:3px  solid limegreen;
-  color: limegreen;font-weifght:bold;
+  color: limegreen;font-weight:bold;
 }
 
 .tabordion input[name="sections"]:checked ~ article {
@@ -339,14 +338,14 @@ button .icon {
  display:inline-block;width:32.7%;
 }
 
-.r1, .r2{mfargin-left:4%;}
+.r1, .r2{margin-left:4%;}
 
 
 
 
 
 :root {
-  back3ground-color: #FCFEFD;
+  background-color: #FCFEFD;
   font-family: helvetica, arial, sans-serif;
   font-size: 15px;
 }
@@ -399,15 +398,15 @@ input, select, textarea {
 
     -ms-flex-wrap: wrap;
     flex-wrap: wrap;
-  max-wridth: 600px;
+  max-width: 600px;
 }
 
 .tr .label{
  
   margin-bottom: 0.25em;width:100%;
   font-size: 10px;text-align:left;
-  font-yweight: 900;padding:0;color:#111;
-  letter-sfpacing: 2px;border:none;
+  font-weight: 900;padding:0;color:#111;
+  letter-spacing: 2px;border:none;
 }
 
 
@@ -533,6 +532,4 @@ input, select, textarea {
 .frm{
   padding-left: 300px;
 }
-
-
 

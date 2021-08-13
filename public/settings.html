@@ -28,6 +28,7 @@
 
     <!--JQuery-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
     <!--Javascript-->
     <script src="./javascript/sidebar.js"></script>
@@ -35,72 +36,87 @@
 
 
     <!--CSS-->
-    <link rel="stylesheet" href="./css/signup.css">
+    <link rel="stylesheet" href="./css/profile.css">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
 </head>
 
 <body>
 
-
+    <!--Sidebar-->
 
     <div class="w3-sidebar w3-bar-block" style="height: 45%">
         <h3 class="w3-bar-item">Account Setting</h3>
         <a href="profile.html" class="w3-bar-item w3-button">My Profile</a>
-        <a href="#" class="w3-bar-item w3-button">Notification Settings</a>
+        <a href="notification.html" class="w3-bar-item w3-button">Notification Settings</a>
         <a href="resetPassword.html" class="w3-bar-item w3-button">Change Password</a>
     </div>
 
-    <div class="wrapper">
-        <div class="navbar">
-            <div class="navbar_left">
 
+
+    <!-- dropdown -->
+    <button id="accountButton" class="account--name show" aria-haspopup="true" aria-expanded="false"> <img
+            src="https://img.icons8.com/ios-glyphs/30/000000/appointment-reminders--v2.png" /> Hello ! Tesvina
+
+        <span class="arrow--down"></span>
+    </button>
+
+
+    <div id="accountPanel" class="account--panel" aria-hidden="true">
+        <div class="account--container">
+
+
+            <button class="account--settings">
+                <a href="profile.html">
+                    <img src="https://image.flaticon.com/icons/svg/70/70367.svg" alt="Profile settings"
+                        title="Account settings" class="icon">
+                </a>
+            </button>
+
+            <ul class="user">
+                <li class="name">Tesvina Robyn</li>
+                <li class="email">rasmitaregina@gmail.com</li>
+            </ul>
+
+            <div class="logout">
+                <a href="login.html">Logout</a>
             </div>
 
-            <div class="navbar_right">
-                <div class="notifications">
-                    <div class="icon_wrap"><i class="far fa-bell"></i></div>
+        </div>
+    </div>
+
+
+    <div class="frm">
+        <div id='profile-upload'>
+            <div class="hvr-profile-img">
+                <input type="file" name="logo" id='getval' class="upload" id="imag">
+                <div class="icon">
+                    <div class="camera4"><span></span></div>
                 </div>
-                <div class="profile">
-                    <div class="icon_wrap">
-                        <img src="./images/cat.png" alt="profile_pic">
-                        <span class="name">Hello, Tesvina </span>
-
-                        <i class="fas fa-chevron-down"></i>
-
-
-                    </div>
-                    <a class="settings" href="settings.html"><span class="picon"><i
-                                class="fas fa-cog"></i></span>Settings</a>
-                    <a class="logout" href="login.html"><span class="picon"><i
-                                class="fas fa-sign-out-alt"></i></span>Logout</a>
-                    </ul>
-                </div>
-
-
-
-
-
             </div>
         </div>
     </div>
+
+    <script src="./javascript/settings.js"></script>
 
 
 
 
     <div class="test">
-        <div class="col-md-3">
+        <!-- <div class="col-md-3">
 
-            <div href=# class="d-inline"><img src="./avatars/cat.png " width=130px>
+            <div href=# class="d-inline"><img src="./images/cat.png " width=130px>
                 <br>
                 <p class="pl-2 mt-4"><a href="#" class="btn" style="color:black">Edit Picture</a></p>
             </div>
 
 
-        </div>
+        </div> -->
+
+        
 
 
-        <div class="col-lg-8 pb-5">
+        <div class="col-lg-9 pb-9">
             <form class="row">
                 <div class="col-md-6">
                     <div class="form-group">
@@ -175,9 +191,9 @@
 
 
 
-                
                     </div>
                 </div>
+
 
                 <div class="col-12">
                     <hr class="mt-2 mb-3">

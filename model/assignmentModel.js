@@ -393,7 +393,7 @@ const assignmentModel = {
         return new Promise(async (resolve, reject) => {
             try {
                 const result = await Group.aggregate([
-                    {
+                    { // select group that matches group id
                         $match: {
                             _id: ObjectId(group_id)
                         }
@@ -401,11 +401,12 @@ const assignmentModel = {
                     {
                         $project: { posts: 0 }
                     },
-
-                    {
-                        $unwind: "$members"
+                    { // unwind members array to become objects
+                        $unwind: {
+                            path: "$members"
+                        },
                     },
-                    {
+                    { // join users collection to members using id
                         $lookup: {
                             from: "users",
                             localField: "members.user_id",
@@ -413,12 +414,12 @@ const assignmentModel = {
                             as: "user_details"
                         }
                     },
-                    {
+                    { // transform array to object
                         $addFields: { 
                             user_details: { $first: "$user_details" }
                         }
                     },
-                    {
+                    { // combine existing members object with joined user details
                         $addFields: {
                             "members.name": { $concat: ["$user_details.first_name", " ", "$user_details.last_name"] },
                             "members.role": "$user_details.role",
@@ -465,13 +466,16 @@ const assignmentModel = {
                         }
                     },
                     {
-                        $unwind: "$assignment"
+                        $unwind: {
+                            path: "$assignment",
+                            // preserveNullAndEmptyArrays: true
+                        },
                     },
 
-                    {
+                    { // join member's quizzes to grp assignments to check if assignm completed
                         $addFields: {
                             completed: {
-                                $first: {
+                                $last: {
                                     $filter: {
                                         input: "$quiz",
                                         as: "quiz",
@@ -486,7 +490,7 @@ const assignmentModel = {
 
                     {
                         $addFields: {
-                            member_assignment: { 
+                            member_assignment: {
                                 $mergeObjects: [ "$members", "$completed" ]
                             },
                         }
@@ -609,8 +613,16 @@ const assignmentModel = {
                     },
 
                 ]);
-                console.log("SUCCESS! Result", result)
-                resolve(result[0]);
+
+                if(result.length < 1) {
+                    let empty = await Group.findOne({ _id: ObjectId(group_id)}).select("group_name");
+                    console.log("SUCCESS! Result", empty)
+                    resolve(empty);
+                }
+                else {
+                    console.log("SUCCESS! Result", result[0])
+                    resolve(result[0]);
+                }
             } catch(err) {
                 console.error(`ERROR! Could not get assignment progress by id ${group_id}: ${err}`);
                 reject(err);

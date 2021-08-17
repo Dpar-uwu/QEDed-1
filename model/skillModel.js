@@ -53,7 +53,6 @@ const SkillSchema = new Schema({
         }
     }
 });
-const Skill = mongoose.model("Skill", SkillSchema);
 
 const skillModel = {
     SkillSchema

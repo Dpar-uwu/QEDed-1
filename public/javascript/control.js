@@ -582,6 +582,7 @@ $(document).on("click", ".editTopic", function () {
 
 //SKILLS
 $(document).on("click", ".addSkill", function () {
+    resetSkillForm();
     let elements = document.getElementsByTagName("input");
     let id = this.id;
 

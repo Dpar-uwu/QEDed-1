@@ -25,15 +25,30 @@ function getAssignmentByUser() {
 }
 
 $(document).on("click", ".assignment", function() {
-    window.location.href = "/quiz.html?skill=" + this.id + "&assignment=" + this.dataset.assignment;
+    if(this.classList.contains("completed")) {
+        window.location.href = "/viewpastquiz.html?quizId=" + this.dataset.quizId;
+    }
+    else {
+        window.location.href = "/quiz.html?skill=" + this.id + "&assignment=" + this.dataset.assignment;
+    }
 });
+
+$(document).on("click", ".tag-container", function() {
+    let toggle = document.querySelector("#completed-list");
+    if(toggle.childElementCount >= 1) {
+        toggle.classList.toggle("visible");
+        document.querySelector(".arrow").classList.toggle("rotate");
+    }
+})
 
 
 /* DISPLAY FUNCTIONS */
 function displayAssignments(assignments) {
     let assignmentList = document.querySelector("#assignment-list");
+    let completedList = document.querySelector("#completed-list");
 
     let content = "";
+    let completedAssignment = "";
     assignments.forEach(assignment => {
         if(assignment.completed_quiz == false) {
             content += `
@@ -43,12 +58,31 @@ function displayAssignments(assignments) {
                         <small class="assign-by">Assigned By: ${assignment.assigned_by_name} (${assignment.group_name})</small>
                         <span class="assign-skill">${assignment.skill_name}</span>
                     </div>
-                    <small class="deadline">${displayDate(assignment.deadline)}</small>
+                    <small class="deadline">
+                        <span>${displayDate(assignment.deadline)}</span>
+                        ${isOverdue(assignment.deadline)? "<span class='overdue'>Overdue</span>" : ""}
+                    </small>
                 </div>
+            `;
+        }
+        else if(assignment.completed_quiz) {
+            completedAssignment = `
+            <div class="assignment completed" id="${assignment.skill_id}" data-assignment="${assignment._id}" data-quiz-id="${assignment.completed_quiz}">
+                <div class="assignment-details">
+                    <span class="assignment-title">${assignment.title}</span>
+                    <small class="assign-by">Assigned By: ${assignment.assigned_by_name} (${assignment.group_name})</small>
+                    <span class="assign-skill">${assignment.skill_name}</span>
+                </div>
+                <small class="deadline">${displayDate(assignment.deadline)}</small>
+            </div>
             `;
         }
     });
     if(content != "") assignmentList.innerHTML = content;
+    if(completedAssignment != "") {
+        completedList.innerHTML = completedAssignment;
+        document.querySelector(".completed-number").textContent = completedList.childElementCount;
+    }
 }
 
 
@@ -70,7 +104,15 @@ function displayDate(dt) {
     let today = new Date(Date.now());
 
     let result = (date.toDateString() == today.toDateString()) ?
-        "Today" :
+        "<strong>Today</strong>" :
         date.toDateString()
+    return result;
+}
+
+function isOverdue(dt) {
+    let date = new Date(dt);
+    let today = new Date(Date.now());
+
+    let result = (date < today);
     return result;
 }

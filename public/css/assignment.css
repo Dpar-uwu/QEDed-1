@@ -39,7 +39,7 @@
     max-width: 996px;
     display: flex;
     flex-direction: column;
-    margin: 14px auto;
+    margin: 4px auto 14px;
 }
 
 .assignment {
@@ -93,6 +93,8 @@
 
 .deadline {
     color: #6a99a2;
+    display: flex;
+    flex-direction: column;
 }
 
 #edit-btn {
@@ -242,6 +244,12 @@
     border-radius: 15px;
     padding: 3px 7px;
     font-size: 12px;
+    transition: 0.2s ease;
+}
+
+.member-assign-status:hover {
+    background-color: #f3f8ff;
+    color: #98c5ff;
 }
 
 .status, .score, .time_taken {
@@ -275,10 +283,66 @@
 
 }
 
-.visible {
-    opacity: 1;
-    max-height: 1000px;
+.arrow {
+    transition: 0.1s ease;
 }
+
+.visible {
+    opacity: 1 !important;
+    max-height: 1000px !important;
+    padding-bottom: 8px;
+}
+
+.overdue {
+    color: #ef798a;
+    background-color: #ef798a33;
+    border-radius: 15px;
+    padding: 3px 5px;
+    text-align: center;
+    font-size: 12px;
+    justify-content: center;
+}
+
+
+/* COMPLETED */
+.completed-list-wrapper {
+    max-width: 996px;
+    margin: 0 auto;
+    padding-top: 10px;
+    cursor: pointer;
+}
+
+
+.tag-container {
+    color: #333;
+    font-size: 13px;
+    margin: 8px 24px;
+}
+
+#completed-list {
+    border-bottom: 1px solid #ddd;
+    opacity: 0;
+    max-height: 0;
+    overflow-y: auto;
+    transition: 0.2s ease-in-out;
+}
+
+.completed {
+    /* margin: 8px !important; */
+    color: #555;
+    background-color: #fafafa;
+}
+
+.completed:hover {
+    color: #000;
+    background-color: #fff;
+    box-shadow: 2px 2px 7px rgba(34, 34, 34, 0.04);
+}
+
+.rotate {
+    transform: rotate(90deg);
+}
+
 
 @media (max-width: 768px) {
     #edit-btn {
@@ -289,6 +353,7 @@
         margin: 0 0 14px;
     }
     .assignment {
+        margin: 8px 8px 0;
         padding: 14px;
         font-size: 14px;
     }
@@ -301,9 +366,6 @@
         width: 95%;
     }
 
-    .assignment {
-        margin: 8px 8px 0;
-    }
 
     .member-assign-status  {
         font-size: 11px;
@@ -319,5 +381,9 @@
 
     .assignment-status {
         font-size: 9px;
+    }
+
+    .tag-container {
+        margin: 8px;
     }
 }

@@ -18,6 +18,7 @@ const GroupSchema = new Schema({
     },
     members: {
         type: [{
+            _id: false,
             user_id: {
                 type: ObjectId,
                 required: "User ID required"

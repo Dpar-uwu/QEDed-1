@@ -33,6 +33,7 @@
 #announcement-list {
     padding: 0 30px 4px;
     width: 100%;
+    overflow-x: hidden;
     overflow-y: scroll;
     position: relative;
     flex: 1 1 0;/* Firefox */

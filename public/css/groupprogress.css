@@ -21,3 +21,7 @@
 }
 
 .dropdown-toggle:after { content: none }
+
+.member {
+  cursor: pointer;
+}

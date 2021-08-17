@@ -30,13 +30,35 @@ $(document).on("click", "#btn-create", function() {
     createAssignment();
 });
 
+// click on completed assignments dropdown
+$(document).on("click", ".tag-container", function() {
+    let toggle = document.querySelector("#completed-list");
+    if(toggle.childElementCount >= 1) {
+        toggle.classList.toggle("visible");
+        document.querySelector(".arrow").classList.toggle("rotate");
+    }
+})
+
 $(document).on("click", ".assignment", function() {
     let role = decodeToken().issuedRole;
     if(role == "student") {
-        window.location.href = "/quiz.html?skill=" + this.id +"&assignment=" + this.dataset.assignment;
+        if(this.classList.contains("completed")) {
+            window.location.href = "/viewpastquiz.html?quizId=" + this.dataset.quizId;
+        }
+        else {
+            window.location.href = "/quiz.html?skill=" + this.id + "&assignment=" + this.dataset.assignment;
+        }
     }
     else if(role == "teacher" || role == "parent" || role == "admin") {
         this.nextElementSibling.classList.toggle("visible");
+    }
+});
+
+$(document).on("click", ".member-assign-status", function() {
+    let asgnStatus = this.querySelector(".assignment-status");
+    console.log(asgnStatus)
+    if(asgnStatus.classList.contains("complete")) {
+        window.location.href = "/viewpastquiz.html?quizId=" + asgnStatus.dataset.quizId;
     }
 });
 
@@ -63,7 +85,6 @@ function getAssignmentByGrp() {
             dataType: 'JSON',
             success: function (data, textStatus, xhr) {
                 displayGroupName(data.group_name);
-                console.log(data);
                 displayAssignments(data.assignments);
             },
             error: function (xhr, textStatus, errorThrown) {
@@ -159,7 +180,6 @@ function createAssignment() {
 async function displayEducatorUI() {
     try {
         let role = await checkIfGrpAdmin();
-        console.log("HEYYYY", role)
         if(role == "admin" || role == "owner") {
             let content = `
                 <button id="edit-btn" data-bs-toggle="modal" data-bs-target="#assignQuizModal">
@@ -180,8 +200,10 @@ function displayGroupName(group_name) {
 
 function displayAssignments(assignments) {
     let assignmentList = document.querySelector("#assignment-list");
+    let completedList = document.querySelector("#completed-list");
 
     let content = "";
+    let completedAssignment = null;
     assignments.forEach(assignment => {
         // student view
         if(assignment.completed_quiz == false) {
@@ -196,7 +218,19 @@ function displayAssignments(assignments) {
                 </div>
             `;
         }
-        else if(assignment.member_assignment) {
+        else if(assignment.completed_quiz) {
+            completedAssignment = `
+            <div class="assignment completed" id="${assignment.skill_id}" data-assignment="${assignment._id}" data-quiz-id="${assignment.completed_quiz}">
+                <div class="assignment-details">
+                    <span class="assignment-title">${assignment.title}</span>
+                    <small class="assign-by">Assigned By: ${assignment.assigned_by_name}</small>
+                    <span class="assign-skill">${assignment.skill_name}</span>
+                </div>
+                <small class="deadline">${displayDate(assignment.deadline)}</small>
+            </div>
+            `;
+        }
+        else if(assignment.member_assignment) { //for educator: displays status of each member in the group
             let fullyCompleted = true;
             let statusContent = "";
             statusContent += `
@@ -220,7 +254,7 @@ function displayAssignments(assignments) {
                             '<div class="status"><span class="assignment-status ongoing"><i class="fas fa-minus-circle"></i> In Progress<span></div>' : ""}
 
                         ${status.isCompleted == true ? 
-                            '<div class="status"><span class="assignment-status complete"><i class="fas fa-check-circle"></i> Completed</span></div>' : ""}
+                            `<div class="status"><span class="assignment-status complete" data-quiz-id="${status._id}"><i class="fas fa-check-circle"></i> Completed</span></div>` : ""}
 
                         <div class="score">
                             ${
@@ -240,7 +274,10 @@ function displayAssignments(assignments) {
                     </div>
                 `
                 //display only is members have not fullyCompleted
-                fullyCompleted = fullyCompleted && assignment.member_assignment.isCompleted;
+                fullyCompleted = fullyCompleted 
+                    && (assignment.member_assignment[i].isCompleted?
+                    assignment.member_assignment[i].isCompleted
+                    : false);
 
             }
             if(!fullyCompleted) {
@@ -258,9 +295,28 @@ function displayAssignments(assignments) {
                     </div>
                 `;
             }
+            else {
+                completedAssignment = `
+                <div class="assignment completed" id="${assignment.skill_id}" data-assignment="${assignment._id}" data-quiz-id="${assignment.completed_quiz}">
+                    <div class="assignment-details">
+                        <span class="assignment-title">${assignment.title}</span>
+                        <small class="assign-by">Assigned By: ${assignment.assigned_by_name}</small>
+                        <span class="assign-skill">${assignment.skill_name}</span>
+                    </div>
+                    <small class="deadline">${displayDate(assignment.deadline)}</small>
+                </div>
+                <div class="toggleContent">
+                    ${statusContent}
+                </div>
+                `;
+            }
         }
     });
     if(content != "") assignmentList.innerHTML = content;
+    if(completedAssignment && completedAssignment != "") {
+        completedList.innerHTML = completedAssignment;
+        document.querySelector(".completed-number").textContent = completedList.querySelectorAll(".assignment").length;
+    }
 }
 
 function populateLevelSelect(levels) {

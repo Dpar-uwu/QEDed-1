@@ -236,6 +236,10 @@
     width: 25%;
 }
 
+.link  {
+    cursor: pointer;
+}
+
 .assignment-status {
     /* display: flex;
     justify-content: center; */

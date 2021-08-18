@@ -629,10 +629,27 @@ const quizModel = {
                         $match: { "done_by": ObjectId(userId) }
                     },
                     {
+                        $lookup: {
+                            from: "levels",
+                            localField: "skill_id",
+                            foreignField: "topics.skills._id",
+                            as: "levels"
+                        }
+                    },
+                    {
+                        $match: {
+                            levels:{ $not: {$size: 0} }
+                        }
+                    },
+                    {
+                        $project: {levels: 0}
+                    },
+                    {
                         // group quizzes by skillId
                         $group: {
                             "_id": "$skill_id",
                             "average_score": { $avg: "$score.total" },
+                            "skill_id": { $last: "$skill_id" },
                             "skill_name": { $last: "$skill_name" },
                             "num_of_quiz": { $sum: 1 },
                             "average_time_taken": { $avg: "$time_taken" }
@@ -699,6 +716,22 @@ const quizModel = {
         return new Promise(async (resolve, reject) => {
             try {
                 const popular = await Quiz.aggregate([
+                    {
+                        $lookup: {
+                            from: "levels",
+                            localField: "skill_id",
+                            foreignField: "topics.skills._id",
+                            as: "levels"
+                        }
+                    },
+                    {
+                        $match: {
+                            levels:{ $not: {$size: 0} }
+                        }
+                    },
+                    {
+                        $project: {levels: 0}
+                    },
                     {
                         $group: {
                             "_id": "$skill_id",

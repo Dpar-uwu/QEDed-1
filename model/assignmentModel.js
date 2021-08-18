@@ -138,6 +138,9 @@ const assignmentModel = {
                     {
                         $project: { level: 0, topic: 0, skill: 0 }
                     },
+                    { 
+                        $match: { skill_name: { $exists: true } } 
+                    },
                     {
                         $lookup: {
                             from: "quizzes",
@@ -275,6 +278,9 @@ const assignmentModel = {
                     },
                     {
                         $project: { level: 0, topic: 0, skill: 0 }
+                    },
+                    { 
+                        $match: { skill_name: { $exists: true } } 
                     },
                     { // join to groups to get group name
                         $lookup: {
@@ -565,6 +571,9 @@ const assignmentModel = {
                     },
                     {
                         $project: { level: 0, topic: 0, skill: 0 }
+                    },
+                    { 
+                        $match: { skill_name: { $exists: true } } 
                     },
                     { // sort deadline by ascending order
                         $sort: {

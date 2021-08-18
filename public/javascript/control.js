@@ -2,7 +2,7 @@
 /* EVENT LISTENERS & API CALLS */
 // onload get all levels
 $(document).ready(function () {
-    $(".header").load("rightbar.html",function(){
+    $(".header").load("rightbar.html", function () {
         document.getElementById("name").innerHTML = getName();
     });
 
@@ -105,8 +105,8 @@ $(document).on("click", "#setDefault", function () {
 $(document).on("click", ".addLevelBtn", function () {
     let level = $('#inputLevel').val();
     console.log(level);
-    if(level > 0){
-        $.ajax({
+    if (level > 0) {
+        checkAuth(() => $.ajax({
             url: `/level`,
             type: 'POST',
             data: { 'level': level },
@@ -120,9 +120,9 @@ $(document).on("click", ".addLevelBtn", function () {
             error: function (xhr, textStatus, errorThrown) {
                 $('#inputLevelErr').html(JSON.parse(xhr.responseText).error);
                 $('#inputLevel').focus();
-    
+
                 const res = xhr.responseJSON;
-    
+
                 if (res.code == "UNAUTHENTICATED_USER") {
                     window.location.href = "/login.html";
                 }
@@ -130,9 +130,10 @@ $(document).on("click", ".addLevelBtn", function () {
                     window.location.href = "/403.html";
                 }
             }
-        });
+        })
+        )
     }
-    else{
+    else {
         $('#inputLevelErr').html("Level cannot be a negative number.");
         $('#inputLevel').focus();
     }
@@ -142,7 +143,7 @@ $(document).on("click", ".editLevelBtn", function () {
     let level = $('#inputLevel').val();
     let id = this.id;
 
-    $.ajax({
+    checkAuth(() => $.ajax({
         url: `/level/${id}`,
         type: 'PUT',
         data: { 'level': level },
@@ -166,7 +167,8 @@ $(document).on("click", ".editLevelBtn", function () {
                 window.location.href = "/403.html";
             }
         }
-    });
+    })
+    )
 })
 
 $(document).on("click", ".deleteLevelBtn", function () {
@@ -176,37 +178,39 @@ $(document).on("click", ".deleteLevelBtn", function () {
     $.confirm({
         icon: 'fas fa-exclamation-triangle',
         title: 'Are you sure?',
-        content: 'This will permanently delete this level and the action cannot be undone.',
+        content: 'This will permanently delete this level and the action cannot be undone. Note that it is not avisable to delete a level.',
         type: 'red',
         buttons: {
             ok: {
                 text: "Delete",
                 btnClass: 'btn-outline-danger',
-                keys: ['enter'],
-                action: function () {
-                    $.ajax({
-                        url: `/level/${id}`,
-                        type: 'DELETE',
-                        dataType: 'JSON',
-                        headers: {
-                            Authorization: (localStorage.getItem("token") != null) ? "Bearer " + localStorage.getItem("token") : ""
-                        },
-                        success: function (data, textStatus, xhr) {
-                            location.reload();
-                        },
-                        error: function (xhr, textStatus, errorThrown) {
-                            console.log(xhr.responseText);
+                // keys: ['enter'],
+                action: () => {
+                    checkAuth(() => {
+                        $.ajax({
+                            url: `/level/${id}`,
+                            type: 'DELETE',
+                            dataType: 'JSON',
+                            headers: {
+                                Authorization: (localStorage.getItem("token") != null) ? "Bearer " + localStorage.getItem("token") : ""
+                            },
+                            success: function (data, textStatus, xhr) {
+                                location.reload();
+                            },
+                            error: function (xhr, textStatus, errorThrown) {
+                                console.log(xhr.responseText);
 
-                            const res = xhr.responseJSON;
+                                const res = xhr.responseJSON;
 
-                            if (res.code == "UNAUTHENTICATED_USER") {
-                                window.location.href = "/login.html";
+                                if (res.code == "UNAUTHENTICATED_USER") {
+                                    window.location.href = "/login.html";
+                                }
+                                else if (res.code == "UNAUTHORIZED_USER") {
+                                    window.location.href = "/403.html";
+                                }
                             }
-                            else if (res.code == "UNAUTHORIZED_USER") {
-                                window.location.href = "/403.html";
-                            }
-                        }
-                    });
+                        });
+                    })
                 }
             },
             cancel: function () {
@@ -221,7 +225,7 @@ $(document).on("click", ".addTopicBtn", function () {
     let topic_name = $('#inputTopic').val();
     let id = $('#level_id').val();
 
-    $.ajax({
+    checkAuth(() => $.ajax({
         url: `/topic/${id}`,
         type: 'POST',
         data: { 'topic_name': topic_name },
@@ -246,14 +250,15 @@ $(document).on("click", ".addTopicBtn", function () {
                 window.location.href = "/403.html";
             }
         }
-    });
+    })
+    )
 })
 
 $(document).on("click", ".editTopicBtn", function () {
     let topic = $('#inputTopic').val();
     let id = this.id;
 
-    $.ajax({
+    checkAuth(() => $.ajax({
         url: `/topic/${id}`,
         type: 'PUT',
         data: { 'topic_name': topic },
@@ -278,7 +283,8 @@ $(document).on("click", ".editTopicBtn", function () {
                 window.location.href = "/403.html";
             }
         }
-    });
+    })
+    )
 })
 
 $(document).on("click", ".deleteTopicBtn", function () {
@@ -296,30 +302,32 @@ $(document).on("click", ".deleteTopicBtn", function () {
                 btnClass: 'btn-outline-danger',
                 keys: ['enter'],
                 action: function () {
-                    $.ajax({
-                        url: `/topic/${id}`,
-                        type: 'DELETE',
-                        dataType: 'JSON',
-                        headers: {
-                            Authorization: (localStorage.getItem("token") != null) ? "Bearer " + localStorage.getItem("token") : ""
-                        },
-                        success: function (data, textStatus, xhr) {
-                            console.log(data)
-                            $(`#${data.level_id}`).trigger('click');
-                        },
-                        error: function (xhr, textStatus, errorThrown) {
-                            console.log(xhr.responseText);
+                    checkAuth(
+                        $.ajax({
+                            url: `/topic/${id}`,
+                            type: 'DELETE',
+                            dataType: 'JSON',
+                            headers: {
+                                Authorization: (localStorage.getItem("token") != null) ? "Bearer " + localStorage.getItem("token") : ""
+                            },
+                            success: function (data, textStatus, xhr) {
+                                console.log(data)
+                                $(`#${data.level_id}`).trigger('click');
+                            },
+                            error: function (xhr, textStatus, errorThrown) {
+                                console.log(xhr.responseText);
 
-                            const res = xhr.responseJSON;
+                                const res = xhr.responseJSON;
 
-                            if (res.code == "UNAUTHENTICATED_USER") {
-                                window.location.href = "/login.html";
+                                if (res.code == "UNAUTHENTICATED_USER") {
+                                    window.location.href = "/login.html";
+                                }
+                                else if (res.code == "UNAUTHORIZED_USER") {
+                                    window.location.href = "/403.html";
+                                }
                             }
-                            else if (res.code == "UNAUTHORIZED_USER") {
-                                window.location.href = "/403.html";
-                            }
-                        }
-                    });
+                        })
+                    )
                 }
             },
             cancel: function () {
@@ -364,7 +372,7 @@ $(document).on("click", ".addSkillBtn", function () {
         },
     };
     // post skill details by id
-    $.ajax({
+    checkAuth(() => $.ajax({
         url: `/skill/${id}`,
         data: JSON.stringify(data),
         method: "POST",
@@ -401,7 +409,8 @@ $(document).on("click", ".addSkillBtn", function () {
                 errorDisplay.innerHTML = res.error;
             }
         }
-    });
+    })
+    )
 })
 
 $(document).on("click", ".updateSkillBtn", function () {
@@ -440,7 +449,7 @@ $(document).on("click", ".updateSkillBtn", function () {
         },
     };
     // update skill details by id
-    $.ajax({
+    checkAuth(() => $.ajax({
         url: `/skill/${id}`,
         data: JSON.stringify(data),
         method: "PUT",
@@ -476,7 +485,8 @@ $(document).on("click", ".updateSkillBtn", function () {
                 errorDisplay.innerHTML = res.error;
             }
         }
-    });
+    })
+    )
 })
 
 $(document).on("click", ".deleteSkillBtn", function () {
@@ -493,30 +503,32 @@ $(document).on("click", ".deleteSkillBtn", function () {
                 text: "Delete",
                 btnClass: 'btn-outline-danger',
                 keys: ['enter'],
-                action: function () {
-                    $.ajax({
-                        url: `/skill/${id}`,
-                        type: 'DELETE',
-                        dataType: 'JSON',
-                        headers: {
-                            Authorization: (localStorage.getItem("token") != null) ? "Bearer " + localStorage.getItem("token") : ""
-                        },
-                        success: function (data, textStatus, xhr) {
-                            $(`#${data.level_id}`).trigger('click');
-                        },
-                        error: function (xhr, textStatus, errorThrown) {
-                            console.log(xhr.responseText);
+                action: () => {
+                    checkAuth(
+                        $.ajax({
+                            url: `/skill/${id}`,
+                            type: 'DELETE',
+                            dataType: 'JSON',
+                            headers: {
+                                Authorization: (localStorage.getItem("token") != null) ? "Bearer " + localStorage.getItem("token") : ""
+                            },
+                            success: function (data, textStatus, xhr) {
+                                $(`#${data.level_id}`).trigger('click');
+                            },
+                            error: function (xhr, textStatus, errorThrown) {
+                                console.log(xhr.responseText);
 
-                            const res = xhr.responseJSON;
+                                const res = xhr.responseJSON;
 
-                            if (res.code == "UNAUTHENTICATED_USER") {
-                                window.location.href = "/login.html";
+                                if (res.code == "UNAUTHENTICATED_USER") {
+                                    window.location.href = "/login.html";
+                                }
+                                else if (res.code == "UNAUTHORIZED_USER") {
+                                    window.location.href = "/403.html";
+                                }
                             }
-                            else if (res.code == "UNAUTHORIZED_USER") {
-                                window.location.href = "/403.html";
-                            }
-                        }
-                    });
+                        })
+                    )
                 }
             },
             cancel: function () {
@@ -539,7 +551,7 @@ $(document).on("click", ".icon", function (event) {
     $('.addLevelBtn').addClass('editLevelBtn').removeClass('addLevelBtn');
     $('.editLevelBtn').attr('id', id);
     $('.deleteLevelBtn').remove();
-    $('.editLevelBtn').before(`<button type="button" class="btn btn-outline-danger deleteLevelBtn">Delete</button>`);
+    $('.editLevelBtn').before(`<button type="button" class="btn deleteLevelBtn">Delete</button>`);
     $('.deleteLevelBtn').attr('id', id);
 
     event.stopPropagation();
@@ -576,7 +588,7 @@ $(document).on("click", ".editTopic", function () {
     $('.addTopicBtn').addClass('editTopicBtn').removeClass('addTopicBtn');
     $('.editTopicBtn').attr('id', id);
     $('.deleteTopicBtn').remove();
-    $('.editTopicBtn').before(`<button type="button" class="btn btn-outline-danger deleteTopicBtn">Delete</button>`);
+    $('.editTopicBtn').before(`<button type="button" class="btn deleteTopicBtn">Delete</button>`);
     $('.deleteTopicBtn').attr('id', id);
 })
 
@@ -633,8 +645,8 @@ function displayTopic(data, name) {
     let content = "";
 
     container.innerHTML = "";
-    container.innerHTML +=     
-    `<button class="btn addTopic" 
+    container.innerHTML +=
+        `<button class="btn addTopic" 
         id="${data._id}" 
         data-bs-toggle="modal" 
         data-bs-target="#topicModal" 
@@ -667,12 +679,12 @@ function displayTopic(data, name) {
                 </div>
                 
                 `
-            });
-        content += 
-        `<div class="addSkill" id="${topics[i]._id}" data-bs-toggle="modal" data-bs-target="#skillModal">
+        });
+        content +=
+            `<div class="addSkill" id="${topics[i]._id}" data-bs-toggle="modal" data-bs-target="#skillModal">
             <i class="fas fa-plus-circle"></i> Add Skills
         </div>
-        </div></div>`;  
+        </div></div>`;
         container.innerHTML += content;
     }
 }
@@ -781,7 +793,7 @@ function calculateQn() {
 function validateNumOfQn() {
     let num_of_qn = document.querySelector('#num_of_qn').value;
     let error = document.querySelector("#num-error");
-    if(num_of_qn % 10 == 0) {
+    if (num_of_qn % 10 == 0) {
         error.style.display = "none";
     }
     else {

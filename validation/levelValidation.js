@@ -81,7 +81,7 @@ let attribute = {
     percent_difficult: (location = "topics.*.skills.*.percent_difficulty") => {
         return body(location)
             .notEmpty().withMessage("Percent difficulty cannot be empty").bail()
-            .matches(/^\d{1}0-\d{1}0-\d{1}0$/).withMessage("Percent difficulty should contain numbers in multiples of 10 separated by - e.g. 20-50-30").bail()
+            .matches(/^\d{1}0-\d{1}0-\d{0,1}0$/).withMessage("Percent difficulty should contain numbers in multiples of 10 separated by - e.g. 20-50-30").bail()
             .custom((val, { req }) => {
                 let percentages = val.split("-");
                 let total = 0;

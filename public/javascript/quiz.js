@@ -16,10 +16,10 @@ $(document).ready(function () {
         location.href = '404.html';
     }
 
-    if(params != null){
-        for(key in params){
-            if( params[key]!="" && params[key]!=undefined && params[key] != null){
-                if(key != "assignment") {
+    if (params != null) {
+        for (key in params) {
+            if (params[key] != "" && params[key] != undefined && params[key] != null) {
+                if (key != "assignment") {
                     path = key;
                     id = params[key];
                 }
@@ -133,18 +133,19 @@ $(document).on("click", ".click", function () {
             //Displaying results
             $('#skillName').remove();
             $('#support').before(
-                `<div class="row justify-content-center align-items-center text-center mt-4">
-                    <i class="col-2 fas fa-glass-cheers fa-4x"></i>
-                    <div class="col-4">
-                        <h2>Congratulations!</h2>
+                `<h2 class="text-center mt-4 mb-2">Congratulations!</h2>
+                <div class="row justify-content-center align-items-center text-center">
+                    
+                    <div class="col-12 px-3">
                         <p>You ${status} the ${quizData.skill_name} quiz!</p>
                         <h6><u>${Math.round(result[1].total)} / 100 </u></h6>
                     </div>
-                    <i class="col-2 fas fa-glass-cheers fa-4x"></i>
+                    
                     <a class="my-3" href="overview.html"><button class="btn btn-outline-primary">Return back</button></a>
                 </div>
                 <div class="text-center"> Take a look at your progress:</div>`
             );
+            // <i class="col-2 fas fa-glass-cheers fa-4x"></i>
 
             //Creating canvas
             createCanvas(5, ['Score', 'Time Taken', 'Easy Score', 'Medium Score', 'Hard Score'], "support");
@@ -154,22 +155,22 @@ $(document).on("click", ".click", function () {
 
                 //Preparing data for posting quiz
                 const data = {
-                    "skill_id": quizData.skillId, 
+                    "skill_id": quizData.skillId,
                     "level": quizData.level,
-                    "skill_name": quizData.skill_name, 
-                    "topic_name": quizData.topic_name, 
+                    "skill_name": quizData.skill_name,
+                    "topic_name": quizData.topic_name,
                     "done_by": user._id,
-                    "score": result[1], 
+                    "score": result[1],
                     "questions": result[0],
                     "num_of_qn": quizData.num_of_qn,
-                    "percent_difficulty": quizData.percent_difficulty, 
+                    "percent_difficulty": quizData.percent_difficulty,
                     "time_taken": time,
-                    "isCompleted": true, 
+                    "isCompleted": true,
                     "created_at": Date.now,
                 }
                 var urlSearchParams = new URLSearchParams(window.location.search);
                 var assignment_id = urlSearchParams.get("assignment");
-                if(assignment_id != null && assignment_id != undefined) {
+                if (assignment_id != null && assignment_id != undefined) {
                     data.assignment_id = assignment_id;
                 }
                 submitQuiz(data);
@@ -262,22 +263,31 @@ function getQuizAjax(path, id) {
     });
 }
 
-function submitQuiz(data) {
+function submitQuiz(newQuiz) {
     $.ajax({
         url: `quiz`,
         type: 'POST',
-        data: JSON.stringify(data),
+        data: JSON.stringify(newQuiz),
         contentType: 'application/json',
         success: function (data, textStatus, xhr) {
             $('.submitBtn').remove();
             $('.returnBtn').remove();
-            
+
             getDetailedBenchmark("", "support");
 
             let container = document.getElementById("support");
 
             container.className = "row m-0 m-auto justify-content-center";
             $(container).after('<h4 class="my-5 text-center">Review Quiz</h4>');
+            
+            if(newQuiz.score.total >= 80) {
+                // add animation
+                confetti();
+
+                setTimeout(() => {
+                    confetti.reset();
+                }, 40000);
+            }
         },
         error: function (xhr, textStatus, errorThrown) {
             console.log(xhr);
@@ -297,14 +307,14 @@ function updateUserInfo(points) {
     let mulitplier = 1;
     let final = 0;
 
-    while(!max){
-        let x = Math.floor(data.exp_points/ (1000 * mulitplier));
-        if(x >= 1){
-            final ++;
-            mulitplier ++;
+    while (!max) {
+        let x = Math.floor(data.exp_points / (1000 * mulitplier));
+        if (x >= 1) {
+            final++;
+            mulitplier++;
             data.exp_points -= (1000 * mulitplier);
         }
-        else{
+        else {
             max = true;
         }
     }
@@ -342,7 +352,7 @@ function updateGameInfo(points) {
             let updated = {
                 "points": points
             }
-        
+
             $.ajax({
                 url: `/game?user_id=${userInfo._id}`,
                 type: 'PUT',
@@ -389,7 +399,7 @@ function after(path, data) {
                 "display": head + data[i][vname + end]
             })
         }
-        
+
         document.getElementById("subtitle").innerHTML = vname.charAt(0).toUpperCase() + vname.slice(1);
         displayCard(notes, vname);
     }
@@ -397,13 +407,13 @@ function after(path, data) {
         $("body").html(
             `<div class="row justify-content-center m-2">
                 <div  class="d-flex justify-content-center">
-                   <img src="images/Psleonline_logo_transparent.png" alt="Logo" style="width: 30%">
+                   <img src="images/Psleonline_logo_transparent.png" alt="Logo" style="width: 35%">
                 </div>
                 <div class="col-12 col-sm-10 border rounded" id="content">
                     <div class="row flex-nowrap noBar justify-content-center">
-                        <div class="d-flex flex-column justify-content-center align-items-center p-5">       
+                        <div class="d-flex flex-column justify-content-center align-items-center py-5 px-3 p-sm-5">       
                             <h4 class="text-center">${data.skill_name}</h4>
-                            <div class="border p-5 mt-2 border-round">
+                            <div class="border p-sm-5 p-3 mt-2" style="border-radius:15px;">
                                 <div class="pl-5">
                                     <p class="h5 text-center mb-5">Instructions</p>
                                     <p class="m-1">The quiz has a time limit of <span id="time">${data.duration}</span> minutes.</p>
@@ -423,7 +433,7 @@ function after(path, data) {
 // Display Data
 function displayQuestion() {
     let container = document.getElementById("content");
-    
+
     container.innerHTML =
         `<div class="h5 text-center my-3" id="skillName">${quizData.skill_name}</div>
             <div class="container row m-auto">
@@ -442,8 +452,8 @@ function displayQuestion() {
 
     let content = funcs[quizData.topic_name].arrangeQuestion(quizData, questionArray);
     container.innerHTML += content + '<div class=" justify-content-center d-flex text-center mb-3"><button class="btn-light btn returnBtn me-2">Cancel</button><button class="btn-outline-primary btn click submitBtn">Submit</button></div>';
-    $(".reviewClass").css("display","none");
-    
+    $(".reviewClass").css("display", "none");
+
     //Starting timer
     startCountdown();
 }
@@ -475,7 +485,7 @@ function displayCard(data, name) {
 
 //Function for countdown 
 function startCountdown() {
-    let seconds; 
+    let seconds;
     let minutes;
     let duration = 60 * quizData.duration - 1;//Duration in seconds
 
@@ -523,7 +533,7 @@ const fraction = {
         // a/b + c/d
         numerator = array.a * array.d + array.b * array.c;
         denominator = array.b * array.d;
-        
+
         return fraction.proper(numerator, denominator);
     },
     multiply: (array) => {
@@ -630,7 +640,7 @@ const fraction = {
                 if (!dupes) {
                     if (quizData.skill_code == 'FRAC_SIMPLIFY') {
                         gcd = fraction.getGCD(sorted.a, sorted.b);
-                        
+
                         if (gcd != 1 && sorted.a != sorted.b) {
                             ans = fraction.proper(sorted.a, sorted.b);
                             checkpoint = false;
@@ -659,8 +669,8 @@ const fraction = {
         if (quizData.skill_code == 'FRAC_SIMPLIFY') amount = 2;
 
         for (let i = 0; i < questionArray.length; i++) {
-            content += `<div class="row col-9 justify-content-center align-items-center text-center m-auto mb-3"><div class="small col-md-2">Question ${i + 1}</div>`;
-           
+            content += `<div class="row col-9 justify-content-center align-items-center text-center m-auto mb-5"><div class="small col-md-2">Question ${i + 1}</div>`;
+
             for (let l = 0; l < amount; l++) {
                 let name = 'col-12';
                 let operator = null;
@@ -701,9 +711,9 @@ const fraction = {
 
                 if (l == amount - 2) operator = "=";
 
-                if (quizData.skill_code != 'FRAC_SIMPLIFY'){
+                if (quizData.skill_code != 'FRAC_SIMPLIFY') {
                     if (l == 0) (quizData.skill_code == 'FRAC_ADD') ? operator = "+" : operator = "x";
-                } 
+                }
 
                 if (operator != null) {
                     content +=
@@ -723,7 +733,7 @@ const fraction = {
         let medium = 0;
         let difficult = 0;
         let questions = [];
-        
+
         const numOfQ = quizData.num_of_qn, percentDifficulty = quizData.percent_difficulty.split("-");
         const numOfEasy = numOfQ * (percentDifficulty[0] / 100);
         const numOfMedium = numOfQ * (percentDifficulty[1] / 100);
@@ -743,7 +753,7 @@ const fraction = {
             if (inputA != undefined) studentAns['ansA'] = inputA;
             if (inputB != undefined) studentAns['ansB'] = inputB;
 
-            $(".reviewClass").css("display","block");
+            $(".reviewClass").css("display", "block");
 
             if (inputA == questionArray[i].ansA && inputB == questionArray[i].ansB && input == questionArray[i].ans) {
                 if (i < numOfEasy) {
@@ -784,7 +794,7 @@ const fraction = {
             "difficult": (difficult / numOfDifficult) * 100,
         }
         score["total"] = ((score.easy / 100) * numOfEasy + (score.medium / 100) * numOfMedium + (score.difficult / 100) * numOfDifficult) / numOfQ * 100;
-        
+
         let points = easy * 5 + medium * 10 + difficult * 15;
         return [questions, score, points];
     }
@@ -793,3 +803,20 @@ const fraction = {
 const funcs = {
     'Fractions': fraction,
 };
+
+
+// misc functions
+function confetti() {
+    console.log("calling confetti")
+    var myCanvas = document.createElement('canvas');
+    document.appendChild(myCanvas);
+
+    var myConfetti = confetti.create(myCanvas, {
+        resize: true,
+        useWorker: true
+    });
+    myConfetti({
+        particleCount: 80,
+        spread: 200
+    });
+}

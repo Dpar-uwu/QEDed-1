@@ -19,7 +19,11 @@ function decodeToken(){
     return decodedData;
 }
 
-function checkAuth() {
+// takes in callback which is called after getting new (valid)
+// access token using refresh token
+function checkAuth(callback = null) {
+    console.log("Checking auth...")
+    console.log(callback != null)
     let role = ["admin", "student", "teacher", "parent"];
     
     protectedRoutes.forEach(page => {
@@ -33,7 +37,9 @@ function checkAuth() {
         if(data == "" || !data) throw new Error("Not Authenticated");
         if(!role.includes(data.issuedRole)) throw new Error("Not Authorized");
         if(data.exp*1000 < new Date()) throw new Error("Token Expired");
-        
+        if(callback != null) {
+            callback();
+        }
     } catch(err) {
         console.log(err)
         if(err.message == "Not Authenticated") {
@@ -52,6 +58,11 @@ function checkAuth() {
                 },
                 success: function(data, textStatus, xhr) {
                     localStorage.setItem('token', data.accessToken);
+                    console.log("Got new token")
+                    if(callback != null) {
+                        console.log(callback)
+                        callback();
+                    }
                 },
                 error: function(xhr, textStatus, errorThrown){
                     window.location.href = "./login.html";

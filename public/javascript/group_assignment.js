@@ -244,7 +244,7 @@ function displayAssignments(assignments) {
             for(let i = 0; i < assignment.member_assignment.length; i++) {
                 let status = assignment.member_assignment[i];
                 statusContent += `
-                    <div class="member-assign-status">
+                    <div class="member-assign-status ${status.isCompleted? "link":""}">
                         <div class="member-name">${status.name}</div>
                         
                         ${status.isCompleted == undefined || status.isCompleted == null ? 

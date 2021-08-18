@@ -1064,14 +1064,42 @@ input[type=submit]:hover {
 }
 
 #levelbuttons {
-	margin-top: 80px;
-	margin-left: 440px;
+	max-width: 996px;
+	margin: 40px auto 0;
+	/* margin-left: 440px; */
+	display: flex;
+	flex-wrap: wrap;
+	/* flex-direction: column; */
+
+}
+
+.resouces-wrapper {
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	min-height: 70%
+}
+
+#levelbuttons-public {
+	max-width: 768px;
+	margin: 40px auto 0;
+	/* margin-left: 440px; */
+	display: flex;
+	flex-wrap: wrap;
+	/* flex-direction: column; */
+
+}
+
+.lvl-btn {
+	width: 33%;
+	display: flex;
+	justify-content: center;
 }
 
 a.button3 {
 	display: inline-block;
 	padding: 1em 1em;
-	margin: 0.5em 0.5em 1.5em 0;
+	margin: 0.5em;
 	border-radius: 2em;
 	box-sizing: border-box;
 	text-decoration: none;

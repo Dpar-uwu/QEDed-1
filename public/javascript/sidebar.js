@@ -3,7 +3,7 @@ const navItems = [
         name: "Overview",
         link: "overview.html",
         icon: "fas fa-home",
-        access: ["parent", "teacher", "student"]
+        access: ["student"]
     },
     {
         name: "Quiz Control Panel",
@@ -52,6 +52,7 @@ const navItems = [
 /* EVENT LISTENER */
 $(document).ready(function () {
     if(!window.location.toString().includes("quiz.html?skill")){
+        $('head').append('<link rel="stylesheet" type="text/css" href="./css/sidebar.css">');
         $(".sidebar").load("sidebar.html", function () {
             sidebar();
         });
@@ -68,7 +69,7 @@ function sidebar() {
                 `<div class="nav-item align-self-center">
                     <a 
                         href="${navItems[i].link}"
-                        class="nav-link align-middle px-0"
+                        class="nav-link align-middle px-3 px-lg-4 sidenav-link text-center text-sm-start ${window.location.pathname.split("/")[1] == navItems[i].link ? 'active-tab' : ''}"
                         data-bs-toggle="tooltip"
                         data-bs-placement="right"
                         title="${navItems[i].name}"

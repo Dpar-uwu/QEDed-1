@@ -265,9 +265,7 @@ function displayAllMessage(messages) {
                         <div class="sender_name"> 
                             ${attribute == "own" ? "" : msg.sender_name}
                         </div>
-                        <div class="post-content">
-                            ${msg.content}
-                        </div>
+                        <div class="post-content">${msg.content}</div>
                         <div class="text-time">
                             ${displayTime(msg.created_at)}
                         </div>
@@ -306,9 +304,7 @@ function displayMessage(msg, sender_name = "") {
                 <div class="sender_name"> 
                     ${attribute == "own" ? "" : sender_name}
                 </div>
-                <div class="post-content">
-                    ${msg.content}
-                </div>
+                <div class="post-content">${msg.content}</div>
                 <div class="text-time">
                     ${displayTime(msg.created_at)}
                 </div>

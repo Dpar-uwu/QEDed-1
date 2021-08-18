@@ -99,7 +99,7 @@ router.get("/recommendation",
             else
                 res.status(500).send({ error: "Error getting recommendation", code: "UNEXPECTED_ERROR" });
         } finally {
-            console.timeEnd("POST recommend quiz");
+            console.timeEnd("GET recommend quiz");
         }
     }
 )

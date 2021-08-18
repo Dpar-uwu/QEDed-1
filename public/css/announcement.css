@@ -17,11 +17,8 @@
     overflow: hidden;
 }
 
-
-
-
-
 /* NO CONTENT */
+
 #noresult {
     min-height: 70vh;
     display: flex;
@@ -33,15 +30,16 @@
 #announcement-list {
     padding: 0 30px 4px;
     width: 100%;
+    scroll-behavior: smooth;
     overflow-x: hidden;
     overflow-y: scroll;
     position: relative;
-    flex: 1 1 0;/* Firefox */
+    flex: 1 1 0;
+    /* Firefox */
     align-self: center;
-    scrollbar-color: rgba(0,0,0,.2) hsla(0,0%,100%,0.1);
+    scrollbar-color: rgba(0, 0, 0, .2) hsla(0, 0%, 100%, 0.1);
     scrollbar-width: thin;
 }
-
 
 .text-row {
     max-width: 675px;
@@ -49,7 +47,6 @@
 }
 
 .date {
-    
     font-size: 13px;
     display: flex;
     justify-content: center;
@@ -73,12 +70,12 @@
     padding: 8px 14px;
     color: #000;
     font-size: 13px;
-    width: -moz-fit-content; /* Firefox */
+    width: -moz-fit-content;
+    /* Firefox */
     width: fit-content;
     min-width: initial;
     max-width: 75%;
     word-wrap: break-word;
-    
 }
 
 .own .text {
@@ -91,6 +88,10 @@
     /* display: block; */
     opacity: 1;
     transform: translateX(0px);
+}
+
+.post-content {
+    white-space: pre-line;
 }
 
 .text-dropdown {
@@ -147,11 +148,13 @@
     font-size: 10px;
     color: #7e7e7e;
 }
+
 .text-content {
-    white-space: pre-line /* show new lines*/
+    white-space: pre-line/* show new lines*/
 }
 
 /* CONNECTION ERROR DISPLAY */
+
 #conn-err {
     background-color: #ffd97a;
     padding: 5px;
@@ -187,17 +190,34 @@
     caret-color: #ef798a;
 }
 
+#input-msg::-webkit-input-placeholder {
+    /* Edge */
+    color: #aaa;
+    font-size: 13px;
+}
+
+#input-msg:-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
+    color: #aaa;
+    font-size: 13px;
+}
+
+#input-msg::placeholder {
+    color: #aaa;
+    font-size: 13px;
+}
+
 ::-webkit-scrollbar {
     width: 6px!important;
     height: 6px!important;
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: rgba(0,0,0,.2);
+    background-color: rgba(0, 0, 0, .2);
 }
 
 ::-webkit-scrollbar-track {
-    background: hsla(0,0%,100%,.1);
+    background: hsla(0, 0%, 100%, .1);
 }
 
 #input-submit {
@@ -216,8 +236,8 @@
     border: 1px solid #ced4da;
 }
 
-
 /* CONNECTION ERROR MODAL */
+
 #warning-icon {
     color: #ef798a;
     margin-bottom: 12px;
@@ -244,8 +264,8 @@
     box-shadow: 0px 0px 0px 4px #ef798b8b !important;
 }
 
-
 /* EDIT POST WRAPPER */
+
 .edit-post-wrapper {
     background-color: #eaeaea;
     color: #464646;
@@ -283,6 +303,7 @@
 }
 
 /* MODAL BUTTONS */
+
 #deletePost {
     border-color: #ef798a;
     color: #ef798a;
@@ -315,8 +336,6 @@
         max-width: 85%;
     }
 }
-
-
 
 @media (min-width: 1200px) {
     .text {

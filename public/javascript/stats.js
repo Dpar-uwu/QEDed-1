@@ -10,7 +10,7 @@ $(document).ready(function () {
             document.getElementById("name").innerHTML = getName();
         })
 
-        getDetailedBenchmark("","container");
+        getDetailedBenchmark("", "container");
         getFilter();
     }
 })
@@ -19,7 +19,7 @@ $(document).on("click", '.select', function () {
     let selected = $(this).children().text();
     $("li").removeClass("active");
     $(this).addClass("active");
-    
+
     if (selected != "Detailed") {
         type = "comparison";
         getComparisonBenchmark("");
@@ -54,7 +54,7 @@ function getDetailedBenchmark(query, containerName) {
                 extractDetailedData(data);
             }
             else {
-                $('#zoom').css("display","none");
+                $('#zoom').css("display", "none");
                 displayNth();
             }
 
@@ -76,7 +76,7 @@ function getComparisonBenchmark(query) {
 
             console.log(data)
             Object.keys(data).forEach(key => {
-                
+
                 title.push(key);
                 extractedData.push(extractComparisonData(data[key]));
             });
@@ -98,7 +98,18 @@ function getFilter() {
         type: 'GET',
         dataType: 'JSON',
         success: function (data, textStatus, xhr) {
-            createFilter(data);
+            if (data.length < 1) {
+                $('#title').nextAll().remove();
+                $('#title').after(
+                    `<div class="text-center mt-5">
+                        <div><i class = "fa-5x fas fa-chart-bar" style="color: #EF798A; text-shadow: 5px 5px 0px #98c5ff, -5px -5px 0px #ffcb45;"></i></div>
+                        <div>Do a quiz to unlock!</div>
+                    </div>
+                    `);
+            }
+            else{
+                createFilter(data);
+            }
         },
         error: function (xhr, textStatus, errorThrown) {
             console.log(errorThrown);
@@ -159,7 +170,7 @@ function createFilter(data) {
 /*CREATE CANVAS*/
 function createCanvas(amount, title, containerName) {
     let content = "";
-    
+
     for (let i = 0; i < amount; i++) {
         (i < 2) ? classname = 'col-lg-5' : classname = 'col-lg-4 ';
         content += `
@@ -173,14 +184,14 @@ function createCanvas(amount, title, containerName) {
             content += '<div class="col-12 text-center mt-3 mb-3 h5"> The Percentage Scores </div>'
         }
     }
-    document.getElementById(containerName).innerHTML = content;    
+    document.getElementById(containerName).innerHTML = content;
 }
 
-function displayChart(data, id) {  
-     chart = new Chart(document.getElementById(`chart${id}`).getContext('2d'), {
+function displayChart(data, id) {
+    chart = new Chart(document.getElementById(`chart${id}`).getContext('2d'), {
         type: 'bar',
         data: {
-            labels: ['Last Quiz','Global Avg', 'Recent 10 Avg'],
+            labels: ['Last Quiz', 'Global Avg', 'Recent 10 Avg'],
             datasets: [{
                 //Input data here
                 data: data,

@@ -354,7 +354,26 @@ function getGameInfo() {
             extractData(data);
         },
         error: function (xhr, textStatus, errorThrown) {
-            console.log(errorThrown);
+            if(JSON.parse(xhr.responseText).code == "NOT_FOUND"){
+                createGameInfo();
+            }
+        }
+    });
+}
+
+function createGameInfo(){
+    let user_id = JSON.parse(localStorage.getItem('userInfo'))._id;
+
+    $.ajax({
+        url: `/game?user_id=${user_id}`,
+        method: 'POST',
+        dataType: 'JSON',
+        success: function(data, textStatus, xhr) {
+            console.log("Game Info Successfully Created!");
+            getGameInfo();
+        },
+        error: function(xhr, textStatus, errorThrown){
+            console.log("Error: " + xhr.responseText);
         }
     });
 }

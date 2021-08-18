@@ -27,7 +27,9 @@ router.get("/",
 
             res.status(200).send(result);
         } catch (err) {
-            if (err instanceof Error || err instanceof MongoError)
+            if (err == 'NOT_FOUND')
+                res.status(404).send({ error: err, code: 'NOT_FOUND' });
+            else if (err instanceof Error || err instanceof MongoError)
                 res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
             else
                 res.status(500).send({ error: "Error getting game info by userid", code: "UNEXPECTED_ERROR" });

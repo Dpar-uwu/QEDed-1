@@ -29,7 +29,6 @@ $(document).on("change","#account-role", function(){
     }
 })
 $(document).on("click", "#updateBtn", function(){
-
     let first_name = $("#account-fn").val();
     let last_name = $("#account-ln").val();
     let gender = $('input:radio:checked').val();
@@ -83,7 +82,11 @@ function updateAccount(data){
         method: "PUT",
         dataType: 'JSON',
         success: function (data, textStatus, xhr) {
-            console.log(data);
+            $.alert({
+                title: 'Updated!',
+                content: 'Profile successfully updated!',
+            });
+            localStorage.setItem("userInfo", JSON.stringify(data.user))
         },
         error: function (xhr, textStatus, errorThrown) {
             let key;

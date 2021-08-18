@@ -286,8 +286,9 @@ router.put("/:userId",
         try {
             console.time("PUT user");
             const result = await user.updateProfile(userId, changedFields);
-
-            res.status(200).send({ message: "User Updated" });
+            delete result.password;
+            
+            res.status(200).send({ message: "User Updated", user: result });
         } catch (err) {
             if (err == "NOT_FOUND")
                 res.status(404).send({ error: "User ID not found", code: err });

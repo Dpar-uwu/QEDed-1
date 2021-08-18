@@ -159,10 +159,7 @@ $(document).on('click', '#signupBtn', function (event) {
                 withCredentials: true
             },
             success: function (data, textStatus, xhr) {
-                console.log(data)
-                if(data.result.role == "student"){
-                    createGameInfo(data.result._id);
-                }
+                createGameInfo(data.result._id);
                 window.location.href = './login.html';
             },
             error: function (xhr, textStatus, errorThrown) {

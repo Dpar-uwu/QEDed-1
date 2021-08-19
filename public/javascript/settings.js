@@ -1,55 +1,63 @@
 
 //notification ish
 // using $x as the jQuery object for version 1.7.2
+// $(document).ready(function () {
+
+//   let panel = $('#accountPanel'),
+//     button = $('#accountButton');
+
+//   $(button).click(function (e) {
+//     e.preventDefault();
+
+//     $(panel).toggleClass('on');
+
+//     // change ARIA elements based on state
+//     if ($(panel).hasClass('on')) {
+//       $(button).attr('aria-expanded', 'true');
+//       $(panel).attr('aria-hidden', 'false');
+//     } else {
+//       $(button).attr('aria-expanded', 'false');
+//       $(panel).attr('aria-hidden', 'true');
+//     }
+//   });
+
+//   $('.context a').click(function () {
+//     $('.select').removeClass('selected');
+//     $(this).closest('li').find('span').toggleClass('selected');
+//   });
+
+//   $(document).mouseup(function (e) {
+//     // close panel when you click anywhere outside the panel
+
+//     // check for IE9
+//     if (navigator.appVersion.indexOf("MSIE 9.") != -1) {
+
+//       document.onclick = function (e) {
+//         if (e.target.id !== panel) {
+//           panel.style.display = 'none';
+//         }
+//       };
+
+//     } else {
+
+//       if (!$(button).is(e.target) && !panel.is(e.target) && panel.has(e.target).length === 0) {
+//         panel.removeClass('on');
+//       }
+
+//     }
+//   });
+
+// })
+
 $(document).ready(function () {
-
-  let panel = $('#accountPanel'),
-    button = $('#accountButton');
-
-  $(button).click(function (e) {
-    e.preventDefault();
-
-    $(panel).toggleClass('on');
-
-    // change ARIA elements based on state
-    if ($(panel).hasClass('on')) {
-      $(button).attr('aria-expanded', 'true');
-      $(panel).attr('aria-hidden', 'false');
-    } else {
-      $(button).attr('aria-expanded', 'false');
-      $(panel).attr('aria-hidden', 'true');
-    }
+  $(".header").load("rightbar.html", function () {
+    document.getElementById("name").innerHTML = getName();
   });
-
-  $('.context a').click(function () {
-    $('.select').removeClass('selected');
-    $(this).closest('li').find('span').toggleClass('selected');
-  });
-
-  $(document).mouseup(function (e) {
-    // close panel when you click anywhere outside the panel
-
-    // check for IE9
-    if (navigator.appVersion.indexOf("MSIE 9.") != -1) {
-
-      document.onclick = function (e) {
-        if (e.target.id !== panel) {
-          panel.style.display = 'none';
-        }
-      };
-
-    } else {
-
-      if (!$(button).is(e.target) && !panel.is(e.target) && panel.has(e.target).length === 0) {
-        panel.removeClass('on');
-      }
-
-    }
-  });
-
 })
 
-
+function getName() {
+  return JSON.parse(localStorage.getItem('userInfo')).first_name;
+}
 /*
 (function ready(fn) {
   if (document.attachEvent ? document.readyState === 'complete' : document.readyState !== 'loading') {
@@ -109,15 +117,15 @@ $(document).ready(function () {
 
 
 document.getElementById('getval').addEventListener('change', readURL, true);
-function readURL(){
+function readURL() {
   var file = document.getElementById("getval").files[0];
   var reader = new FileReader();
-  reader.onloadend = function(){
-      document.getElementById('profile-upload').style.backgroundImage = "url(" + reader.result + ")";        
+  reader.onloadend = function () {
+    document.getElementById('profile-upload').style.backgroundImage = "url(" + reader.result + ")";
   }
-  if(file){
-      reader.readAsDataURL(file);
-  }else{
+  if (file) {
+    reader.readAsDataURL(file);
+  } else {
   }
 }
 
@@ -129,11 +137,11 @@ jQuery(function ($) {
   $('#edit_btn').click(function () {
     $("#submit_btn").show(0);
     $("#edit_btn").hide(0);
-      $inputs.prop('disabled', false);
+    $inputs.prop('disabled', false);
   });
   $('#submit_btn').click(function () {
-      $inputs.prop('disabled', true);
-       $("#submit_btn").hide(0);
+    $inputs.prop('disabled', true);
+    $("#submit_btn").hide(0);
     $("#edit_btn").show(0);
   });
 })

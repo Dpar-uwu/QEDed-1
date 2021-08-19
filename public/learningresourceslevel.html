@@ -31,7 +31,7 @@
     <!--Javascript-->
     <script src="./javascript/sidebar.js"></script>
     <script src="./javascript/auth.js"></script>
-    <script src="./javascript/overview.js"></script>
+    <!-- <script src="./javascript/overview.js"></script> -->
 
     <!-- End of scripts -->
 
@@ -45,7 +45,14 @@
 
     <!-- Website Title -->
     <title>PSLEOnline | Learning Resources</title>
-
+    <script>
+        $(document).ready(function () {
+        $(".header").load("rightbar.html", function(){
+            document.getElementById("name").innerHTML = getName();
+        });
+        getAssignmentByUser();
+});
+    </script>
 </head>
 
 <body>
@@ -56,6 +63,7 @@
         <div class="row flex-nowrap">
             <div class="sidebar col-auto col-sm-4 col-md-3 col-xl-2 px-0"></div>
             <div class="rightbar col py-3 content">
+                <div class="header p-0" style="background-color: #fff;"></div>
                 <section class="resouces-wrapper">
                     <div class="lrtitle">
                         <h2> Learning Resources </h2>

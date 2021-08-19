@@ -767,6 +767,22 @@ const groupModel = {
                     {
                         $match: match_opt
                     },
+                    { // join to level to get skill name
+                        $lookup: {
+                            from: "levels",
+                            as: "level",
+                            localField: "skill_id",
+                            foreignField: "topics.skills._id"
+                        }
+                    },
+                    { 
+                        $match: { 
+                            level: { $not: {$size: 0} } 
+                        }
+                    },
+                    {
+                        $project: { level: 0}
+                    },
                     {
                         $group: {
                             "_id": {

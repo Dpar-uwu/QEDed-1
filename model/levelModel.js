@@ -121,6 +121,13 @@ const levelModel = {
                 console.log("SUCESS! Result", result);
 
                 const defaultSyllabus = require('../datasheets/syllabus.json');
+                defaultSyllabus._id = ObjectId(defaultSyllabus._id);
+                defaultSyllabus.topics.forEach(topic => {
+                    topic._id = ObjectId(topic._id);
+                    topic.skills.forEach(skill => {
+                        skill._id = ObjectId(skill._id);
+                    });
+                });
                 const newLevels = new Level(defaultSyllabus);
                 const result2 = await newLevels.save();
 

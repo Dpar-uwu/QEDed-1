@@ -29,6 +29,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!--Javascript-->
+    <script src="./javascript/sidebar.js"></script>
     <script src="./javascript/viewpastquiz.js"></script>
 
     <!--CSS-->
@@ -54,26 +55,41 @@
             text-align: center;
         }
 
-        .table td, .table th {
+        .table td,
+        .table th {
             text-align: center;
+        }
+
+        tbody tr:hover {
+            --bs-table-accent-bg: #f5f9ff !important;
+            background-color: #f3f8ff !important;
+            color: #98c5ff !important;
+        }
+        tbody tr:hover .n {
+            border-color: #98c5ff !important;
         }
     </style>
 </head>
 
-<body class="container">
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th scope="col">No.</th>
-                <th scope="col">Question</th>
-                <th scope="col">Attempted Ans</th>
-                <th scope="col">Answer</th>
-                <th scope="col"></th>
-            </tr>
-        </thead>
-        <tbody id="questions">
-        </tbody>
-    </table>
+<body class="container-fluid">
+    <div class="row flex-nowrap">
+        <div class="sidebar col-auto col-sm-4 col-md-3 col-xl-2 px-0"></div>
+        <div class="rightbar col py-3 content">
+            <div class="header"></div>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">No.</th>
+                        <th scope="col">Question</th>
+                        <th scope="col">Attempted Ans</th>
+                        <th scope="col">Answer</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody id="questions">
+                </tbody>
+            </table>
+        </div>
 </body>
 
 </html>

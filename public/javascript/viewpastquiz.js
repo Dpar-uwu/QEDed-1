@@ -3,8 +3,10 @@ let quizId = urlSearchParams.get("quizId");
 var topicName;
 
 $(document).ready(function(){
+    $(".header").load("rightbar.html", function(){
+        document.getElementById("name").innerHTML = getName();
+    });
     getPastQuiz();
-
 })
 
 function getPastQuiz(){

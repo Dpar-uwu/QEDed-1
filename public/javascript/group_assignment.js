@@ -10,7 +10,7 @@ $(document).ready(function () {
 });
 
 // display topic according to selected level
-$(document).on("change", "#level-select", function() {
+$(document).on("change", "#level-select", function () {
     document.querySelector(".topic-input-wrapper").style.display = "block";
     document.querySelector(".skill-input-wrapper").style.display = "none";
     let selectedLvl = this.value;
@@ -18,7 +18,7 @@ $(document).on("change", "#level-select", function() {
 });
 
 // display skill accoording to selected topic
-$(document).on("change", "#topic-select", function() {
+$(document).on("change", "#topic-select", function () {
     document.querySelector(".skill-input-wrapper").style.display = "block";
     let selectedLvl = document.querySelector("#level-select").value;
     let selectedTopic = this.value;
@@ -26,38 +26,38 @@ $(document).on("change", "#topic-select", function() {
 });
 
 // create assignment button
-$(document).on("click", "#btn-create", function() {
+$(document).on("click", "#btn-create", function () {
     createAssignment();
 });
 
 // click on completed assignments dropdown
-$(document).on("click", ".tag-container", function() {
+$(document).on("click", ".tag-container", function () {
     let toggle = document.querySelector("#completed-list");
-    if(toggle.childElementCount >= 1) {
+    if (toggle.childElementCount >= 1) {
         toggle.classList.toggle("visible");
         document.querySelector(".arrow").classList.toggle("rotate");
     }
 })
 
-$(document).on("click", ".assignment", function() {
+$(document).on("click", ".assignment", function () {
     let role = decodeToken().issuedRole;
-    if(role == "student") {
-        if(this.classList.contains("completed")) {
+    if (role == "student") {
+        if (this.classList.contains("completed")) {
             window.location.href = "/viewpastquiz.html?quizId=" + this.dataset.quizId;
         }
         else {
             window.location.href = "/quiz.html?skill=" + this.id + "&assignment=" + this.dataset.assignment;
         }
     }
-    else if(role == "teacher" || role == "parent" || role == "admin") {
+    else if (role == "teacher" || role == "parent" || role == "admin") {
         this.nextElementSibling.classList.toggle("visible");
     }
 });
 
-$(document).on("click", ".member-assign-status", function() {
+$(document).on("click", ".member-assign-status", function () {
     let asgnStatus = this.querySelector(".assignment-status");
     console.log(asgnStatus)
-    if(asgnStatus.classList.contains("complete")) {
+    if (asgnStatus.classList.contains("complete")) {
         window.location.href = "/viewpastquiz.html?quizId=" + asgnStatus.dataset.quizId;
     }
 });
@@ -66,7 +66,7 @@ $(document).on("click", ".member-assign-status", function() {
 function getAssignmentByGrp() {
     let role = decodeToken().issuedRole;
 
-    if(role == "student") {
+    if (role == "student") {
         $.ajax({
             url: `/assignment/group?groupId=${groupId}&userId=${decodeToken().sub}`,
             dataType: 'JSON',
@@ -105,7 +105,8 @@ function checkIfGrpAdmin() {
             },
             error: function (xhr, textStatus, errorThrown) {
                 console.log(errorThrown);
-                reject(errorThrown)            }
+                reject(errorThrown)
+            }
         });
     })
 }
@@ -127,17 +128,17 @@ function getLevelSelect() {
 
 
 function getTopicByLevel(selectedLevel) {
-    let topics = syllabus.find(level=> {
+    let topics = syllabus.find(level => {
         return level._id == selectedLevel;
     });
     populateTopic(topics.topics);
 }
 
 function getSkillByTopic(selectedLevel, selectedSkill) {
-    let topics = syllabus.find(level=> {
+    let topics = syllabus.find(level => {
         return level._id == selectedLevel;
     });
-    let skills = topics.topics.find(topic=> {
+    let skills = topics.topics.find(topic => {
         return topic._id == selectedSkill;
     });
     populateSkill(skills.skills);
@@ -153,23 +154,24 @@ function createAssignment() {
         assigned_by: decodeToken().sub,
         group_id: groupId,
     };
-
-    $.ajax({
-        url: `/assignment`,
-        type: 'POST',
-        data: JSON.stringify(data),
-        dataType: 'JSON',
-        contentType: "application/json",
-        headers: {
-            Authorization: (localStorage.getItem("token") != null) ? "Bearer " +localStorage.getItem("token") : ""
-        },
-        success: function (data, textStatus, xhr) {
-            location.reload();
-        },
-        error: function (xhr, textStatus, errorThrown) {
-            console.log(xhr.responseText)
-            document.querySelector('#error').innerHTML = JSON.parse(xhr.responseText).error;
-        }
+    validateAssignment(data, () => {
+        $.ajax({
+            url: `/assignment`,
+            type: 'POST',
+            data: JSON.stringify(data),
+            dataType: 'JSON',
+            contentType: "application/json",
+            headers: {
+                Authorization: (localStorage.getItem("token") != null) ? "Bearer " + localStorage.getItem("token") : ""
+            },
+            success: function (data, textStatus, xhr) {
+                location.reload();
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.responseText)
+                document.querySelector('#error').innerHTML = JSON.parse(xhr.responseText).error;
+            }
+        });
     });
 }
 
@@ -180,7 +182,7 @@ function createAssignment() {
 async function displayEducatorUI() {
     try {
         let role = await checkIfGrpAdmin();
-        if(role == "admin" || role == "owner") {
+        if (role == "admin" || role == "owner") {
             let content = `
                 <button id="edit-btn" data-bs-toggle="modal" data-bs-target="#assignQuizModal">
                     Assign Quiz
@@ -188,10 +190,10 @@ async function displayEducatorUI() {
             `;
             document.querySelector("#btn-wrapper").innerHTML = content;
         }
-    } catch(err) {
+    } catch (err) {
         window.location.href = "/403.html";
     }
-    
+
 }
 
 function displayGroupName(group_name) {
@@ -206,7 +208,7 @@ function displayAssignments(assignments) {
     let completedAssignment = null;
     assignments.forEach(assignment => {
         // student view
-        if(assignment.completed_quiz == false) {
+        if (assignment.completed_quiz == false) {
             content += `
                 <div class="assignment" id="${assignment.skill_id}" data-assignment="${assignment._id}">
                     <div class="assignment-details">
@@ -218,7 +220,7 @@ function displayAssignments(assignments) {
                 </div>
             `;
         }
-        else if(assignment.completed_quiz) {
+        else if (assignment.completed_quiz) {
             completedAssignment = `
             <div class="assignment completed" id="${assignment.skill_id}" data-assignment="${assignment._id}" data-quiz-id="${assignment.completed_quiz}">
                 <div class="assignment-details">
@@ -230,7 +232,7 @@ function displayAssignments(assignments) {
             </div>
             `;
         }
-        else if(assignment.member_assignment) { //for educator: displays status of each member in the group
+        else if (assignment.member_assignment) { //for educator: displays status of each member in the group
             let fullyCompleted = true;
             let statusContent = "";
             statusContent += `
@@ -241,46 +243,44 @@ function displayAssignments(assignments) {
                     <div>Time Taken</div>
                 </div>
             `;
-            for(let i = 0; i < assignment.member_assignment.length; i++) {
+            for (let i = 0; i < assignment.member_assignment.length; i++) {
                 let status = assignment.member_assignment[i];
                 statusContent += `
-                    <div class="member-assign-status ${status.isCompleted? "link":""}">
+                    <div class="member-assign-status ${status.isCompleted ? "link" : ""}">
                         <div class="member-name">${status.name}</div>
                         
-                        ${status.isCompleted == undefined || status.isCompleted == null ? 
-                            '<div class="status"><span class="assignment-status uncomplete"><i class="fas fa-times-circle"></i> Not Started</span></div>' : ""}
+                        ${status.isCompleted == undefined || status.isCompleted == null ?
+                        '<div class="status"><span class="assignment-status uncomplete"><i class="fas fa-times-circle"></i> Not Started</span></div>' : ""}
 
-                        ${status.isCompleted == false ? 
-                            '<div class="status"><span class="assignment-status ongoing"><i class="fas fa-minus-circle"></i> In Progress<span></div>' : ""}
+                        ${status.isCompleted == false ?
+                        '<div class="status"><span class="assignment-status ongoing"><i class="fas fa-minus-circle"></i> In Progress<span></div>' : ""}
 
-                        ${status.isCompleted == true ? 
-                            `<div class="status"><span class="assignment-status complete" data-quiz-id="${status._id}"><i class="fas fa-check-circle"></i> Completed</span></div>` : ""}
+                        ${status.isCompleted == true ?
+                        `<div class="status"><span class="assignment-status complete" data-quiz-id="${status._id}"><i class="fas fa-check-circle"></i> Completed</span></div>` : ""}
 
                         <div class="score">
-                            ${
-                                status.isCompleted == true?
-                                status.score.total.toFixed(1) + "%" :
-                                ""
-                            }
+                            ${status.isCompleted == true ?
+                        status.score.total.toFixed(1) + "%" :
+                        ""
+                    }
                         </div>
 
                         <div class="time_taken">
-                            ${
-                                status.isCompleted == true?
-                                status.time_taken + "s" :
-                                ""
-                            }
+                            ${status.isCompleted == true ?
+                        status.time_taken + "s" :
+                        ""
+                    }
                         </div>
                     </div>
                 `
                 //display only is members have not fullyCompleted
-                fullyCompleted = fullyCompleted 
-                    && (assignment.member_assignment[i].isCompleted?
-                    assignment.member_assignment[i].isCompleted
-                    : false);
+                fullyCompleted = fullyCompleted
+                    && (assignment.member_assignment[i].isCompleted ?
+                        assignment.member_assignment[i].isCompleted
+                        : false);
 
             }
-            if(!fullyCompleted) {
+            if (!fullyCompleted) {
                 content += `
                     <div class="assignment" id="${assignment.skill_id}" data-assignment="${assignment._id}">
                         <div class="assignment-details">
@@ -312,8 +312,8 @@ function displayAssignments(assignments) {
             }
         }
     });
-    if(content != "") assignmentList.innerHTML = content;
-    if(completedAssignment && completedAssignment != "") {
+    if (content != "") assignmentList.innerHTML = content;
+    if (completedAssignment && completedAssignment != "") {
         completedList.innerHTML = completedAssignment;
         document.querySelector(".completed-number").textContent = completedList.querySelectorAll(".assignment").length;
     }
@@ -367,9 +367,60 @@ function decodeToken() {
 function displayDate(dt) {
     let date = new Date(dt);
     let today = new Date(Date.now());
-    
+
     let result = (date.toDateString() == today.toDateString()) ?
         "Today" :
         date.toDateString()
     return result;
+}
+
+
+// form validation
+function validateAssignment(data, callback) {
+    let err = "";
+    errInput = "";
+
+    if (data.title == "") {
+        errInput = "#title";
+        err += "Please Enter a name for the assignment<br>";
+    }
+    if (data.level_id == "") {
+        errInput == "" ?errInput = "#level-select" : "";
+        err += "Please select the grade/level of the assignment<br>";
+    }
+    if (data.topic_id == "") {
+        errInput == ""? errInput = "#topic-select" : "";
+        err += "Please select the topic of the assignment<br>";
+    }
+    if (data.skill_id == "") {
+        errInput == ""? errInput = "#skill-select" : "";
+        err += "Please select the sub-topic/skill of the assignment<br>";
+    }
+    if (data.deadline == "" || !validDeadline(data.deadline)) {
+        errInput == ""? errInput = "#skill-select" : "";
+        err += "Please enter a deadline that is today or after today<br>";
+    }
+
+
+    if (err == "") {
+        callback();
+    }
+    else {
+        document.querySelector(errInput).focus();
+        document.querySelector("#error").innerHTML = err;
+    }
+
+}
+
+function validDeadline(d) {
+    var now = new Date();
+    var today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+
+    let userEntered = new Date(d);
+    if (userEntered.getTime() < today.getTime())
+        return false;
+    else if (userEntered.getTime() == today.getTime())
+        return true;
+    else
+        return true;
 }

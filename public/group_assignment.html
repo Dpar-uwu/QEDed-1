@@ -70,7 +70,8 @@
                 <div id="noresult">
                     <i class="fas fa-clipboard-check text-center"
                         style="font-size: 100px;color:#ef798a;text-shadow: 4px 4px 0px #98c5ff"></i>
-                    <span class="h5 pt-4 text-center" style="color:#003844">There are currently no assignments for this group.</span>
+                    <span class="h5 pt-4 text-center" style="color:#003844">There are currently no assignments for this
+                        group.</span>
                 </div>
             </div>
 
@@ -99,24 +100,25 @@
                         <div class="mb-3">
                             <label for="level-select" class="col-form-label modal-label">Level</label>
                             <select id="level-select" class="form-select" aria-label="Select a level">
-                                <option value="none" selected disabled hidden>Select A Level</option>
+                                <option value="" selected disabled hidden>Select A Level</option>
                             </select>
                         </div>
                         <div class="topic-input-wrapper mb-3">
                             <label for="topic-select" class="col-form-label modal-label">Topics</label>
                             <select id="topic-select" class="form-select" aria-label="Select a topic">
-                                <option selected disabled hidden>Select A Topic</option>
+                                <option value="" selected disabled hidden>Select A Topic</option>
                             </select>
                         </div>
                         <div class="skill-input-wrapper mb-3">
                             <label for="skill-select" class="col-form-label modal-label">Sub-Topic</label>
                             <select id="skill-select" class="form-select" aria-label="Select a skill">
-                                <option selected disabled hidden>Select A Skill</option>
+                                <option value="" selected disabled hidden>Select A Skill</option>
                             </select>
                         </div>
                         <span id="error"></span>
+                    </form>
                 </div>
-                </form>
+
                 <div class="d-flex justify-content-center pb-4">
                     <!-- <button id="updateGroup" type="button" class="btn">Update</button> -->
                     <button type="button" class="btn btn-cancel" data-bs-toggle="modal" data-bs-target="#delGrpModal"

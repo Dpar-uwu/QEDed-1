@@ -5,6 +5,8 @@ const path = require('path');
 const mongoose = require("mongoose");
 const express = require("express");
 const bodyParser = require("body-parser");
+const exphbs = require('express-handlebars');
+const nodemailer = require("nodemailer");
 
 const userController = require("./userController.js");
 const levelController = require("./levelController.js");
@@ -23,9 +25,16 @@ const gameController = require('./gameController.js');
 // const email = require("../email/email");
 const app = express();
 
+app.engine('handlebars', exphbs());
+app.set('view engine', 'handlebars');
+
 // cookie parser middleware
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
 
 // cors middleware
 const cors = require('cors');
@@ -51,12 +60,9 @@ app.use(express.json({
 }));
 app.use(express.urlencoded({ extended: false }));
 
-app.use(bodyParser.urlencoded({ extended: false}));
-app.use(bodyParser.json());
-
 
 /* host web pages */
-app.use(express.static('public'));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 /* Connect to MondoBD Instance */
 const localurl = isDevelopment ? ("mongodb://localhost:27017/" + process.env.DATABASE_CLUSTER) : process.env.CONNECTION_STRING;
@@ -131,6 +137,12 @@ app.use((_error, _req, res, _next) => {
 app.all("*", (_req, res) => {
     res.status(404).sendFile(path.resolve("public/404.html"))
 });
+
+//render
+app.get('/', (req, res) => {
+    res.render('contact');
+})
+
 
 /**
  * WEBSOCKET
@@ -231,6 +243,10 @@ const socketListener = (server) => {
         })
     });
 };
+
+app.post('/send', (req, res) => {
+    console.log(req.body);
+})
 
 
 // handle unhandledrejection to prevent program from breaking

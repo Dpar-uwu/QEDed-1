@@ -62,7 +62,7 @@ router.get("/progress",
     });
 
 /**
- * GET /assignment/user/:userId  get asg by user id
+ * GET /assignment/user?userId  get asg by user id
  */
 router.get("/user",
     //validate("userId"),

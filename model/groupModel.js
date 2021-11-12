@@ -368,7 +368,7 @@ const groupModel = {
             }
         });
     },
-
+    
 
     // create group with members  DONE
     createGroup: (group_name, owner, members) => {
@@ -511,6 +511,7 @@ const groupModel = {
     },
 
 
+    // get benchmark
     viewGroupBenchmark: (groupId) => {
         return new Promise(async (resolve, reject) => {
             try {

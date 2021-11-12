@@ -141,7 +141,7 @@ router.post("/addMember",
     //validate("benchmark"),
     async (req, res) => {
         const { groupId, userId } = req.query;
-        
+
         try {
             console.time("POST addMember");
             const result = await groupModel.addMember(groupId, userId);
@@ -170,15 +170,15 @@ router.put("/",
         try {
             console.time("PUT update group name");
             const result = await groupModel.updateGroupName(groupId, group_name);
-            res.status(200).send({message: "Group Name Updated"});
+            res.status(200).send({ message: "Group Name Updated" });
         } catch (err) {
             if (err == "NOT_FOUND")
                 res.status(404).send({ error: "Group ID not found", code: err });
-            else 
-            if (err instanceof Error || err instanceof MongoError)
-                res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
             else
-                res.status(500).send({ error: "Error updating group name", code: "UNEXPECTED_ERROR" });
+                if (err instanceof Error || err instanceof MongoError)
+                    res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+                else
+                    res.status(500).send({ error: "Error updating group name", code: "UNEXPECTED_ERROR" });
         } finally {
             console.timeEnd("PUT update group name");
         }
@@ -194,7 +194,7 @@ router.delete("/removeMember",
         try {
             console.time("DELETE removeMember");
             const result = await groupModel.removeMember(groupId, userId);
-            res.status(200).send({message: "Member Deleted"});
+            res.status(200).send({ message: "Member Deleted" });
         } catch (err) {
             // if (err == "NOT_FOUND")
             //     res.status(404).send({ error: "User ID not found", code: err });
@@ -223,11 +223,11 @@ router.put("/makeAdmin",
         } catch (err) {
             if (err == "NOT_FOUND")
                 res.status(404).send({ error: "User or Group ID not found in group", code: err });
-            else 
-            if (err instanceof Error || err instanceof MongoError)
-                res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
             else
-                res.status(500).send({ error: "Error updating group admin", code: "UNEXPECTED_ERROR" });
+                if (err instanceof Error || err instanceof MongoError)
+                    res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+                else
+                    res.status(500).send({ error: "Error updating group admin", code: "UNEXPECTED_ERROR" });
         } finally {
             console.timeEnd("PUT make admin by user id");
         }
@@ -348,6 +348,31 @@ router.post("/leaderboard",
 router.delete("/:groupId",
     //validate("quizId"),
     async (req, res) => {
+        const { groupId, userId } = req.query;
+        try {
+            console.time("PUT dismiss admin by user id");
+            const result = await groupModel.dismissGroupAdmin(groupId, userId);
+
+            res.status(200).send({ message: "Group Updated" });
+        } catch (err) {
+            // if (err == "NOT_FOUND")
+            //     res.status(404).send({ error: "Topic ID not found", code: err });
+            // else 
+            if (err instanceof Error || err instanceof MongoError)
+                res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+            else
+                res.status(500).send({ error: "Error updating group admin", code: "UNEXPECTED_ERROR" });
+        } finally {
+            console.timeEnd("PUT dismiss admin by user id");
+        }
+    });
+
+/**
+* DELETE /group/:groupId - delete grp by id
+*/
+router.delete("/:groupId",
+    //validate("quizId"),
+    async (req, res) => {
         const { groupId } = req.params;
         try {
             console.time("DELETE grp by id");
@@ -367,41 +392,5 @@ router.delete("/:groupId",
             console.timeEnd("DELETE grp by id");
         }
     });
-
-
-// ????
-/**
- * POST /quiz/:groupId - assign quiz by grpid
- */
-router.post("/:groupId",
-    //validate("createTopic"),
-    async (req, res) => {
-        const { groupId } = req.params;
-        const { skill_id, skill_name, topic_name, done_by,
-            score, questions, num_of_qn, percent_difficulty, time_taken,
-            isCompleted, assigned_by, deadline } = req.body;
-        try {
-            console.time("POST quiz by grpid");
-            const result = await groupModel.assignQuizbyGrpId(groupId, {
-                skill_id, skill_name, topic_name, done_by,
-                score, questions, num_of_qn, percent_difficulty, time_taken,
-                isCompleted, assigned_by, deadline
-            });
-
-            res.status(200).send({ new_id: result._id });
-        } catch (err) {
-            // if (err == "NOT_FOUND")
-            //     res.status(404).send({ error: "Level ID not found", code: err });
-            // else 
-            if (err instanceof Error || err instanceof MongoError)
-                res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
-            else
-                res.status(500).send({ error: "Error assigning quiz by grp id", code: "UNEXPECTED_ERROR" });
-        } finally {
-            console.timeEnd("POST quiz by grpid");
-        }
-    });
-
-
 
 module.exports = router;

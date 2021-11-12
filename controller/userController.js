@@ -25,6 +25,9 @@ const { isAuth } = require("../auth/authorization");
 const { MongoError } = require("mongodb");
 const { Error } = require("mongoose");
 
+const nodemailer = require("nodemailer");
+const schedule = require('node-schedule');
+
 /**
  * GET /user - gets all users
  */
@@ -250,6 +253,116 @@ router.post("/refresh_token",
         }
     }
 )
+
+router.post("/sendemail",
+validate("email"),
+async (req, res) => {
+    const { email } = req.body;
+    try {
+        console.time("POST reset password request");
+        
+        const requestPasswordResetService = await tokenPassword.requestPasswordReset(email);
+        res.status(200).send({ message: "Email sent" });
+    }
+    catch (err) {
+        if (err == "NOT_FOUND")
+            res.status(404).send({ error: "Email does not exists", code: "NOT_FOUND" });
+        else if (err instanceof Error || err instanceof MongoError)
+            res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
+        else
+            res.status(500).send({ error: "Error in reset password request", code: "UNEXPECTED_ERROR" });
+    } finally {
+        console.timeEnd("POST reset password request");
+    }
+}
+);
+
+// router.post('/sendemail', (req,res) => {
+//     const { email } = req.body;
+//     const output = `
+//     <p>Hello User, this is your statistics update for the week!</p>
+//     <h3>Quizzes Done</h3>
+//     <h3>Improvements</h3>
+//     <h3>Analytics</h3>
+//     `;
+
+//     let transporter = nodemailer.createTransport({
+//         host: 'mail.hover.com',
+//         port: 465,
+//         secure: true,
+//         auth: {
+//             user: process.env.EMAIL,
+//             pass: process.env.PASS
+//         }
+
+//     });
+
+//     let mailOptions = {
+//         from: `"PSLEOnline" <${process.env.EMAIL}>`,
+//         to: email,
+//         subject: "Your Statistics Update",
+//         html: output
+//     };
+
+//     schedule.scheduleJob('*/2 * * * * *', ()=>{
+//         transporter.sendMail(mailOptions, (error, info) => {
+//             if (error) {
+//                 throw error;
+//             }
+//             else {
+//                 console.log('Message %s sent: %s', info.messageId, info.response);
+//                 resolve('Message %s sent: %s', info.messageId, info.response)
+                
+//                 res.status(200).send({ message: "Email Sent!" });
+//             }
+//         });
+//     });
+// });
+
+router.post('/contact', (req,res) => {
+    const output = `
+    <p>You have a new contact request</p>
+    <h3>Contact Details</h3>
+    <ul>
+        <li>Name : ${req.body.name}</li>
+        <li>Email : ${req.body.email}</li>
+    </ul>
+    <h3>Message</h3>
+    <p>${req.body.message}</p>
+    `;
+
+    let transporter = nodemailer.createTransport({
+        host: 'mail.hover.com',
+        port: 465,
+        secure: true,
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.PASS
+        }
+
+    });
+
+    let mailOptions = {
+        from: `"PSLEOnline" <${process.env.EMAIL}>`,
+        to: "gamergrodd@gmail.com",
+        subject: "PSLEOnline Contact Request",
+        html: output
+    };
+    
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            throw error;
+        }
+        else {
+            console.log('Message %s sent: %s', info.messageId, info.response);
+            resolve('Message %s sent: %s', info.messageId, info.response)
+            
+            res.status(200).send({ message: "Email Sent!" });
+        }
+    });
+    
+});
+
 router.put("/resetPassword",
     validate("resetPassword"),
     async (req, res) => {

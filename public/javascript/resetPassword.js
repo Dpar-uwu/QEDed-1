@@ -15,11 +15,19 @@ $(document).ready(function(){
 
 $(document).on("click", "#forget", function(){
     let email = $('#input').val();
+    console.log("forget 1");
     requestPasswordReset(email);
+})
+
+$(document).on("click", "#send", function(){
+    let email = $('#input').val();
+    console.log("Let's go!");
+    sendEmail(email);
 })
 
 $(document).on("click", "#reset", function(){
     let password = $('#input').val();
+    console.log("forget 2");
     resetPassword(password);
 })
 
@@ -31,7 +39,7 @@ function requestPasswordReset(email){
         data: {"email": email},
         dataType: 'JSON',
         success: function (data, textStatus, xhr) {
-            console.log("success");
+            console.log("success requestPasswordReset");
             document.getElementsByClassName('round')[0].style.display = "none";
             document.body.innerHTML += "<h5>An email has been sent to your account for resetting of password</h5>";
         },
@@ -62,7 +70,7 @@ function resetPassword(password){
         data: data,
         dataType: 'JSON',
         success: function (data, textStatus, xhr) {
-            console.log("success");
+            console.log("success resetPassword");
             document.getElementsByClassName('round')[0].style.display = "none";
             document.body.innerHTML += "<h5>Your password have been successfully updated!</h5><a href='login.html'>Return to Login</a>";
           
@@ -83,6 +91,59 @@ function resetPassword(password){
         }
     });
 }
+
+function sendEmail(email){
+    $.ajax({
+        url: '/user/sendemail',
+        type: "POST",
+        data: {"email": email},
+        dataType: 'JSON',
+        success: function (data, textStatus, xhr) {
+            console.log("success email sent");
+            //document.getElementsByClassName('round')[0].style.display = "none";
+            //document.body.innerHTML += "<h5>An email has been sent to your account for resetting of password</h5>";
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            const err = xhr.responseJSON;
+
+            if(err.code == "INVALID_REQUEST"){
+                document.getElementById("errMessage").innerHTML= err.error[0];
+            }
+            else{
+                document.getElementById("errMessage").innerHTML = err.error;
+            }
+
+            $('#input').focus();
+        }
+    });
+}
+
+function contact(email){
+    $.ajax({
+        url: '/user/contact',
+        type: "POST",
+        data: {"email": email},
+        dataType: 'JSON',
+        success: function (data, textStatus, xhr) {
+            console.log("success email sent");
+            //document.getElementsByClassName('round')[0].style.display = "none";
+            //document.body.innerHTML += "<h5>An email has been sent to your account for resetting of password</h5>";
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            const err = xhr.responseJSON;
+
+            if(err.code == "INVALID_REQUEST"){
+                document.getElementById("errMessage").innerHTML= err.error[0];
+            }
+            else{
+                document.getElementById("errMessage").innerHTML = err.error;
+            }
+
+            $('#input').focus();
+        }
+    });
+}
+
 
 // function tokenExist(){
 //     $.ajax({

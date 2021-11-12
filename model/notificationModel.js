@@ -157,7 +157,6 @@ const notificationModel = {
     // get notification details by notification id 
     // if with assignment redirect to assignment page 
     // if with quiz id, show student progress 
-    // CHG UNREAD TO FALSE
     getNotificationById: (notificationId, user_id) => {
         return new Promise(async (resolve, reject) => {
             try {
@@ -326,7 +325,6 @@ const notificationModel = {
             }
         })
     },
-
     
     /**
      * 

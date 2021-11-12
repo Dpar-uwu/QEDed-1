@@ -37,6 +37,7 @@ const tokenModel = {
         return new Promise(async (resolve, reject) =>{
             try{
                 const user = await User.findOne({ email });
+                console.log("i am user", user);
                 if (!user) throw "NOT_FOUND";
         
                 let token = await Token.findOne({ userId: user._id });
@@ -58,6 +59,8 @@ const tokenModel = {
                 resolve(link);
             }
             catch(err){
+                console.log(err);
+                console.log(err.message);
                 reject(err);
             }
 

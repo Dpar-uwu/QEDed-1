@@ -20,10 +20,10 @@ $(document).on("click", "#forget", function(){
 })
 
 $(document).on("click", "#send", function(){
-    let email = $('#input').val();
-    console.log("Let's go!");
-    sendEmail(email);
+    sendEmail();
 })
+
+//sendEmail();
 
 $(document).on("click", "#reset", function(){
     let password = $('#input').val();
@@ -92,16 +92,12 @@ function resetPassword(password){
     });
 }
 
-function sendEmail(email){
+function sendEmail(){
     $.ajax({
         url: '/user/sendemail',
         type: "POST",
-        data: {"email": email},
-        dataType: 'JSON',
         success: function (data, textStatus, xhr) {
             console.log("success email sent");
-            //document.getElementsByClassName('round')[0].style.display = "none";
-            //document.body.innerHTML += "<h5>An email has been sent to your account for resetting of password</h5>";
         },
         error: function (xhr, textStatus, errorThrown) {
             const err = xhr.responseJSON;

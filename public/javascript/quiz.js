@@ -1,4 +1,8 @@
 var intervalId, countdown, quizData, questionArray = [];
+let subtopicname=""
+
+
+
 
 /* EVENT LISTENER */
 $(document).ready(function () {
@@ -89,8 +93,13 @@ $(document).on("click", ".click", function () {
     let id = this.id;
 
     if (id == "beginBtn") { //Start quiz
+        console.log("checking test")
         questionArray = [];
+        console.log(quizData.topic_name)
+        console.log(quizData)
         funcs[quizData.topic_name].generateQuestion(quizData);
+        console.log(questionArray)
+    
 
         displayQuestion();
     }
@@ -108,12 +117,19 @@ $(document).on("click", ".click", function () {
 
                 return false;
             }
-            //Checking for invalid input
+            
+            //checking if it is algebra quiz
+            if(quizData.topic_name=="Algebra"){
+                isNumber=true;
+            }else{
+                //Checking for invalid input
             if (isNaN($(this).val())) {
                 id = this.id;
                 isNumber = false;
 
                 return false;
+            }
+
             }
         });
 
@@ -130,15 +146,27 @@ $(document).on("click", ".click", function () {
             let result = funcs[quizData.topic_name].markQuiz(quizData, questionArray);
             let user = JSON.parse(localStorage.getItem("userInfo"));
             let status = (result[1].total >= 50) ? 'pass' : 'fail';
+            let status1;
+            let status2;
+            if(result[1].total <= 50){
+                status1="Your score is ";
+                status2="! You can do better!<br>Review your mistakes below and try again!"
+            }else if(result[1].total <= 80){
+                status1="Your score is ";
+                status2="! Good work!<br>Review your mistakes below and try again, aim for perfection!"
+            }else{
+                status1="Congratulations! Your score is ";
+                status2="!<br>Now try more to boost your ranking on the leaderboard!"
+            }
+
+
             //Displaying results
             $('#skillName').remove();
             $('#support').before(
-                `<h2 class="text-center mt-4 mb-2">Congratulations!</h2>
-                <div class="row justify-content-center align-items-center text-center">
+                `<div class="row justify-content-center align-items-center text-center">
                     
                     <div class="col-12 px-3">
-                        <p>You ${status} the ${quizData.skill_name} quiz!</p>
-                        <h6><u>${Math.round(result[1].total)} / 100 </u></h6>
+                    <p>${status1}${Math.round(result[1].total)} / 100${status2}</p>
                     </div>
                     
                     <a class="my-3" href="overview.html"><button class="btn btn-outline-primary">Return back</button></a>
@@ -148,7 +176,8 @@ $(document).on("click", ".click", function () {
             // <i class="col-2 fas fa-glass-cheers fa-4x"></i>
 
             //Creating canvas
-            createCanvas(5, ['Score', 'Time Taken', 'Easy Score', 'Medium Score', 'Hard Score'], "support");
+            subtopicname=quizData.skill_name;
+            createCanvas2(2, ['Score', 'Time Taken'], "support");
 
             //Check if its trial
             if (!window.location.toString().includes("trial")) {
@@ -180,7 +209,7 @@ $(document).on("click", ".click", function () {
             }
             else {
 
-                for (let i = 0; i < 5; i++) {
+                for (let i = 0; i < 2; i++) {
                     displayChart([50, 60, 10], i);
                 }
 
@@ -273,7 +302,8 @@ function submitQuiz(newQuiz) {
             $('.submitBtn').remove();
             $('.returnBtn').remove();
 
-            getDetailedBenchmark("", "support");
+            getDetailedBenchmark4(subtopicname, "support");
+            createCanvas2(2, ['Score', 'Time Taken'], "support");
 
             let container = document.getElementById("support");
 
@@ -404,6 +434,7 @@ function after(path, data) {
         displayCard(notes, vname);
     }
     else {
+       
         $("body").html(
             `<div class="row justify-content-center m-2">
                 <div  class="d-flex justify-content-center">
@@ -425,7 +456,15 @@ function after(path, data) {
                             </div>
                         </div>
                     </div>
-                </div>`);
+                </div>
+                <script>
+                var mathFieldSpan = document.getElementById('math-field');
+                var MQ = MathQuill.getInterface(2); 
+                MQ.MathField(mathFieldSpan);</script>
+
+                
+                
+                `);
         quizData = data;
     }
 }
@@ -527,6 +566,7 @@ const fraction = {
         }
         else {
             return fraction.getGCD(b, a % b);
+           
         }
     },
     add: (array) => {
@@ -557,6 +597,7 @@ const fraction = {
 
         return result;
     },
+
     sort: (array) => {
         let sorted = {};
         const alphabets = ["a", "b", "c", "d"];
@@ -582,6 +623,7 @@ const fraction = {
 
         return dupes;
     },
+
     stringQuestion: (question) => {
         let result = question.a + "/" + question.b;
 
@@ -800,8 +842,1542 @@ const fraction = {
     }
 }
 
+//Decimal
+const decimal={
+    stringQuestion: (question) => {
+        let result
+
+       
+
+        if(quizData.skill_code == 'DECIMAL_ROUNDING_OFF'){
+            result=question.qn
+        }else if(quizData.skill_code == 'DECIMAL_ADDITION_SUBTRACTION'){
+            if(question.type=="hard"){
+                result=question.qnA + "-" +question.qnB
+            }else{
+                result=question.qnA + "+" +question.qnB
+            }
+        }else if(quizData.skill_code == 'DECIMAL_MULTIPLICATION'){
+            result=question.qnA + "x" +question.qnB
+        }else if(quizData.skill_code == 'DECIMAL_DIVISION'){
+            result=question.qnA + "÷" +question.qnB
+        }
+
+        return result;
+    },
+    stringAnswer: (answer) => {
+        let result;
+
+        if ('ansA' in answer) {
+            ('ans' in answer) ? result = answer.ans + " " + answer.ansA + "/" + answer.ansB : result = answer.ansA + "/" + answer.ansB;
+        }
+        else {
+            result = answer.ans;
+        }
+
+        return result;
+    },
+    generateQuestion: (quizData) => {
+        //output 0: {a: 6, b: 2, ans: 3}
+        const numOfQ = quizData.num_of_qn;
+        const percentDifficulty = quizData.percent_difficulty.split("-");
+        const numOfEasy = numOfQ * (percentDifficulty[0] / 100);
+        const numOfMedium = numOfQ * (percentDifficulty[1] / 100);
+        const numOfHard = numOfQ * (percentDifficulty[2] / 100);
+        
+
+        if(quizData.skill_code=="DECIMAL_ROUNDING_OFF"){
+        for(var i=0;i<numOfEasy;i++){
+            const randomDecimal=parseFloat(((Math.random() * quizData.easy_values.max) + quizData.easy_values.min).toFixed(7))
+            const ansDecimal=Math.round(randomDecimal * 1) / 1
+            let decimalQn={qn:randomDecimal,ans:ansDecimal,type:"easy"}
+            questionArray.push(decimalQn)
+        }
+
+        for(var i=0;i<numOfMedium;i++){
+            const randomDecimal=parseFloat(((Math.random() * quizData.medium_values.max) + quizData.medium_values.min).toFixed(7))
+            const ansDecimal=Math.round(randomDecimal * 10) / 10
+            let decimalQn={qn:randomDecimal,ans:ansDecimal,type:"medium"}
+            questionArray.push(decimalQn)
+        }
+        //difficult_values
+        for(var i=0;i<numOfHard;i++){
+            const randomDecimal=parseFloat(((Math.random() * quizData.difficult_values.max) + quizData.difficult_values.min).toFixed(7))
+            const ansDecimal=Math.round(randomDecimal * 100) / 100
+            let decimalQn={qn:randomDecimal,ans:ansDecimal,type:"hard"}
+             questionArray.push(decimalQn)
+        }
+        }else if(quizData.skill_code=="DECIMAL_ADDITION_SUBTRACTION"){
+            for(var i=0;i<numOfEasy;i++){
+                const randomDecimal1=parseFloat(((Math.random() * quizData.easy_values.max) + quizData.easy_values.min).toFixed(1))
+                const randomDecimal2=parseFloat(((Math.random() * quizData.easy_values.max) + quizData.easy_values.min).toFixed(1))
+                const ansDecimal=(randomDecimal1+randomDecimal2).toFixed(1)
+                let decimalQn={qnA:randomDecimal1,qnB:randomDecimal2,ans:ansDecimal,type:"easy"}
+                questionArray.push(decimalQn)
+            }
+    
+            for(var i=0;i<numOfMedium;i++){
+                const randomDecimal1=parseFloat(((Math.random() * quizData.medium_values.max) + quizData.medium_values.min).toFixed(2))
+                const randomDecimal2=parseFloat(((Math.random() * quizData.medium_values.max) + quizData.medium_values.min).toFixed(2))
+                const ansDecimal=(randomDecimal1+randomDecimal2).toFixed(2)
+                let decimalQn={qnA:randomDecimal1,qnB:randomDecimal2,ans:ansDecimal,type:"medium"}
+                questionArray.push(decimalQn)
+            }
+            //difficult_values
+            for(var i=0;i<numOfHard;i++){
+                const randomDecimal1=parseFloat(((Math.random() * quizData.difficult_values.max) + quizData.difficult_values.min).toFixed(2))
+                const randomDecimal2=parseFloat(((Math.random() * quizData.difficult_values.max) + quizData.difficult_values.min).toFixed(2))
+                let bigNum=0;
+                let smallNum=0;
+                if(randomDecimal1>randomDecimal2){
+                    bigNum=randomDecimal1;
+                    smallNum=randomDecimal2;
+                }else{
+                    bigNum=randomDecimal2;
+                    smallNum=randomDecimal1;
+                }
+                const ansDecimal=(bigNum-smallNum).toFixed(2)
+                let decimalQn={qnA:bigNum,qnB:smallNum,ans:ansDecimal,type:"hard"}
+                 questionArray.push(decimalQn)
+            }
+
+        }else if(quizData.skill_code=="DECIMAL_MULTIPLICATION"){
+            
+            for(var i=0;i<numOfEasy;i++){
+                const randomDecimal1=parseFloat(((Math.random() * quizData.easy_values.max) + quizData.easy_values.min).toFixed(1))
+                const randomDecimal2=parseFloat((Math.floor(Math.random() * quizData.easy_values.max) + quizData.easy_values.min).toFixed(1))
+                const ansDecimal=(randomDecimal1*randomDecimal2).toFixed(1)
+                let decimalQn={qnA:randomDecimal1,qnB:randomDecimal2,ans:ansDecimal,type:"easy"}
+                questionArray.push(decimalQn)
+            }
+    
+            for(var i=0;i<numOfMedium;i++){
+                const randomDecimal1=parseFloat(((Math.random() * quizData.medium_values.max) + quizData.medium_values.min).toFixed(2))
+                const randomDecimal2=parseFloat((Math.floor(Math.random() * quizData.medium_values.max) + quizData.medium_values.min).toFixed(2))
+                const ansDecimal=(randomDecimal1*randomDecimal2).toFixed(2)
+                let decimalQn={qnA:randomDecimal1,qnB:randomDecimal2,ans:ansDecimal,type:"medium"}
+                questionArray.push(decimalQn)
+            }
+            for(var i=0;i<numOfHard;i++){
+                const randomDecimal1=parseFloat(((Math.random() * quizData.difficult_values.max) + quizData.difficult_values.min).toFixed(3))
+                const randomDecimal2=parseFloat((Math.floor(Math.random() * quizData.difficult_values.max) + quizData.difficult_values.min).toFixed(3))
+                const ansDecimal=(randomDecimal1*randomDecimal2).toFixed(3)
+                let decimalQn={qnA:randomDecimal1,qnB:randomDecimal2,ans:ansDecimal,type:"hard"}
+                questionArray.push(decimalQn)
+            }
+
+        }else if(quizData.skill_code=="DECIMAL_DIVISION"){
+            for(var i=0;i<numOfEasy;i++){
+                const randomDecimal1=parseFloat(((Math.random() * quizData.easy_values.max) + quizData.easy_values.min).toFixed(1))
+                const randomDecimal2=parseFloat((Math.floor(Math.random() * quizData.easy_values.max) + quizData.easy_values.min).toFixed(1))
+                const ansDecimal=(randomDecimal1/randomDecimal2).toFixed(1)
+                let decimalQn={qnA:randomDecimal1,qnB:randomDecimal2,ans:ansDecimal,type:"easy"}
+                questionArray.push(decimalQn)
+            }
+    
+            for(var i=0;i<numOfMedium;i++){
+                const randomDecimal1=parseFloat(((Math.random() * quizData.medium_values.max) + quizData.medium_values.min).toFixed(2))
+                const randomDecimal2=parseFloat((Math.floor(Math.random() * quizData.medium_values.max) + quizData.medium_values.min).toFixed(2))
+                const ansDecimal=(randomDecimal1/randomDecimal2).toFixed(2)
+                let decimalQn={qnA:randomDecimal1,qnB:randomDecimal2,ans:ansDecimal,type:"medium"}
+                questionArray.push(decimalQn)
+            }
+            for(var i=0;i<numOfHard;i++){
+                const randomDecimal1=parseFloat(((Math.random() * quizData.difficult_values.max) + quizData.difficult_values.min).toFixed(3))
+                const randomDecimal2=parseFloat((Math.floor(Math.random() * quizData.difficult_values.max) + quizData.difficult_values.min).toFixed(3))
+                const ansDecimal=(randomDecimal1/randomDecimal2).toFixed(3)
+                let decimalQn={qnA:randomDecimal1,qnB:randomDecimal2,ans:ansDecimal,type:"hard"}
+                questionArray.push(decimalQn)
+            }
+
+        }
+
+
+
+        
+
+},
+arrangeQuestion:()=>{
+
+    let content = "";
+    let questionLine="";
+    let questionLine2="";
+    if(quizData.skill_code=="DECIMAL_ROUNDING_OFF"){
+    for (let i = 0; i < questionArray.length; i++) {
+        content += `<div class="row col-9 justify-content-center align-items-center text-center m-auto mb-5"><div class="small col-md-2">Question ${i + 1}</div>`;
+        if(questionArray[i].type=="easy"){
+            questionLine="the nearest whole number"
+        }else if(questionArray[i].type=="medium"){
+            questionLine="the 1 decimal place"
+        }else if(questionArray[i].type=="hard"){
+            questionLine="the 2 decimal place"  
+        }
+        content +=`<div class="row col-md-6 align-items-center">Round off `+questionArray[i].qn+` to `+questionLine+`</div><br><br> <div align-items-center>Answer: <input class="text-center" size = "1" id='input${i}'></div>`
+
+        content += `<div class='col-md-2 reviewClass'><span id='review${i}'></span></div></div>`;
+    }
+}else if(quizData.skill_code=="DECIMAL_ADDITION_SUBTRACTION"){
+    for (let i = 0; i < questionArray.length; i++) {
+        content += `<div class="row col-9 justify-content-center align-items-center text-center m-auto mb-5"><div class="small col-md-2">Question ${i + 1}</div>`;
+        if(questionArray[i].type=="easy"){
+            questionLine="1 decimal place"
+            questionLine2="+"
+        }else if(questionArray[i].type=="medium"){
+            questionLine="2 decimal place"
+            questionLine2="+"
+        }else if(questionArray[i].type=="hard"){
+            questionLine="2 decimal place"  
+            questionLine2="-"
+        }
+        content +=`<div class="row col-md-8 align-items-center">Evaluate `+questionArray[i].qnA+" "+questionLine2+" "+questionArray[i].qnB+`. Enter the answer in `+questionLine+`.</div><br><br> <div align-items-center>Answer: <input class="text-center" size = "1" id='input${i}'></div>`
+
+        content += `<div class='col-md-2 reviewClass'><span id='review${i}'></span></div></div>`;
+    }
+}else if(quizData.skill_code=="DECIMAL_MULTIPLICATION"||quizData.skill_code=="DECIMAL_DIVISION"){
+    for (let i = 0; i < questionArray.length; i++) {
+        content += `<div class="row col-9 justify-content-center align-items-center text-center m-auto mb-5"><div class="small col-md-2">Question ${i + 1}</div>`;
+        if(questionArray[i].type=="easy"){
+            questionLine="1 decimal place"
+        }else if(questionArray[i].type=="medium"){
+            questionLine="2 decimal place"
+        }else if(questionArray[i].type=="hard"){
+            questionLine="3 decimal place"  
+        }
+        if(quizData.skill_code=="DECIMAL_MULTIPLICATION"){
+            questionLine2="x"
+        }else if(quizData.skill_code=="DECIMAL_DIVISION"){
+            questionLine2="÷"
+        }
+        content +=`<div class="row col-md-8 align-items-center">Evaluate `+questionArray[i].qnA+" "+questionLine2+" "+questionArray[i].qnB+`. Enter the answer in `+questionLine+`.</div><br><br> <div align-items-center>Answer: <input class="text-center" size = "1" id='input${i}'></div>`
+
+        content += `<div class='col-md-2 reviewClass'><span id='review${i}'></span></div></div>`;
+    }
+
+}
+    return content;
+
+
+},
+markQuiz: () => {
+    let score
+    let easy = 0;
+    let medium = 0;
+    let difficult = 0;
+    let questions = [];
+
+    const numOfQ = quizData.num_of_qn, percentDifficulty = quizData.percent_difficulty.split("-");
+    const numOfEasy = numOfQ * (percentDifficulty[0] / 100);
+    const numOfMedium = numOfQ * (percentDifficulty[1] / 100);
+    const numOfDifficult = numOfQ * (percentDifficulty[2] / 100);
+
+    for (let i = 0; i < numOfQ; i++) {
+        let review = '<i class="fas fa-check"></i>';
+        let difficulty = 'difficult';
+        let isCorrect = false;
+        let studentAns = {};
+
+        let input = ('ans' in questionArray[i]) ? $(`#input${i}`).val() : undefined;
+        let inputA = ('ansA' in questionArray[i]) ? $(`#inputA${i}`).val() : undefined;
+        let inputB = ('ansB' in questionArray[i]) ? $(`#inputB${i}`).val() : undefined;
+
+        if (input != undefined) studentAns['ans'] = input;
+        if (inputA != undefined) studentAns['ansA'] = inputA;
+        if (inputB != undefined) studentAns['ansB'] = inputB;
+
+        $(".reviewClass").css("display", "block");
+
+        if (inputA == questionArray[i].ansA && inputB == questionArray[i].ansB && input == questionArray[i].ans) {
+            if (i < numOfEasy) {
+                difficulty = 'easy';
+                easy++;
+            }
+            else if (i < numOfEasy + numOfMedium) {
+                difficulty = 'medium';
+                medium++;
+            }
+            else {
+                difficult++;
+            }
+            isCorrect = true;
+        }
+        else {
+            review = '<i class="fas fa-times"></i>  Ans: ';
+
+            if ('ans' in questionArray[i]) review += `${questionArray[i].ans}`;
+            if ('ansA' in questionArray[i]) review += `<sup>${questionArray[i].ansA}</sup>&frasl;<sub>${questionArray[i].ansB}</sub>`;
+        }
+        document.getElementById(`review${i}`).innerHTML = review;
+
+        questions.push({
+            "skill_id": quizData.skillId,
+            "question_number": i + 1,
+            "question": decimal.stringQuestion(questionArray[i]),
+            "answer": decimal.stringAnswer(studentAns),
+            "correct_answer": decimal.stringAnswer(questionArray[i]),
+            "isCorrect": isCorrect,
+            "difficulty": difficulty
+        });
+    }
+
+    score = {
+        "easy": (easy / numOfEasy) * 100,
+        "medium": (medium / numOfMedium) * 100,
+        "difficult": (difficult / numOfDifficult) * 100,
+    }
+    score["total"] = ((score.easy / 100) * numOfEasy + (score.medium / 100) * numOfMedium + (score.difficult / 100) * numOfDifficult) / numOfQ * 100;
+
+    let points = easy * 5 + medium * 10 + difficult * 15;
+    return [questions, score, points];
+}
+
+}
+const algebra={
+   gcd:(number1,number2)=>{
+       if(number2==0){
+           return number1;
+       }else{
+           var remainder=number1%number2;
+           return algebra.gcd(number2, remainder);
+       }
+
+   },
+    stringQuestion: (question) => {
+        let result
+
+       
+
+        if(quizData.skill_code == 'ALGEBRA_ADDITION'||quizData.skill_code=="ALGEBRA_MULTIPLICATION"||quizData.skill_code=="ALGEBRA_DIVISION"||quizData.skill_code=="ALGEBRA_EXPANSION"){
+            result=question.qn
+        }
+
+        return result;
+    },
+    stringAnswer: (answer) => {
+        let result;
+
+        if ('ansA' in answer) {
+            ('ans' in answer) ? result = answer.ans + " " + answer.ansA + "/" + answer.ansB : result = answer.ansA + "/" + answer.ansB;
+        }
+        else {
+            result = answer.ans;
+        }
+
+        return result;
+    },
+    generateQuestion: (quizData) => {
+        //output 0: {a: 6, b: 2, ans: 3}
+        const numOfQ = quizData.num_of_qn;
+        const percentDifficulty = quizData.percent_difficulty.split("-");
+        const numOfEasy = numOfQ * (percentDifficulty[0] / 100);
+        const numOfMedium = numOfQ * (percentDifficulty[1] / 100);
+        const numOfHard = numOfQ * (percentDifficulty[2] / 100);
+
+      
+        
+
+        if(quizData.skill_code=="ALGEBRA_ADDITION"){
+        for(var i=0;i<numOfEasy;i++){
+            var alphabet = "";
+            var possible = "abcdefghijklmnopqrstuvwxyz";
+            alphabet += possible.charAt(Math.floor(Math.random() * possible.length));
+
+            const firstNumber=parseFloat(((Math.random() * quizData.easy_values.max) + quizData.easy_values.min).toFixed(0))
+            const secondNumber=parseFloat(((Math.random() * quizData.easy_values.max) + quizData.easy_values.min).toFixed(0))
+            const qnTerms=firstNumber+alphabet+"+"+secondNumber+alphabet
+            const ansNumber=firstNumber+secondNumber
+            const ansTerm=ansNumber+alphabet
+            let algebraQn={qn:qnTerms,ans:ansTerm,type:"easy"}
+            questionArray.push(algebraQn)
+        }
+
+        for(var i=0;i<numOfMedium;i++){
+            var alphabet = "";
+            var possible = "abcdefghijklmnopqrstuvwxyz";
+            alphabet += possible.charAt(Math.floor(Math.random() * possible.length));
+
+             const firstNumber=parseFloat(((Math.random() * quizData.medium_values.max) + quizData.medium_values.min).toFixed(0))
+            const secondNumber=parseFloat(((Math.random() * quizData.medium_values.max) + quizData.medium_values.min).toFixed(0))
+            const thirdNumber=parseFloat(((Math.random() * quizData.medium_values.max) + quizData.medium_values.min).toFixed(0))
+
+            const qnTerms=firstNumber+alphabet+"+"+secondNumber+alphabet+"+"+thirdNumber+alphabet
+            const ansNumber=firstNumber+secondNumber+thirdNumber
+            const ansTerm=ansNumber+alphabet
+
+            let algebraQn={qn:qnTerms,ans:ansTerm,type:"medium"}
+            questionArray.push(algebraQn)
+        }
+        //difficult_values
+        for(var i=0;i<numOfHard;i++){
+            var alphabet1 = "";
+            var alphabet2="";
+            var possible = "abcdefghijklmnopqrstuvwxyz";
+            alphabet1 += possible.charAt(Math.floor(Math.random() * possible.length));
+            var possible2=possible.replace(alphabet1,'');
+            alphabet2 += possible2.charAt(Math.floor(Math.random() * possible2.length));
+
+            const firstNumber=parseFloat(((Math.random() * quizData.difficult_values.max) + quizData.difficult_values.min).toFixed(0))
+            const secondNumber=parseFloat(((Math.random() * quizData.difficult_values.max) + quizData.difficult_values.min).toFixed(0))
+            const thirdNumber=parseFloat(((Math.random() * quizData.difficult_values.max) + quizData.difficult_values.min).toFixed(0))
+
+            const patternNumber=Math.floor((Math.random() * 3) + 1)
+            if(patternNumber==1){
+                console.log("1")
+                const qnTerms=firstNumber+alphabet1+"+"+secondNumber+alphabet1+"+"+thirdNumber+alphabet2
+                const ansNumber=firstNumber+secondNumber
+                const ansTerm=ansNumber+alphabet1+"+"+thirdNumber+alphabet2
+                const ansTerm2=thirdNumber+alphabet2+"+"+ansNumber+alphabet1
+                let algebraQn={qn:qnTerms,ans:ansTerm,ans2:ansTerm2,type:"hard"}
+                questionArray.push(algebraQn)
+            }else if(patternNumber==2){
+                console.log("2")
+                const qnTerms=firstNumber+alphabet1+"+"+secondNumber+alphabet2+"+"+thirdNumber+alphabet2
+                const ansNumber=secondNumber+thirdNumber
+                const ansTerm=firstNumber+alphabet1+"+"+ansNumber+alphabet2
+                const ansTerm2=ansNumber+alphabet2+"+"+firstNumber+alphabet1
+                let algebraQn={qn:qnTerms,ans:ansTerm,ans2:ansTerm2,type:"hard"}
+                questionArray.push(algebraQn)
+            }else if(patternNumber==3){
+                console.log("3")
+                const qnTerms=firstNumber+alphabet1+"+"+secondNumber+alphabet2+"+"+thirdNumber+alphabet1
+                const ansNumber=firstNumber+thirdNumber
+                const ansTerm=secondNumber+alphabet2+"+"+ansNumber+alphabet1
+                const ansTerm2=ansNumber+alphabet1+"+"+secondNumber+alphabet2
+                let algebraQn={qn:qnTerms,ans:ansTerm,ans2:ansTerm2,type:"hardv2"}
+                questionArray.push(algebraQn)
+
+            }
+
+            
+            
+        }
+        }else if(quizData.skill_code=="ALGEBRA_MULTIPLICATION"){
+            for(var i=0;i<numOfEasy;i++){
+                var alphabet = "";
+                var possible = "abcdefghijklmnopqrstuvwxyz";
+                alphabet += possible.charAt(Math.floor(Math.random() * possible.length));
+    
+
+                
+                let firstNumber=Math.floor((Math.random() * ((quizData.easy_values.max*2)+1)) + quizData.easy_values.min);
+                let secondNumber=Math.floor((Math.random() * ((quizData.easy_values.max*2)+1)) + quizData.easy_values.min);
+                let firstpower=Math.floor(Math.random() * 9) + 1;
+                let secondpower=Math.floor(Math.random() * 9) + 1;
+
+                if(firstNumber==0){
+                    firstNumber=2
+                }
+                if(firstNumber==1){
+                    firstNumber=3
+                }
+
+                if(secondNumber==0){
+                    secondNumber=2
+                }
+                if(secondNumber==1){
+                    secondNumber=3
+                }
+
+
+
+                const qnTerms=firstNumber+alphabet+"^"+firstpower+"."+secondNumber+alphabet+"^"+secondpower
+                let ansTerm;
+                if((firstpower+secondpower)==0){
+                    ansTerm=(firstNumber*secondNumber)
+                }else if((firstpower+secondpower)==1){
+                    ansTerm=(firstNumber*secondNumber)+alphabet
+                }else{
+                   ansTerm=(firstNumber*secondNumber)+alphabet+"^"+(firstpower+secondpower)
+                }
+                let algebraQn={qn:qnTerms,ans:ansTerm,type:"easy"}
+                questionArray.push(algebraQn)
+            }
+            for(var i=0;i<numOfMedium;i++){
+                var alphabet = "";
+                var possible = "abcdefghijklmnopqrstuvwxyz";
+                alphabet += possible.charAt(Math.floor(Math.random() * possible.length));
+    
+                let firstNumber=Math.floor((Math.random() * ((quizData.medium_values.max*2)+1)) + quizData.medium_values.min);
+                let secondNumber=Math.floor((Math.random() * ((quizData.medium_values.max*2)+1)) + quizData.medium_values.min);
+                let firstpower=Math.floor((Math.random() * ((9*2)+1)) + (-9));
+                let secondpower=Math.floor((Math.random() * ((9*2)+1)) + (-9));
+
+                if(firstNumber==0){
+                    firstNumber=2
+                }
+                if(firstNumber==1){
+                    firstNumber=3
+                }
+
+                if(secondNumber==0){
+                    secondNumber=2
+                }
+                if(secondNumber==1){
+                    secondNumber=3
+                }
+
+                if(firstpower==0){
+                    firstpower=2
+                }
+                if(firstpower==1){
+                    firstpower=3
+                }
+
+                if(secondpower==0){
+                    secondpower=2
+                }
+                if(secondpower==1){
+                    secondpower=3
+                }
+
+               
+
+
+                const qnTerms=firstNumber+alphabet+"^"+firstpower+"."+secondNumber+alphabet+"^"+secondpower;
+                let ansTerm;
+                if((firstpower+secondpower)==0){
+                    ansTerm=(firstNumber*secondNumber)
+                }else if((firstpower+secondpower)==1){
+                    ansTerm=(firstNumber*secondNumber)+alphabet
+                }else{
+                   ansTerm=(firstNumber*secondNumber)+alphabet+"^"+(firstpower+secondpower)
+                }
+                
+    
+                let algebraQn={qn:qnTerms,ans:ansTerm,type:"medium"}
+                questionArray.push(algebraQn)
+            }
+            for(var i=0;i<numOfHard;i++){
+                var alphabet1 = "";
+                var alphabet2="";
+                var possible = "abcdefghijklmnopqrstuvwxyz";
+                alphabet1 += possible.charAt(Math.floor(Math.random() * possible.length));
+                var possible2=possible.replace(alphabet1,'');
+                alphabet2 += possible2.charAt(Math.floor(Math.random() * possible2.length));
+    
+                let firstNumber=Math.floor((Math.random() * ((quizData.difficult_values.max*2)+1)) + quizData.difficult_values.min);
+                let secondNumber=Math.floor((Math.random() * ((quizData.difficult_values.max*2)+1)) + quizData.difficult_values.min);
+                let firstpower=Math.floor((Math.random() * ((9*2)+1)) + (-9));
+                let secondpower=Math.floor((Math.random() * ((9*2)+1)) + (-9));
+                let thirdpower=Math.floor((Math.random() * ((9*2)+1)) + (-9));
+
+                if(firstNumber==0){
+                    firstNumber=2
+                }
+                if(firstNumber==1){
+                    firstNumber=3
+                }
+
+                if(secondNumber==0){
+                    secondNumber=2
+                }
+                if(secondNumber==1){
+                    secondNumber=3
+                }
+
+                if(firstpower==0){
+                    firstpower=2
+                }
+                if(firstpower==1){
+                    firstpower=3
+                }
+
+                if(secondpower==0){
+                    secondpower=2
+                }
+                if(secondpower==1){
+                    secondpower=3
+                }
+
+                if(thirdpower==0){
+                    thirdpower=2
+                }
+                if(thirdpower==1){
+                    thirdpower=3
+                }
+                
+
+
+                const qnTerms=firstNumber+alphabet1+"^"+firstpower+"."+secondNumber+alphabet2+"^"+secondpower+"."+alphabet2+"^"+thirdpower;
+                let ansTerm;
+                let ansTerm2;
+                if((secondpower+thirdpower)==0){
+                    ansTerm=(firstNumber*secondNumber)+alphabet1+"^"+firstpower
+                }else if((secondpower+thirdpower)==1){
+                    ansTerm=(firstNumber*secondNumber)+alphabet1+"^"+firstpower+"."+alphabet2
+                    ansTerm2=(firstNumber*secondNumber)+alphabet2+"."+alphabet1+"^"+firstpower
+
+                }else{
+                   ansTerm=(firstNumber*secondNumber)+alphabet1+"^"+firstpower+"."+alphabet2+"^"+(secondpower+thirdpower)
+                   ansTerm2=(firstNumber*secondNumber)+alphabet2+"^"+(secondpower+thirdpower)+"."+alphabet1+"^"+firstpower
+                }
+
+                let algebraQn={qn:qnTerms,ans:ansTerm,ans2:ansTerm2,type:"hardv2"}
+                questionArray.push(algebraQn)
+
+
+
+               
+
+               
+    
+                
+                
+            }
+        }else if(quizData.skill_code=="ALGEBRA_DIVISION"){
+            for(var i=0;i<numOfEasy;i++){
+                var alphabet = "";
+                var possible = "abcdefghijklmnopqrstuvwxyz";
+                alphabet += possible.charAt(Math.floor(Math.random() * possible.length));
+
+                let firstNumberqn=Math.floor(Math.random() * ((quizData.easy_values.max)) + quizData.easy_values.min);
+                let secondNumberqn=Math.floor(Math.random() * ((quizData.easy_values.max)) + quizData.easy_values.min);
+                let firstpower=Math.floor(Math.random() * 9)+1;
+                let secondpower=Math.floor(Math.random() * 9)+1;
+
+                let firstNumberans;
+                let secondNumberans;
+                let firstpowerans;
+                let secondpowerans;
+
+                let firstNumber=firstNumberqn;
+                let secondNumber=secondNumberqn;
+
+
+                let HCF=algebra.gcd(firstNumber,secondNumber);
+                
+
+                if(firstpower>secondpower){
+                    firstpowerans=alphabet+"^"+(firstpower-secondpower);
+                    secondpowerans="";
+                }else if(secondpower>firstpower){
+                    secondpowerans=alphabet+"^"+(secondpower-firstpower);
+                    firstpowerans="";
+                }else if(firstpower==secondpower){
+                    firstpowerans="";
+                    secondpowerans=""
+                }
+
+                firstNumberans=(firstNumber/HCF);
+                secondNumberans=(secondNumber/HCF);
+                
+
+                let qnTerms1=firstNumber+alphabet+"^"+firstpower;
+                let qnTerms2=secondNumber+alphabet+"^"+secondpower;
+
+                let ansTerm1=firstNumberans+firstpowerans;
+                let ansTerm2=secondNumberans+secondpowerans;
+
+                qnTerms1=qnTerms1.replace('^1','')
+                qnTerms2=qnTerms2.replace('^1','')
+                ansTerm1=ansTerm1.replace('^1','')
+                ansTerm2=ansTerm2.replace('^1','')
+
+                qnTerms1=qnTerms1.replace('1'+alphabet,alphabet)
+                qnTerms2=qnTerms2.replace('1'+alphabet,alphabet)
+                ansTerm1=ansTerm1.replace('1'+alphabet,alphabet)
+                ansTerm2=ansTerm2.replace('1'+alphabet,alphabet)
+                let algebraQn
+                if(ansTerm2==1){
+                algebraQn={qn:qnTerms1+"/"+qnTerms2,ans:ansTerm1,type:"easy"}
+                }else{
+                    algebraQn={qn:qnTerms1+"/"+qnTerms2,ans:ansTerm1+"/"+ansTerm2,type:"easy"}  
+                }
+            
+                questionArray.push(algebraQn)
+    
+            }
+            for(var i=0;i<numOfMedium;i++){
+                var alphabet = "";
+                var possible = "abcdefghijklmnopqrstuvwxyz";
+                alphabet += possible.charAt(Math.floor(Math.random() * possible.length));
+
+                let firstNumberqn=Math.floor((Math.random() * ((quizData.medium_values.max*2)+1)) + quizData.medium_values.min);
+                let secondNumberqn=Math.floor((Math.random() * ((quizData.medium_values.max*2)+1)) + quizData.medium_values.min);
+                let firstpower=Math.floor((Math.random() * ((9*2)+1)) + (-9));
+                let secondpower=Math.floor((Math.random() * ((9*2)+1)) + (-9));
+
+                let firstNumberans;
+                let secondNumberans;
+                let firstpowerans;
+                let secondpowerans;
+
+                let firstNumber=firstNumberqn;
+                let secondNumber=secondNumberqn;
+
+                let firstNegativenumber;
+                let secondNegativenumber;
+
+                if(firstNumber==0){
+                    firstNumber=2
+                }
+
+                if(secondNumber==0){
+                    secondNumber=2
+                }
+
+                if(firstpower==0){
+                    firstpower=2
+                }
+
+                if(secondpower==0){
+                    secondpower=2
+                }
+
+                if(firstNumber<0){
+                    firstNegativenumber=true;
+                    firstNumber=Math.abs(firstNumber)
+
+                }else{
+                    firstNegativenumber=false;
+                }
+                if(secondNumber<0){
+                    secondNegativenumber=true;
+                    secondNumber=Math.abs(secondNumber)
+                }else{
+                    secondNegativenumber=false;
+                }
+
+                let HCF=algebra.gcd(firstNumber,secondNumber);
+                
+
+                if(firstpower>secondpower){
+                    firstpowerans=alphabet+"^"+(firstpower-secondpower);
+                    secondpowerans="";
+                }else if(secondpower>firstpower){
+                    secondpowerans=alphabet+"^"+(secondpower-firstpower);
+                    firstpowerans="";
+                }else if(firstpower==secondpower){
+                    firstpowerans="";
+                    secondpowerans=""
+                }
+
+                firstNumberans=(firstNumber/HCF);
+                secondNumberans=(secondNumber/HCF);
+                let qnTerms1;
+                let qnTerms2;
+                let ansTerm1;
+                let ansTerm2;
+                
+
+                if(firstNegativenumber==true&&secondNegativenumber==true){
+                    qnTerms1="-"+firstNumber+alphabet+"^"+firstpower;
+                    qnTerms2="-"+secondNumber+alphabet+"^"+secondpower;
+
+                    ansTerm1=firstNumberans+firstpowerans;
+                    ansTerm2=secondNumberans+secondpowerans;
+
+
+                }else if(firstNegativenumber==false&&secondNegativenumber==false){
+                    qnTerms1=firstNumber+alphabet+"^"+firstpower;
+                    qnTerms2=secondNumber+alphabet+"^"+secondpower;
+
+                    ansTerm1=firstNumberans+firstpowerans;
+                    ansTerm2=secondNumberans+secondpowerans;
+
+                }else if(firstNegativenumber==true&&secondNegativenumber==false){
+                    qnTerms1="-"+firstNumber+alphabet+"^"+firstpower;
+                    qnTerms2=secondNumber+alphabet+"^"+secondpower;
+
+                    ansTerm1="-"+firstNumberans+firstpowerans;
+                    ansTerm2=secondNumberans+secondpowerans;
+
+                }else if(firstNegativenumber==false&&secondNegativenumber==true){
+                    qnTerms1=firstNumber+alphabet+"^"+firstpower;
+                    qnTerms2="-"+secondNumber+alphabet+"^"+secondpower;
+
+                    ansTerm1="-"+firstNumberans+firstpowerans;
+                    ansTerm2=secondNumberans+secondpowerans;
+
+                }
+               
+
+
+
+
+
+                if(qnTerms1.includes('^1')){
+                    if(qnTerms1.includes('^10')==true||qnTerms1.includes('^11')==true||qnTerms1.includes('^12')==true||qnTerms1.includes('^13')==true||qnTerms1.includes('^14')==true||qnTerms1.includes('^15')==true||qnTerms1.includes('^16')==true||qnTerms1.includes('^17')==true||qnTerms1.includes('^18')==true||qnTerms1.includes('^19')==true){
+                        
+                    }else{
+                        qnTerms1=qnTerms1.replace('^1','')
+
+                    }
+                }
+
+                if(qnTerms2.includes('^1')){
+                    if(qnTerms2.includes('^10')==true||qnTerms2.includes('^11')==true||qnTerms2.includes('^12')==true||qnTerms2.includes('^13')==true||qnTerms2.includes('^14')==true||qnTerms2.includes('^15')==true||qnTerms2.includes('^16')==true||qnTerms2.includes('^17')==true||qnTerms2.includes('^18')==true||qnTerms2.includes('^19')==true){
+                       
+                    }else{
+                        qnTerms2=qnTerms2.replace('^1','')
+
+                    }
+                }
+
+
+                if(ansTerm1.includes('^1')){
+                    if(ansTerm1.includes('^10')==true||ansTerm1.includes('^11')==true||ansTerm1.includes('^12')==true||ansTerm1.includes('^13')==true||ansTerm1.includes('^14')==true||ansTerm1.includes('^15')==true||ansTerm1.includes('^16')==true||ansTerm1.includes('^17')==true||ansTerm1.includes('^18')==true||ansTerm1.includes('^19')==true){
+                        
+                    }else{
+                        ansTerm1=ansTerm1.replace('^1','')
+
+                    }
+                }
+
+                if(ansTerm2.includes('^1')){
+                    if(ansTerm2.includes('^10')==true||ansTerm2.includes('^11')==true||ansTerm2.includes('^12')==true||ansTerm2.includes('^13')==true||ansTerm2.includes('^14')==true||ansTerm2.includes('^15')==true||ansTerm2.includes('^16')==true||ansTerm2.includes('^17')==true||ansTerm2.includes('^18')==true||ansTerm2.includes('^19')==true){
+                        
+                    }else{
+                        ansTerm2=ansTerm2.replace('^1','')
+                    }
+                }
+                
+            
+
+                qnTerms1=qnTerms1.replace('1'+alphabet,alphabet)
+                qnTerms2=qnTerms2.replace('1'+alphabet,alphabet)
+                ansTerm1=ansTerm1.replace('1'+alphabet,alphabet)
+                ansTerm2=ansTerm2.replace('1'+alphabet,alphabet)
+                let algebraQn
+                if(ansTerm2==1){
+                    algebraQn={qn:qnTerms1+"/"+qnTerms2,ans:ansTerm1,type:"medium"}
+                    }else{
+                        algebraQn={qn:qnTerms1+"/"+qnTerms2,ans:ansTerm1+"/"+ansTerm2,type:"medium"}  
+                    }
+            
+                questionArray.push(algebraQn)
+    
+            }
+            for(var i=0;i<numOfHard;i++){
+                var alphabet = "";
+                var alphabet2="";
+                var possible = "abcdefghijklmnopqrstuvwxyz";
+                alphabet += possible.charAt(Math.floor(Math.random() * possible.length));
+
+                var possible2=possible.replace(alphabet,'');
+                alphabet2 += possible2.charAt(Math.floor(Math.random() * possible2.length));
+
+                let firstNumberqn=Math.floor((Math.random() * ((quizData.difficult_values.max*2)+1)) + quizData.difficult_values.min);
+                let secondNumberqn=Math.floor((Math.random() * ((quizData.difficult_values.max*2)+1)) + quizData.difficult_values.min);
+                let firstpower=Math.floor((Math.random() * ((9*2)+1)) + (-9));
+                let secondpower=Math.floor((Math.random() * ((9*2)+1)) + (-9));
+
+                let thirdpower=Math.floor((Math.random() * ((9*2)+1)) + (-9));
+
+                let firstNumberans;
+                let secondNumberans;
+                let firstpowerans;
+                let secondpowerans;
+
+                let firstNumber=firstNumberqn;
+                let secondNumber=secondNumberqn;
+
+                let firstNegativenumber;
+                let secondNegativenumber;
+
+                if(firstNumber==0){
+                    firstNumber=2
+                }
+
+                if(secondNumber==0){
+                    secondNumber=2
+                }
+
+                if(firstpower==0){
+                    firstpower=2
+                }
+
+                if(secondpower==0){
+                    secondpower=2
+                }
+
+                if(thirdpower==0){
+                    thirdpower=2
+                }
+
+
+                if(firstNumber<0){
+                    firstNegativenumber=true;
+                    firstNumber=Math.abs(firstNumber)
+
+                }else{
+                    firstNegativenumber=false;
+                }
+                if(secondNumber<0){
+                    secondNegativenumber=true;
+                    secondNumber=Math.abs(secondNumber)
+                }else{
+                    secondNegativenumber=false;
+                }
+
+                let HCF=algebra.gcd(firstNumber,secondNumber);
+                
+
+                if(firstpower>secondpower){
+                    firstpowerans=alphabet+"^"+(firstpower-secondpower);
+                    secondpowerans="";
+                }else if(secondpower>firstpower){
+                    secondpowerans=alphabet+"^"+(secondpower-firstpower);
+                    firstpowerans="";
+                }else if(firstpower==secondpower){
+                    firstpowerans="";
+                    secondpowerans=""
+                }
+
+                firstNumberans=(firstNumber/HCF);
+                secondNumberans=(secondNumber/HCF);
+                let qnTerms1;
+                let qnTerms2;
+                let ansTerm1;
+                let ansTerm2;
+                
+
+                if(firstNegativenumber==true&&secondNegativenumber==true){
+                    qnTerms1="-"+firstNumber+alphabet+"^"+firstpower+"."+alphabet2+"^"+thirdpower;
+                    qnTerms2="-"+secondNumber+alphabet+"^"+secondpower;
+
+                    if(firstpowerans==""){
+                        ansTerm1=firstNumberans+firstpowerans+alphabet2+"^"+thirdpower;
+                    }else{
+                        ansTerm1=firstNumberans+firstpowerans+"."+alphabet2+"^"+thirdpower;
+                    }
+
+                    
+                    ansTerm2=secondNumberans+secondpowerans;
+
+
+                }else if(firstNegativenumber==false&&secondNegativenumber==false){
+                    qnTerms1=firstNumber+alphabet+"^"+firstpower+"."+alphabet2+"^"+thirdpower;
+                    qnTerms2=secondNumber+alphabet+"^"+secondpower;
+
+                    if(firstpowerans==""){
+                        ansTerm1=firstNumberans+firstpowerans+alphabet2+"^"+thirdpower;
+                    }else{
+                        ansTerm1=firstNumberans+firstpowerans+"."+alphabet2+"^"+thirdpower;
+                    }
+                    ansTerm2=secondNumberans+secondpowerans;
+
+                }else if(firstNegativenumber==true&&secondNegativenumber==false){
+                    qnTerms1="-"+firstNumber+alphabet+"^"+firstpower+"."+alphabet2+"^"+thirdpower;
+                    qnTerms2=secondNumber+alphabet+"^"+secondpower;
+
+                    if(firstpowerans==""){
+                        ansTerm1="-"+firstNumberans+firstpowerans+alphabet2+"^"+thirdpower;
+
+                    }else{
+                    ansTerm1="-"+firstNumberans+firstpowerans+"."+alphabet2+"^"+thirdpower;
+                    }
+                    ansTerm2=secondNumberans+secondpowerans;
+
+                }else if(firstNegativenumber==false&&secondNegativenumber==true){
+                    qnTerms1=firstNumber+alphabet+"^"+firstpower+"."+alphabet2+"^"+thirdpower;
+                    qnTerms2="-"+secondNumber+alphabet+"^"+secondpower;
+
+                    if(firstpowerans==""){
+                        ansTerm1="-"+firstNumberans+firstpowerans+alphabet2+"^"+thirdpower;
+
+                    }else{
+                    ansTerm1="-"+firstNumberans+firstpowerans+"."+alphabet2+"^"+thirdpower;
+                    }
+                    ansTerm2=secondNumberans+secondpowerans;
+
+                }
+               
+
+
+
+
+
+                if(qnTerms1.includes('^1')){
+                    if(qnTerms1.includes('^10')==true||qnTerms1.includes('^11')==true||qnTerms1.includes('^12')==true||qnTerms1.includes('^13')==true||qnTerms1.includes('^14')==true||qnTerms1.includes('^15')==true||qnTerms1.includes('^16')==true||qnTerms1.includes('^17')==true||qnTerms1.includes('^18')==true||qnTerms1.includes('^19')==true){
+                        
+                    }else{
+                        qnTerms1=qnTerms1.replace('^1','')
+
+                    }
+                }
+
+                if(qnTerms2.includes('^1')){
+                    if(qnTerms2.includes('^10')==true||qnTerms2.includes('^11')==true||qnTerms2.includes('^12')==true||qnTerms2.includes('^13')==true||qnTerms2.includes('^14')==true||qnTerms2.includes('^15')==true||qnTerms2.includes('^16')==true||qnTerms2.includes('^17')==true||qnTerms2.includes('^18')==true||qnTerms2.includes('^19')==true){
+                       
+                    }else{
+                        qnTerms2=qnTerms2.replace('^1','')
+
+                    }
+                }
+
+
+                if(ansTerm1.includes('^1')){
+                    if(ansTerm1.includes('^10')==true||ansTerm1.includes('^11')==true||ansTerm1.includes('^12')==true||ansTerm1.includes('^13')==true||ansTerm1.includes('^14')==true||ansTerm1.includes('^15')==true||ansTerm1.includes('^16')==true||ansTerm1.includes('^17')==true||ansTerm1.includes('^18')==true||ansTerm1.includes('^19')==true){
+                        
+                    }else{
+                        ansTerm1=ansTerm1.replace('^1','')
+
+                    }
+                }
+
+                if(ansTerm2.includes('^1')){
+                    if(ansTerm2.includes('^10')==true||ansTerm2.includes('^11')==true||ansTerm2.includes('^12')==true||ansTerm2.includes('^13')==true||ansTerm2.includes('^14')==true||ansTerm2.includes('^15')==true||ansTerm2.includes('^16')==true||ansTerm2.includes('^17')==true||ansTerm2.includes('^18')==true||ansTerm2.includes('^19')==true){
+                        
+                    }else{
+                        ansTerm2=ansTerm2.replace('^1','')
+                    }
+                }
+                
+            
+
+                qnTerms1=qnTerms1.replace('1'+alphabet,alphabet)
+                qnTerms2=qnTerms2.replace('1'+alphabet,alphabet)
+                ansTerm1=ansTerm1.replace('1'+alphabet,alphabet)
+                ansTerm2=ansTerm2.replace('1'+alphabet,alphabet)
+                let algebraQn
+                if(ansTerm2==1){
+                    algebraQn={qn:qnTerms1+"/"+qnTerms2,ans:ansTerm1,type:"hard"}
+                    }else{
+                        algebraQn={qn:qnTerms1+"/"+qnTerms2,ans:ansTerm1+"/"+ansTerm2,type:"hard"}  
+                    }
+            
+                questionArray.push(algebraQn)
+    
+            }
+        }else if(quizData.skill_code=="ALGEBRA_EXPANSION"){
+            for(var i=0;i<numOfEasy;i++){
+                var alphabet = "";
+                var possible = "abcdefghijklmnopqrstuvwxyz";
+                alphabet += possible.charAt(Math.floor(Math.random() * possible.length));
+    
+
+                let firstNumber=Math.floor(Math.random() * ((quizData.easy_values.max)) + quizData.easy_values.min);
+                let secondNumber=Math.floor(Math.random() * ((quizData.easy_values.max)) + quizData.easy_values.min);
+                
+
+
+
+
+                const qnTerms=firstNumber+"("+alphabet+"+"+secondNumber+")"
+                let ansTerm=firstNumber+alphabet+"+"+(firstNumber*secondNumber);
+                let ans2Term=(firstNumber*secondNumber)+"+"+firstNumber+alphabet
+                
+                let algebraQn={qn:qnTerms,ans:ansTerm,ans2:ans2Term, type:"easyv2"}
+                questionArray.push(algebraQn)
+            }
+            for(var i=0;i<numOfMedium;i++){
+                var alphabet = "";
+                var possible = "abcdefghijklmnopqrstuvwxyz";
+                alphabet += possible.charAt(Math.floor(Math.random() * possible.length));
+    
+                let firstNumber=Math.floor((Math.random() * ((quizData.medium_values.max*2)+1)) + quizData.medium_values.min);
+                let secondNumber=Math.floor((Math.random() * ((quizData.medium_values.max*2)+1)) + quizData.medium_values.min);
+                let secondnumberisNegative;
+                
+
+                if(firstNumber==0){
+                    firstNumber=2
+                }
+                if(firstNumber==1){
+                    firstNumber=3
+                }
+                if(firstNumber==-1){
+                    firstNumber=-2
+                }
+
+                if(secondNumber==0){
+                    secondNumber=2
+                }
+                if(secondNumber==1){
+                    secondNumber=3
+                }
+                if(secondNumber==-1){
+                    secondNumber=-2
+                }
+                if(secondNumber<0){
+                    secondnumberisNegative=true;
+                }else{
+                    secondnumberisNegative=false;
+                }
+
+                let pattern=Math.floor((Math.random() * 2) + 1)
+                let qnTerms;
+                let ansTerm;
+                if(pattern==1){
+                    if(secondnumberisNegative==true){
+                    qnTerms=firstNumber+"("+alphabet+"+("+secondNumber+"))"//2(a+(-3)) or -2(a+(-3)) checked
+
+                    if((firstNumber*secondNumber)<0){
+                        ansTerm=firstNumber+alphabet+"-"+Math.abs(firstNumber*secondNumber)
+                        ans2Term="-"+Math.abs(firstNumber*secondNumber)+"+"+firstNumber+alphabet
+                    }else{
+                        ansTerm=firstNumber+alphabet+"+"+(firstNumber*secondNumber)
+                        ans2Term=(firstNumber*secondNumber)+"+"+firstNumber+alphabet
+                    }
+                   
+                    }else{
+                        qnTerms=firstNumber+"("+alphabet+"+"+secondNumber+")"//2(a+3) or -2(a+3) checked
+                        if((firstNumber*secondNumber)<0){
+                            ansTerm=firstNumber+alphabet+"-"+Math.abs(firstNumber*secondNumber)
+                            ans2Term="-"+Math.abs(firstNumber*secondNumber)+"+"+firstNumber+alphabet
+                        }else{
+                            ansTerm=firstNumber+alphabet+"+"+(firstNumber*secondNumber)
+                            ans2Term=(firstNumber*secondNumber)+"+"+firstNumber+alphabet
+                        }
+                      
+                    }
+
+                }else if(pattern==2){
+                    if(secondnumberisNegative==true){
+                        qnTerms=firstNumber+"("+alphabet+"-("+secondNumber+"))"//2(a-(-3)) or -2(a-(-3)) checked
+                        if((firstNumber*secondNumber)<0){
+                            ansTerm=firstNumber+alphabet+"+"+Math.abs(firstNumber*secondNumber)
+                            ans2Term="-"+(firstNumber*secondNumber)+"+"+firstNumber+alphabet
+                        }else{
+                            ansTerm=firstNumber+alphabet+"-"+(firstNumber*secondNumber)
+                            ans2Term="-"+Math.abs(firstNumber*secondNumber)+"+"+firstNumber+alphabet
+                        }
+                       
+                    }else{
+                        qnTerms=firstNumber+"("+alphabet+"-"+secondNumber+")"//2(a-3) or -2(a-3) checked
+                        if((firstNumber*secondNumber)<0){
+                            ansTerm=firstNumber+alphabet+"+"+Math.abs(firstNumber*secondNumber)
+                            ans2Term="-"+(firstNumber*secondNumber)+"+"+firstNumber+alphabet
+                        }else{
+                            ansTerm=firstNumber+alphabet+"-"+(firstNumber*secondNumber)
+                            ans2Term="-"+Math.abs(firstNumber*secondNumber)+"+"+firstNumber+alphabet
+                        }
+                    }
+
+                }
+
+
+                ans2Term=ans2Term.replace('--','+')
+                ans2Term=ans2Term.replace('++','+')
+                ans2Term=ans2Term.replace('+-','-')
+                ans2Term=ans2Term.replace('-+','-')
+ 
+                ans2Term=ans2Term.replace('--','+')
+                ans2Term=ans2Term.replace('++','+')
+                ans2Term=ans2Term.replace('+-','-')
+                ans2Term=ans2Term.replace('-+','-')
+
+                if(ans2Term.charAt(0)=="+"){
+                    ans2Term=ans2Term.replace('+','')
+                }
+
+               
+
+                
+    
+                let algebraQn={qn:qnTerms,ans:ansTerm,ans2:ans2Term, type:"mediumv2"}
+                questionArray.push(algebraQn)
+            }
+            for(var i=0;i<numOfHard;i++){
+                var alphabet = "";
+                var alphabet2="";
+                var possible = "abcdefghijklmnopqrstuvwxyz";
+                alphabet += possible.charAt(Math.floor(Math.random() * possible.length));
+
+                var possible2=possible.replace(alphabet,'');
+                alphabet2 += possible2.charAt(Math.floor(Math.random() * possible2.length));
+    
+                let firstNumber=Math.floor((Math.random() * ((quizData.difficult_values.max*2)+1)) + quizData.difficult_values.min);
+                let secondNumber=Math.floor((Math.random() * ((quizData.difficult_values.max*2)+1)) + quizData.difficult_values.min);
+                let secondnumberisNegative;
+                
+
+                if(firstNumber==0){
+                    firstNumber=2
+                }
+                if(firstNumber==1){
+                    firstNumber=3
+                }
+                if(firstNumber==-1){
+                    firstNumber=-2
+                }
+
+                if(secondNumber==0){
+                    secondNumber=2
+                }
+                if(secondNumber==1){
+                    secondNumber=3
+                }
+                if(secondNumber==-1){
+                    secondNumber=-2
+                }
+                if(secondNumber<0){
+                    secondnumberisNegative=true;
+                }else{
+                    secondnumberisNegative=false;
+                }
+
+                let pattern=Math.floor((Math.random() * 4) + 1)
+                let qnTerms;
+                let ansTerm;
+                if(pattern==1){
+                    if(secondnumberisNegative==true){
+                        qnTerms=firstNumber+"("+alphabet+"+"+alphabet2+"+("+secondNumber+"))"
+                        ansTerm1="+"+firstNumber+alphabet
+                        ansTerm2="+"+firstNumber+alphabet2
+                        ansTerm3="+"+(firstNumber*secondNumber)
+                        
+                    }else{
+                        qnTerms=firstNumber+"("+alphabet+"+"+alphabet2+"+"+secondNumber+")"
+                        ansTerm1="+"+firstNumber+alphabet
+                        ansTerm2="+"+firstNumber+alphabet2
+                        ansTerm3="+"+(firstNumber*secondNumber)
+                    }
+                  
+
+                }else if(pattern==2){
+                    if(secondnumberisNegative==true){
+                        qnTerms=firstNumber+"("+alphabet+"+"+alphabet2+"-("+secondNumber+"))"
+                        ansTerm1="+"+firstNumber+alphabet
+                        ansTerm2="+"+firstNumber+alphabet2
+                        ansTerm3="-"+(firstNumber*secondNumber)
+                    }else{
+                        qnTerms=firstNumber+"("+alphabet+"+"+alphabet2+"-"+secondNumber+")"
+                        ansTerm1="+"+firstNumber+alphabet
+                        ansTerm2="+"+firstNumber+alphabet2
+                        ansTerm3="-"+(firstNumber*secondNumber)
+                    }
+                  
+
+                }else if(pattern==3){
+                    if(secondnumberisNegative==true){
+                        qnTerms=firstNumber+"("+alphabet+"-"+alphabet2+"+("+secondNumber+"))"
+                        ansTerm1="+"+firstNumber+alphabet
+                        ansTerm2="-"+firstNumber+alphabet2
+                        ansTerm3="+"+(firstNumber*secondNumber)
+                    }else{
+                        qnTerms=firstNumber+"("+alphabet+"-"+alphabet2+"+"+secondNumber+")"
+                        ansTerm1="+"+firstNumber+alphabet
+                        ansTerm2="-"+firstNumber+alphabet2
+                        ansTerm3="+"+(firstNumber*secondNumber)
+                    }
+                  
+
+                }else if(pattern==4){
+                    if(secondnumberisNegative==true){
+                        qnTerms=firstNumber+"("+alphabet+"-"+alphabet2+"-("+secondNumber+"))"
+                        ansTerm1="+"+firstNumber+alphabet
+                        ansTerm2="-"+firstNumber+alphabet2
+                        ansTerm3="-"+(firstNumber*secondNumber)
+                    }else{
+                        qnTerms=firstNumber+"("+alphabet+"-"+alphabet2+"-"+secondNumber+")"
+                        ansTerm1="+"+firstNumber+alphabet
+                        ansTerm2="-"+firstNumber+alphabet2
+                        ansTerm3="-"+(firstNumber*secondNumber)
+                    }
+                  
+
+                }
+
+               //answer variation: 123,132,213,231,312,321
+                ansTerm=ansTerm1+ansTerm2+ansTerm3
+
+               ansTerm=ansTerm.replace('--','+')
+               ansTerm=ansTerm.replace('++','+')
+               ansTerm=ansTerm.replace('+-','-')
+               ansTerm=ansTerm.replace('-+','-')
+
+               ansTerm=ansTerm.replace('--','+')
+               ansTerm=ansTerm.replace('++','+')
+               ansTerm=ansTerm.replace('+-','-')
+               ansTerm=ansTerm.replace('-+','-')
+
+               ansTerm=ansTerm.replace('--','+')
+               ansTerm=ansTerm.replace('++','+')
+               ansTerm=ansTerm.replace('+-','-')
+               ansTerm=ansTerm.replace('-+','-')
+
+               if(ansTerm.charAt(0)=="+"){
+                ansTerm=ansTerm.replace('+','')
+            }
+
+            ans2Term=ansTerm1+ansTerm3+ansTerm2
+
+            ans2Term=ans2Term.replace('--','+')
+            ans2Term=ans2Term.replace('++','+')
+            ans2Term=ans2Term.replace('+-','-')
+            ans2Term=ans2Term.replace('-+','-')
+
+            ans2Term=ans2Term.replace('--','+')
+            ans2Term=ans2Term.replace('++','+')
+            ans2Term=ans2Term.replace('+-','-')
+            ans2Term=ans2Term.replace('-+','-')
+
+            ans2Term=ans2Term.replace('--','+')
+            ans2Term=ans2Term.replace('++','+')
+            ans2Term=ans2Term.replace('+-','-')
+            ans2Term=ans2Term.replace('-+','-')
+
+            if(ans2Term.charAt(0)=="+"){
+             ans2Term=ans2Term.replace('+','')
+         }
+         
+            ans3Term=ansTerm2+ansTerm1+ansTerm3
+
+            ans3Term=ans3Term.replace('--','+')
+            ans3Term=ans3Term.replace('++','+')
+            ans3Term=ans3Term.replace('+-','-')
+            ans3Term=ans3Term.replace('-+','-')
+
+            ans3Term=ans3Term.replace('--','+')
+            ans3Term=ans3Term.replace('++','+')
+            ans3Term=ans3Term.replace('+-','-')
+            ans3Term=ans3Term.replace('-+','-')
+
+            ans3Term=ans3Term.replace('--','+')
+            ans3Term=ans3Term.replace('++','+')
+            ans3Term=ans3Term.replace('+-','-')
+            ans3Term=ans3Term.replace('-+','-')
+
+            if(ans3Term.charAt(0)=="+"){
+                ans3Term=ans3Term.replace('+','')
+            }
+
+            ans4Term=ansTerm2+ansTerm3+ansTerm1
+
+            ans4Term=ans4Term.replace('--','+')
+            ans4Term=ans4Term.replace('++','+')
+            ans4Term=ans4Term.replace('+-','-')
+            ans4Term=ans4Term.replace('-+','-')
+
+            ans4Term=ans4Term.replace('--','+')
+            ans4Term=ans4Term.replace('++','+')
+            ans4Term=ans4Term.replace('+-','-')
+            ans4Term=ans4Term.replace('-+','-')
+
+            ans4Term=ans4Term.replace('--','+')
+            ans4Term=ans4Term.replace('++','+')
+            ans4Term=ans4Term.replace('+-','-')
+            ans4Term=ans4Term.replace('-+','-')
+
+            if(ans4Term.charAt(0)=="+"){
+                ans4Term=ans4Term.replace('+','')
+            }
+
+            ans5Term=ansTerm3+ansTerm1+ansTerm2
+
+            ans5Term=ans5Term.replace('--','+')
+            ans5Term=ans5Term.replace('++','+')
+            ans5Term=ans5Term.replace('+-','-')
+            ans5Term=ans5Term.replace('-+','-')
+
+            ans5Term=ans5Term.replace('--','+')
+            ans5Term=ans5Term.replace('++','+')
+            ans5Term=ans5Term.replace('+-','-')
+            ans5Term=ans5Term.replace('-+','-')
+
+            ans5Term=ans5Term.replace('--','+')
+            ans5Term=ans5Term.replace('++','+')
+            ans5Term=ans5Term.replace('+-','-')
+            ans5Term=ans5Term.replace('-+','-')
+
+            if(ans5Term.charAt(0)=="+"){
+                ans5Term=ans5Term.replace('+','')
+            }
+
+            ans6Term=ansTerm3+ansTerm2+ansTerm1
+            ans6Term=ans6Term.replace('--','+')
+            ans6Term=ans6Term.replace('++','+')
+            ans6Term=ans6Term.replace('+-','-')
+            ans6Term=ans6Term.replace('-+','-')
+
+            ans6Term=ans6Term.replace('--','+')
+            ans6Term=ans6Term.replace('++','+')
+            ans6Term=ans6Term.replace('+-','-')
+            ans6Term=ans6Term.replace('-+','-')
+
+            ans6Term=ans6Term.replace('--','+')
+            ans6Term=ans6Term.replace('++','+')
+            ans6Term=ans6Term.replace('+-','-')
+            ans6Term=ans6Term.replace('-+','-')
+
+            if(ans6Term.charAt(0)=="+"){
+                ans6Term=ans6Term.replace('+','')
+            }
+
+
+           
+                
+    
+                let algebraQn={qn:qnTerms,ans:ansTerm,ans2:ans2Term,ans3:ans3Term,ans4:ans4Term,ans5:ans5Term,ans6:ans6Term,type:"hardv6"}
+                questionArray.push(algebraQn)
+            }
+        }
+
+    },
+    arrangeQuestion:()=>{//this is where it will be displayed on the frontend.
+
+
+        let content = "";
+        if(quizData.skill_code=="ALGEBRA_ADDITION"){
+        for (let i = 0; i < questionArray.length; i++) {
+            content += `<div class="row col-9 justify-content-center align-items-center text-center m-auto mb-5"><div class="small col-md-4">Question ${i + 1}</div>`;
+
+            content +=`<div class="row col-md-6">Simplify `+questionArray[i].qn+`</div><br><br> <div align-items-center>Answer: <input class="text-center" size = "6" id='input${i}'></div>`
+    
+            content += `<div class='col-md-2 reviewClass'><span id='review${i}'></span></div></div>`;
+        }
+    }
+    if(quizData.skill_code=="ALGEBRA_MULTIPLICATION"){
+       
+        for (let i = 0; i < questionArray.length; i++) {
+            
+            content += `<div class="row col-9 justify-content-center align-items-center text-center m-auto mb-5"><div class="small col-md-4">Question ${i + 1}</div>`;
+
+            content +=`<div class="row col-md-12">Simplify `+questionArray[i].qn+` <br>Please display . between 2 alphabetical terms. For example if your answer is 2xy, display your answer as 2x.y</div><br><br> <div align-items-center>Answer: 
+            
+            
+            <input class="text-center" size = "6" id='input${i}'>
+
+            </div>`
+    
+            content += `<div class='col-md-2 reviewClass'><span id='review${i}'></span></div></div>`;
+
+            
+            
+        }
+        var mathFieldSpan = document.getElementById('math-field');
+        
+        var MQ = MathQuill.getInterface(2); 
+        MQ.MathField(mathFieldSpan);
+
+        
+    }
+
+    if(quizData.skill_code=="ALGEBRA_DIVISION"){//the test for math input symbol
+        for (let i = 0; i < questionArray.length; i++) {
+            content += `<div class="row col-9 justify-content-center align-items-center text-center m-auto mb-5"><div class="small col-md-4">Question ${i + 1}</div>`;
+
+            content +=`<div class="row col-md-12">Simplify `+questionArray[i].qn+` <br>Please display . between 2 alphabetical terms. For example if your answer is 2xy/-1, display your answer as -2x.y</div><br><br> <div align-items-center>Answer: <input class="text-center" size = "6" id='input${i}'>
+            
+            
+            Type math here: <span id="math-field"></span>
+
+            <script>
+            var mathFieldSpan = document.getElementById('math-field');
+            
+            
+            var MQ = MathQuill.getInterface(2); 
+            MQ.MathField(mathFieldSpan);
+            </script>
+            
+            
+            
+            </div>`
+    
+            content += `<div class='col-md-2 reviewClass'><span id='review${i}'></span></div></div>`;
+        }
+
+    }
+
+    if(quizData.skill_code=="ALGEBRA_EXPANSION"){
+        for (let i = 0; i < questionArray.length; i++) {
+            content += `<div class="row col-9 justify-content-center align-items-center text-center m-auto mb-5"><div class="small col-md-4">Question ${i + 1}</div>`;
+
+            content +=`<div class="row col-md-6">Expand `+questionArray[i].qn+` <br></div><br><br> <div align-items-center>Answer: <input class="text-center" size = "6" id='input${i}'></div>`
+    
+            content += `<div class='col-md-2 reviewClass'><span id='review${i}'></span></div></div>`;
+        }
+    }
+
+
+        return content;
+    
+    
+    },
+    markQuiz: () => {
+        let score
+        let easy = 0;
+        let medium = 0;
+        let difficult = 0;
+        let questions = [];
+    
+        const numOfQ = quizData.num_of_qn, percentDifficulty = quizData.percent_difficulty.split("-");
+        const numOfEasy = numOfQ * (percentDifficulty[0] / 100);
+        const numOfMedium = numOfQ * (percentDifficulty[1] / 100);
+        const numOfDifficult = numOfQ * (percentDifficulty[2] / 100);
+    
+        for (let i = 0; i < numOfQ; i++) {
+            let review = '<i class="fas fa-check"></i>';
+            let difficulty = 'difficult';
+            let isCorrect = false;
+            let studentAns = {};
+    
+            let input = ('ans' in questionArray[i]) ? $(`#input${i}`).val() : undefined;
+           
+    
+            if (input != undefined) studentAns['ans'] = input;
+    
+    
+            $(".reviewClass").css("display", "block");
+    
+            if (input == questionArray[i].ans|| input ==questionArray[i].ans2||input ==questionArray[i].ans3||input ==questionArray[i].ans4||input ==questionArray[i].ans5||input ==questionArray[i].ans6) {
+                if (i < numOfEasy) {
+                    difficulty = 'easy';
+                    easy++;
+                }
+                else if (i < numOfEasy + numOfMedium) {
+                    difficulty = 'medium';
+                    medium++;
+                }
+                else {
+                    difficult++;
+                }
+                isCorrect = true;
+            }
+            else {
+                review = '<i class="fas fa-times"></i>  Ans: ';
+                if(questionArray[i].type=="hardv2"||questionArray[i].type=="mediumv2"||questionArray[i].type=="easyv2"){
+                    if ('ans' in questionArray[i]) review += `${questionArray[i].ans}`+" or "+`${questionArray[i].ans2}`;
+                }else if(questionArray[i].type=="hardv6"){
+                    if ('ans' in questionArray[i]) review += `${questionArray[i].ans}`+" or "+`${questionArray[i].ans2}`+" or "+`${questionArray[i].ans3}`+" or "+`${questionArray[i].ans4}`+" or "+`${questionArray[i].ans5}`+" or "+`${questionArray[i].ans6}`;
+
+                }else{
+
+                if ('ans' in questionArray[i]) review += `${questionArray[i].ans}`
+                }
+    
+               
+            }
+            document.getElementById(`review${i}`).innerHTML = review;
+            let correctAnswer=""
+            if(questionArray[i].type=="hardv2"||questionArray[i].type=="mediumv2"||questionArray[i].type=="easyv2"){
+                correctAnswer=questionArray[i].ans+" or "+questionArray[i].ans2;
+            }else if(questionArray[i].type=="hardv6"){
+                correctAnswer=questionArray[i].ans+" or "+questionArray[i].ans2+" or "+questionArray[i].ans3+" or "+questionArray[i].ans4+" or "+questionArray[i].ans5+" or "+questionArray[i].ans6;
+
+            }else{
+                correctAnswer=questionArray[i].ans;
+            }
+            
+            questions.push({
+                "skill_id": quizData.skillId,
+                "question_number": i + 1,
+                "question": algebra.stringQuestion(questionArray[i]),
+                "answer": algebra.stringAnswer(studentAns),
+                "correct_answer": correctAnswer,
+                "isCorrect": isCorrect,
+                "difficulty": difficulty
+            });
+        }
+    
+        score = {
+            "easy": (easy / numOfEasy) * 100,
+            "medium": (medium / numOfMedium) * 100,
+            "difficult": (difficult / numOfDifficult) * 100,
+        }
+        score["total"] = ((score.easy / 100) * numOfEasy + (score.medium / 100) * numOfMedium + (score.difficult / 100) * numOfDifficult) / numOfQ * 100;
+    
+        let points = easy * 5 + medium * 10 + difficult * 15;
+        return [questions, score, points];
+    }
+
+}
+
 const funcs = {
     'Fractions': fraction,
+    'Decimals': decimal,
+    'Algebra':algebra,
 };
 
 

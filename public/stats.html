@@ -31,7 +31,6 @@
     <!--Javascript-->
     <script src="./javascript/sidebar.js"></script>
     <script src="./javascript/stats.js"></script>
-    <script src="./javascript/resetPassword.js"></script>
 
     <!--CSS-->
     <link rel="stylesheet" href="./css/stats.css">
@@ -43,11 +42,12 @@
         <div class="sidebar col-auto col-sm-4 col-md-3 col-xl-2 px-0"></div>
         <div class="col py-3">
             <div class="header"></div>
-            <div id="title" class="text-center h3">Statistics</div>
+            <div id="title" class="text-center h3">Statistics for Score</div>
             <div id="zoom">
+               
                 <ul class="pagination mb-0 justify-content-center">
-                    <li class="select page-item small active" ><a class="page-link">Detailed</a></li>
-                    <li class="select page-item small"><a class="page-link">Comparison</a></li>
+                    <li class="select page-item small active" ><a class="page-link">Topic</a></li>
+                    <li class="select page-item small"><a class="page-link">Sub-topic</a></li>
                 </ul>
                 <div class="d-flex justify-content-center">
                     <div class="dropdown">
@@ -60,25 +60,14 @@
                         </ul>
                     </div>
                 </div>
+            
             </div>
             <div class="pt-2 justify-content-center row" id="container" style="max-width: 996px;margin: 0 auto;">
             </div>
-            <input type="email" class="sendemail" id="input" placeholder="Email">
-            <button class="btn btn-outline-primary" id="send">Send Email</button>
         </div>
     </div>
+    <input type="email" class="sendemail" id="input" placeholder="Email">
+            <button class="btn btn-outline-primary" id="send">Send Email</button>
 </body>
 
 </html>
-<!-- <div class="tab-content" id="myTabContent">
-    <div class="pt-2 container d-flex align-items-center justify-content-center tab-pane fade show active" id="detailedContainer" role="tabpanel" aria-labelledby="detail-tab">
-        <div class="row mt-4">
-            <ul id="filter-detail" class="pagination justify-content-center"></ul>
-        </div>
-    </div>
-    <div class="pt-2 container d-flex align-items-center justify-content-center tab-pane fade " id="comparisonContainer" role="tabpanel" aria-labelledby="comparison-tab">
-        <div class="row mt-4">
-            <ul id="filter-comparison" class="pagination justify-content-center"></ul>
-        </div>
-    </div>
-</div> -->

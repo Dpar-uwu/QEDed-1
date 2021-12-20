@@ -261,8 +261,8 @@ const quizModel = {
                     {
                         $group: {
                             "_id": "$done_by",
-                            "average_score": { $avg: "$score.total" },
                             "num_of_quiz": { $sum: 1 },
+                            "average_score": { $avg: "$score.total" },
                             "average_time_taken": { $avg: "$time_taken" }
                         }
                     },
@@ -280,8 +280,8 @@ const quizModel = {
                     match_options,
                     {
                         $sort: {
-                            "average_score": -1, //descending
                             "num_of_quiz": -1, // descending
+                            "average_score": -1, //descending
                             "average_time_taken": 1 // ascending 
                         }
                     },
@@ -351,8 +351,30 @@ const quizModel = {
                             "_id": -1
                         }
                     },
+                   {
+                       $limit:10
+                   },
                     {
-                        $limit: 10
+                        $group: {
+                            "_id": null,
+                            "easy_average_score": { $avg: "$score.easy" },
+                            "medium_average_score": { $avg: "$score.medium" },
+                            "difficult_average_score": { $avg: "$score.difficult" },
+                            "total_average_score": { $avg: "$score.total" },
+                            "average_time_taken": { $avg: "$time_taken" }
+                        }
+                    },
+                    { $project: { _id: 0 } }
+                ]);
+
+                const average = await Quiz.aggregate([
+                    {
+                        $match: recent_match_opt
+                    },
+                    {
+                        $sort: {
+                            "_id": -1
+                        }
                     },
                     {
                         $group: {
@@ -386,8 +408,12 @@ const quizModel = {
                     { $project: { _id: 0 } }
                 ]);
 
+                
+
                 result.recent = recent[0];
+                result.average = average[0];
                 result.global = global[0];
+               
 
                 console.log("SUCCESS! Result", result);
                 resolve(result);
@@ -518,12 +544,93 @@ const quizModel = {
                     }
                 ])
 
+                const averageFraction_data = await Quiz.aggregate([
+                    {
+                        $match: match_opt
+                    },
+                    {
+                        $lookup: {
+                            from: "levels",
+                            localField: "skill_id",
+                            foreignField: "topics.skills._id",
+                            as: "levels"
+                        }
+                    },
+                    {
+                        $match: {
+                            levels:{ $not: {$size: 0} },
+                            topic_name:"Fractions"
+                        }
+                    },
+                    {
+                        $group: {
+                            "_id": `$${groupBy}`,
+                            "easy": { $push: "$score.easy" },
+                            "medium": { $push: "$score.medium" },
+                            "difficult": { $push: "$score.difficult" },
+                            "total": { $push: "$score.total" },
+                            "time": { $push: "$time_taken" }
+                        }
+                    },
+                    {
+                        $project: {
+                            "_id": "$_id",
+                            // "easy_average_score": { $avg: { $slice: ["$easy", -10]}},
+                            // "medium_average_score": { $avg: { $slice: ["$medium", -10]}},
+                            // "difficult_average_score": { $avg: { $slice: ["$difficult", -10]}},
+                            "total_average_score": { $avg: "$total" },
+                            // "average_time_taken": { $avg: { $slice: ["$time", -10]}}
+                        }
+                    }
+                ])
+
+                const averageDecimal_data = await Quiz.aggregate([
+                    {
+                        $match: match_opt
+                    },
+                    {
+                        $lookup: {
+                            from: "levels",
+                            localField: "skill_id",
+                            foreignField: "topics.skills._id",
+                            as: "levels"
+                        }
+                    },
+                    {
+                        $match: {
+                            levels:{ $not: {$size: 0} },
+                            topic_name:"Decimals"
+                        }
+                    },
+                    {
+                        $group: {
+                            "_id": `$${groupBy}`,
+                            "easy": { $push: "$score.easy" },
+                            "medium": { $push: "$score.medium" },
+                            "difficult": { $push: "$score.difficult" },
+                            "total": { $push: "$score.total" },
+                            "time": { $push: "$time_taken" }
+                        }
+                    },
+                    {
+                        $project: {
+                            "_id": "$_id",
+                            // "easy_average_score": { $avg: { $slice: ["$easy", -10]}},
+                            // "medium_average_score": { $avg: { $slice: ["$medium", -10]}},
+                            // "difficult_average_score": { $avg: { $slice: ["$difficult", -10]}},
+                            "total_average_score": { $avg: "$total" },
+                            // "average_time_taken": { $avg: { $slice: ["$time", -10]}}
+                        }
+                    }
+                ])
+
                 let result = {};
 
                 for (let i = 0; i < current_data.length; i++) {
                     let name = current_data[i]._id;
                     let recent;
                     let global;
+                    let averageFraction;
 
                     recent_data.forEach(data => {
                         if (data._id == name) {
@@ -537,11 +644,28 @@ const quizModel = {
                             return false;
                         }
                     })
+                    averageFraction_data.forEach(data => {
+                        if (data._id == name) {
+                            averageFraction = data.total_average_score;
+                            return false;
+                        }
+                    })
+
+                    averageDecimal_data.forEach(data => {
+                        if (data._id == name) {
+                            averageDecimal = data.total_average_score;
+                            return false;
+                        }
+                    })
+
+
 
                     result[name] = {
                         "current": current_data[i].total_average_score,
                         "recent": recent,
-                        "global": global
+                        "global": global,
+                        "averageFraction": averageFraction,
+                        "averageDecimal": averageDecimal
                     }
                 }
 

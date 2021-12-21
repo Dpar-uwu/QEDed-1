@@ -9,12 +9,8 @@ const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const JWT = require("jsonwebtoken");
 const sendEmail = require('../email/email');
-const { QuizSchema } = require("./quizModel");
-const Quiz = mongoose.model("Quiz", QuizSchema)
 
 const bcryptSalt = process.env.BCRYPT_SALT;
-
-const schedule = require('node-schedule');
 
 const TokenSchema = new Schema({
     userId: {
@@ -61,38 +57,6 @@ const tokenModel = {
                 sendEmail(user.email, "Password Reset Request", { name: user.first_name, link: link, }, "../email/template/requestResetPassword.handlebars");
                 
                 resolve(link);
-            }
-            catch(err){
-                console.log(err);
-                console.log(err.message);
-                reject(err);
-            }
-
-        })
-    },
-
-    progressupdate: () => {
-        return new Promise(async (resolve, reject) =>{
-            try{
-                const user = await User.find({ 'role': 'student' });
-                console.log(user);
-                if (!user) throw "NOT_FOUND";
-
-                for (let i=0; i<user.length; i++){
-                    const done_by = user[i]._id;
-                    const quizdone = await Quiz.find({ done_by, 'created_at': {$lt: new Date(), $gt: new Date(new Date().getTime() - (168*60*60*1000))} }).lean()
-                    if (quizdone.length === 0){
-                        sendEmail(user[i].email, "Progress Update", 
-                         { name: user[i].first_name }, 
-                         "../email/template/progressupdateNOQUIZ.handlebars");
-                    }
-                    else {
-                         sendEmail(user[i].email, "Progress Update", 
-                         { name: user[i].first_name, quiz: quizdone }, 
-                         "../email/template/progressupdate.handlebars");
-                    }
-                }
-
             }
             catch(err){
                 console.log(err);

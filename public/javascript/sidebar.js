@@ -46,12 +46,6 @@ const navItems = [
         link: "learningresourceslevel.html",
         icon: "far fa-newspaper",
         access: ["student", "teacher", "parent"]
-    },
-    {
-        name: "Send Mail",
-        link: "sendmail.html",
-        icon: "far fa-envelope",
-        access: ["student", "teacher", "parent"]
     }
 ]
 

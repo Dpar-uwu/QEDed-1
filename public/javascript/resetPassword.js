@@ -19,12 +19,6 @@ $(document).on("click", "#forget", function(){
     requestPasswordReset(email);
 })
 
-$(document).on("click", "#send", function(){
-    sendEmail();
-})
-
-//sendEmail();
-
 $(document).on("click", "#reset", function(){
     let password = $('#input').val();
     console.log("forget 2");
@@ -88,28 +82,6 @@ function resetPassword(password){
 
             $('#input').focus();
 
-        }
-    });
-}
-
-function sendEmail(){
-    $.ajax({
-        url: '/user/sendemail',
-        type: "POST",
-        success: function (data, textStatus, xhr) {
-            console.log("success email sent");
-        },
-        error: function (xhr, textStatus, errorThrown) {
-            const err = xhr.responseJSON;
-
-            if(err.code == "INVALID_REQUEST"){
-                document.getElementById("errMessage").innerHTML= err.error[0];
-            }
-            else{
-                document.getElementById("errMessage").innerHTML = err.error;
-            }
-
-            $('#input').focus();
         }
     });
 }

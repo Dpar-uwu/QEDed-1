@@ -6,6 +6,13 @@ const mongoose = require("mongoose");
 const express = require("express");
 const bodyParser = require("body-parser");
 
+const { UserSchema } = require("../model/userModel");
+const User = mongoose.model("User", UserSchema);
+const sendEmail = require('../email/email');
+const { QuizSchema } = require("../model/quizModel");
+const Quiz = mongoose.model("Quiz", QuizSchema);
+const schedule = require('node-schedule');
+
 const userController = require("./userController.js");
 const levelController = require("./levelController.js");
 const topicController = require("./topicController.js");
@@ -70,8 +77,27 @@ const options = {
 // run database connect
 (async () => {
     try {
-        connection = await mongoose.connect(localurl, options);
-        console.log("SUCCESS Connected to database");
+connection = await mongoose.connect(localurl, options);
+console.log("SUCCESS Connected to database");
+
+schedule.scheduleJob('0 0 * * SAT', async () => {
+    const user = await User.find({ 'role': 'student' });
+    if (!user) throw "NOT_FOUND";
+
+for (let i=0; i<user.length; i++){
+    const done_by = user[i]._id;
+    const quizdone = await Quiz.find({ done_by, 'created_at': {$lt: new Date(), $gt: new Date(new Date().getTime() - (168*60*60*1000))} }).lean()
+    if (quizdone.length === 0){
+        sendEmail(user[i].email, "Progress Update", 
+         { name: user[i].first_name }, 
+         "../email/template/progressupdateNOQUIZ.handlebars");
+    }
+    else {
+         sendEmail(user[i].email, "Progress Update", 
+         { name: user[i].first_name, quiz: quizdone }, 
+         "../email/template/progressupdate.handlebars");
+    }
+}} )
     } catch (error) {
         console.error("\x1b[31mERROR Error connecting to database\x1b[0m");
         process.exit(1);

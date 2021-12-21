@@ -26,7 +26,6 @@ const { MongoError } = require("mongodb");
 const { Error } = require("mongoose");
 
 const nodemailer = require("nodemailer");
-const schedule = require('node-schedule');
 
 /**
  * GET /user - gets all users
@@ -253,94 +252,6 @@ router.post("/refresh_token",
         }
     }
 )
-
-router.post("/sendemail",
-(req, res) => {
-    const job = async function(){
-    try {
-        console.time("POST progress update request");
-        
-        await tokenPassword.progressupdate();
-        res.status(200).send({ message: "Email sent" });
-    }
-    catch (err) {
-        if (err == "NOT_FOUND")
-            res.status(404).send({ error: "Email does not exists", code: "NOT_FOUND" });
-        else if (err instanceof Error || err instanceof MongoError)
-            res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
-        else
-            res.status(500).send({ error: "Error in progress update request", code: "UNEXPECTED_ERROR" });
-    } finally {
-        console.timeEnd("POST progress update request");
-    }
-}
-schedule.scheduleJob('0 0 * * SAT', job )
-}
-);
-
-// router.post("/sendemail",
-// validate("email"),
-// async (req, res) => {
-//     const { email } = req.body;
-//     try {
-//         console.time("POST progress update request");
-        
-//         const requestPasswordResetService = await tokenPassword.progressupdate(email);
-//         res.status(200).send({ message: "Email sent" });
-//     }
-//     catch (err) {
-//         if (err == "NOT_FOUND")
-//             res.status(404).send({ error: "Email does not exists", code: "NOT_FOUND" });
-//         else if (err instanceof Error || err instanceof MongoError)
-//             res.status(500).send({ error: err.message, code: "DATABASE_ERROR" });
-//         else
-//             res.status(500).send({ error: "Error in progress update request", code: "UNEXPECTED_ERROR" });
-//     } finally {
-//         console.timeEnd("POST progress update request");
-//     }
-// }
-// );
-
-// router.post('/sendemail', (req,res) => {
-//     const { email } = req.body;
-//     const output = `
-//     <p>Hello User, this is your statistics update for the week!</p>
-//     <h3>Quizzes Done</h3>
-//     <h3>Improvements</h3>
-//     <h3>Analytics</h3>
-//     `;
-
-//     let transporter = nodemailer.createTransport({
-//         host: 'mail.hover.com',
-//         port: 465,
-//         secure: true,
-//         auth: {
-//             user: process.env.EMAIL,
-//             pass: process.env.PASS
-//         }
-
-//     });
-
-//     let mailOptions = {
-//         from: `"PSLEOnline" <${process.env.EMAIL}>`,
-//         to: email,
-//         subject: "Your Statistics Update",
-//         html: output
-//     };
-
-//     schedule.scheduleJob(' * * * * *', ()=>{
-//         transporter.sendMail(mailOptions, (error, info) => {
-//             if (error) {
-//                 throw error;
-//             }
-//             else {
-//                 console.log('Message %s sent: %s', info.messageId, info.response);
-//                 resolve('Message %s sent: %s', info.messageId, info.response)
-
-//             }
-//         });
-//     });
-// });
 
 router.post('/contact', (req,res) => {
     const output = `

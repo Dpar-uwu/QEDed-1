@@ -457,10 +457,6 @@ function after(path, data) {
                         </div>
                     </div>
                 </div>
-                <script>
-                var mathFieldSpan = document.getElementById('math-field');
-                var MQ = MathQuill.getInterface(2); 
-                MQ.MathField(mathFieldSpan);</script>
 
                 
                 
@@ -492,6 +488,17 @@ function displayQuestion() {
     let content = funcs[quizData.topic_name].arrangeQuestion(quizData, questionArray);
     container.innerHTML += content + '<div class=" justify-content-center d-flex text-center mb-3"><button class="btn-light btn returnBtn me-2">Cancel</button><button class="btn-outline-primary btn click submitBtn">Submit</button></div>';
     $(".reviewClass").css("display", "none");
+
+    var MQ = MathQuill.getInterface(2); 
+
+    $('span.static-math').each( (index,element) => {
+      MQ.StaticMath(element);
+    } );
+
+    $('span.math-field').each( (index,element) => {
+      MQ.MathField(element);
+    } );
+
 
     //Starting timer
     startCountdown();
@@ -1226,7 +1233,7 @@ const algebra={
                 const ansNumber=firstNumber+secondNumber
                 const ansTerm=ansNumber+alphabet1+"+"+thirdNumber+alphabet2
                 const ansTerm2=thirdNumber+alphabet2+"+"+ansNumber+alphabet1
-                let algebraQn={qn:qnTerms,ans:ansTerm,ans2:ansTerm2,type:"hard"}
+                let algebraQn={qn:qnTerms,ans:ansTerm,ans2:ansTerm2,type:"hardv2"}
                 questionArray.push(algebraQn)
             }else if(patternNumber==2){
                 console.log("2")
@@ -1234,7 +1241,7 @@ const algebra={
                 const ansNumber=secondNumber+thirdNumber
                 const ansTerm=firstNumber+alphabet1+"+"+ansNumber+alphabet2
                 const ansTerm2=ansNumber+alphabet2+"+"+firstNumber+alphabet1
-                let algebraQn={qn:qnTerms,ans:ansTerm,ans2:ansTerm2,type:"hard"}
+                let algebraQn={qn:qnTerms,ans:ansTerm,ans2:ansTerm2,type:"hardv2"}
                 questionArray.push(algebraQn)
             }else if(patternNumber==3){
                 console.log("3")
@@ -1276,19 +1283,51 @@ const algebra={
                 if(secondNumber==1){
                     secondNumber=3
                 }
+                if(firstpower==1){
+                    firstpower=3
+                }
 
+                if(secondpower==1){
+                    secondpower=3
+                }
+               
 
-
-                const qnTerms=firstNumber+alphabet+"^"+firstpower+"."+secondNumber+alphabet+"^"+secondpower
+                
                 let ansTerm;
+
+                let ansFirstTermForFrontend;
+                let ansFirstPowerForFrontend;
+
                 if((firstpower+secondpower)==0){
-                    ansTerm=(firstNumber*secondNumber)
+                    ansTerm=(firstNumber*secondNumber);
+
+                    ansFirstTermForFrontend=(firstNumber*secondNumber);
+                    ansFirstPowerForFrontend="";
                 }else if((firstpower+secondpower)==1){
                     ansTerm=(firstNumber*secondNumber)+alphabet
+
+                    ansFirstTermForFrontend=(firstNumber*secondNumber)+alphabet;
+                    ansFirstPowerForFrontend="";
                 }else{
                    ansTerm=(firstNumber*secondNumber)+alphabet+"^"+(firstpower+secondpower)
+
+                   ansFirstTermForFrontend=(firstNumber*secondNumber)+alphabet;
+                   ansFirstPowerForFrontend=(firstpower+secondpower);
                 }
-                let algebraQn={qn:qnTerms,ans:ansTerm,type:"easy"}
+
+                let ansTermCheck;
+                ansTermCheck=ansTerm.replace("^","")
+
+                if(firstNumber==-1){
+                    firstNumber="-"
+                }
+                if(secondNumber==-1){
+                    secondNumber="-"
+                }
+
+                const qnTerms=firstNumber+alphabet+"^"+firstpower+"."+secondNumber+alphabet+"^"+secondpower
+                
+                let algebraQn={qn:qnTerms,qnFirstTerm:firstNumber+alphabet,qnFirstPower:firstpower,qnSecondTerm:secondNumber+alphabet,qnSecondPower:secondpower,ans:ansTermCheck,ansDatabase:ansTerm,ansFirstTerm:ansFirstTermForFrontend,ansFirstPower:ansFirstPowerForFrontend,type:"easy"}
                 questionArray.push(algebraQn)
             }
             for(var i=0;i<numOfMedium;i++){
@@ -1330,20 +1369,45 @@ const algebra={
                 }
 
                
+                let ansTerm;
+
+                let ansFirstTermForFrontend;
+                let ansFirstPowerForFrontend;
+
+                if((firstpower+secondpower)==0){
+                    ansTerm=(firstNumber*secondNumber)
+
+                    ansFirstTermForFrontend=(firstNumber*secondNumber);
+                    ansFirstPowerForFrontend="";
+                }else if((firstpower+secondpower)==1){
+                    ansTerm=(firstNumber*secondNumber)+alphabet
+
+                    ansFirstTermForFrontend=(firstNumber*secondNumber)+alphabet;
+                    ansFirstPowerForFrontend="";
+                }else{
+                   ansTerm=(firstNumber*secondNumber)+alphabet+"^"+(firstpower+secondpower)
+
+                   ansFirstTermForFrontend=(firstNumber*secondNumber)+alphabet;
+                   ansFirstPowerForFrontend=(firstpower+secondpower);
+                }
+                
+                let ansTermCheck;
+                ansTermCheck=ansTerm.replace("^","")
+
+                if(firstNumber==-1){
+                    firstNumber="-"
+                }
+                if(secondNumber==-1){
+                    secondNumber="-"
+                }
+
+
+               
 
 
                 const qnTerms=firstNumber+alphabet+"^"+firstpower+"."+secondNumber+alphabet+"^"+secondpower;
-                let ansTerm;
-                if((firstpower+secondpower)==0){
-                    ansTerm=(firstNumber*secondNumber)
-                }else if((firstpower+secondpower)==1){
-                    ansTerm=(firstNumber*secondNumber)+alphabet
-                }else{
-                   ansTerm=(firstNumber*secondNumber)+alphabet+"^"+(firstpower+secondpower)
-                }
-                
     
-                let algebraQn={qn:qnTerms,ans:ansTerm,type:"medium"}
+                let algebraQn={qn:qnTerms,qnFirstTerm:firstNumber+alphabet,qnFirstPower:firstpower,qnSecondTerm:secondNumber+alphabet,qnSecondPower:secondpower,ans:ansTermCheck,ansDatabase:ansTerm,ansFirstTerm:ansFirstTermForFrontend,ansFirstPower:ansFirstPowerForFrontend,type:"medium"}
                 questionArray.push(algebraQn)
             }
             for(var i=0;i<numOfHard;i++){
@@ -1395,23 +1459,94 @@ const algebra={
                     thirdpower=3
                 }
                 
-
-
-                const qnTerms=firstNumber+alphabet1+"^"+firstpower+"."+secondNumber+alphabet2+"^"+secondpower+"."+alphabet2+"^"+thirdpower;
+               
                 let ansTerm;
                 let ansTerm2;
+
+                let ansTermCheck;
+                let ansTermCheck2;
+                let typeofQn="hardv2";
+
+                
+                let ansFirstTermForFrontend;
+                let ansFirstPowerForFrontend;
+                let ansSecondTermForFrontend;
+                let ansSecondPowerForFrontend;
+                
+                let ans2FirstTermForFrontend;
+                let ans2FirstPowerForFrontend;
+                let ans2SecondTermForFrontend;
+                let ans2SecondPowerForFrontend;
+
+
                 if((secondpower+thirdpower)==0){
                     ansTerm=(firstNumber*secondNumber)+alphabet1+"^"+firstpower
+                    typeofQn="hard"
+
+                    ansTermCheck=(firstNumber*secondNumber)+alphabet1+firstpower
+
+                    ansFirstTermForFrontend=(firstNumber*secondNumber)+alphabet1;
+                    ansFirstPowerForFrontend=firstpower;
+                    ansSecondTermForFrontend="";
+                    ansSecondPowerForFrontend="";
+                    
+                    ans2FirstTermForFrontend="";
+                    ans2FirstPowerForFrontend="";
+                    ans2SecondTermForFrontend="";
+                    ans2SecondPowerForFrontend="";
+
                 }else if((secondpower+thirdpower)==1){
                     ansTerm=(firstNumber*secondNumber)+alphabet1+"^"+firstpower+"."+alphabet2
+                    ansTermCheck=(firstNumber*secondNumber)+alphabet1+firstpower+alphabet2
+
+                    ansFirstTermForFrontend=(firstNumber*secondNumber)+alphabet1;
+                    ansFirstPowerForFrontend=firstpower;
+                    ansSecondTermForFrontend=alphabet2;
+                    ansSecondPowerForFrontend="";
+
                     ansTerm2=(firstNumber*secondNumber)+alphabet2+"."+alphabet1+"^"+firstpower
+                    ansTermCheck2=(firstNumber*secondNumber)+alphabet2+alphabet1+firstpower
+
+                    ans2FirstTermForFrontend=(firstNumber*secondNumber)+alphabet2;
+                    ans2FirstPowerForFrontend="";
+                    ans2SecondTermForFrontend=alphabet1;
+                    ans2SecondPowerForFrontend=firstpower;
+
+
 
                 }else{
                    ansTerm=(firstNumber*secondNumber)+alphabet1+"^"+firstpower+"."+alphabet2+"^"+(secondpower+thirdpower)
+                   ansTermCheck=(firstNumber*secondNumber)+alphabet1+firstpower+alphabet2+(secondpower+thirdpower)
+
+                   ansFirstTermForFrontend=(firstNumber*secondNumber)+alphabet1;
+                   ansFirstPowerForFrontend=firstpower;
+                   ansSecondTermForFrontend=alphabet2;
+                   ansSecondPowerForFrontend=(secondpower+thirdpower);
+
                    ansTerm2=(firstNumber*secondNumber)+alphabet2+"^"+(secondpower+thirdpower)+"."+alphabet1+"^"+firstpower
+                   ansTermCheck2=(firstNumber*secondNumber)+alphabet2+(secondpower+thirdpower)+alphabet1+firstpower
+                   ans2FirstTermForFrontend=(firstNumber*secondNumber)+alphabet2;
+                    ans2FirstPowerForFrontend=(secondpower+thirdpower);
+                    ans2SecondTermForFrontend=alphabet1;
+                    ans2SecondPowerForFrontend=firstpower;
                 }
 
-                let algebraQn={qn:qnTerms,ans:ansTerm,ans2:ansTerm2,type:"hardv2"}
+
+                if(firstNumber==-1){
+                    firstNumber="-"
+                }
+                if(secondNumber==-1){
+                    secondNumber="-"
+                }
+
+
+
+                const qnTerms=firstNumber+alphabet1+"^"+firstpower+"."+secondNumber+alphabet2+"^"+secondpower+"."+alphabet2+"^"+thirdpower;
+              
+              
+
+
+                let algebraQn={qn:qnTerms,qnFirstTerm:firstNumber+alphabet1,qnFirstPower:firstpower,qnSecondTerm:secondNumber+alphabet2,qnSecondPower:secondpower,qnThirdTerm:alphabet2,qnThirdPower:thirdpower,ansDatabase:ansTerm,ansDatabase2:ansTerm2,ans:ansTermCheck,ans2:ansTermCheck2,ansFirstTerm:ansFirstTermForFrontend,ansFirstPower:ansFirstPowerForFrontend,ansSecondTerm:ansSecondTermForFrontend,ansSecondPower:ansSecondPowerForFrontend,ans2FirstTerm:ans2FirstTermForFrontend,ans2FirstPower:ans2FirstPowerForFrontend,ans2SecondTerm:ans2SecondTermForFrontend,ans2SecondPower:ans2SecondPowerForFrontend,type:typeofQn}
                 questionArray.push(algebraQn)
 
 
@@ -1467,6 +1602,38 @@ const algebra={
                 let ansTerm1=firstNumberans+firstpowerans;
                 let ansTerm2=secondNumberans+secondpowerans;
 
+                let qnNumerator;
+                let qnNumeratorPower;
+
+                let qnDenominator;
+                let qnDenominatorPower;
+                if(firstNumber==1){
+                    qnNumerator=alphabet
+                }else{
+                qnNumerator=firstNumber+alphabet
+                }
+                if(firstpower==1){
+                    qnNumeratorPower=""
+                }else{
+                qnNumeratorPower=firstpower
+                }
+
+                if(secondNumber==1){
+                    qnDenominator=alphabet
+                }else{
+                qnDenominator=secondNumber+alphabet
+                }
+                if(secondpower==1){
+                    qnDenominatorPower=""
+                }else{
+                qnDenominatorPower=secondpower
+                }
+
+              
+
+                
+                
+
                 qnTerms1=qnTerms1.replace('^1','')
                 qnTerms2=qnTerms2.replace('^1','')
                 ansTerm1=ansTerm1.replace('^1','')
@@ -1476,11 +1643,57 @@ const algebra={
                 qnTerms2=qnTerms2.replace('1'+alphabet,alphabet)
                 ansTerm1=ansTerm1.replace('1'+alphabet,alphabet)
                 ansTerm2=ansTerm2.replace('1'+alphabet,alphabet)
+
+                let ansNumerator
+                let ansNumeratorPower
+
+                let ansDenominator
+                let ansDenominatorPower
+
+                
+
+                if(ansTerm1.indexOf("^")==-1){
+                    ansNumerator=ansTerm1;
+                    ansNumeratorPower=""
+                }else{
+
+                ansNumerator=ansTerm1.slice(0,ansTerm1.indexOf("^"))
+                ansNumeratorPower=ansTerm1.slice(ansTerm1.indexOf("^")+1)
+                }
+
+                if(ansTerm2.indexOf("^")==-1){
+                    ansDenominator=ansTerm2;
+                    ansDenominatorPower=""
+                }else{
+                ansDenominator=ansTerm2.slice(0,ansTerm2.indexOf("^"))
+                ansDenominatorPower=ansTerm2.slice(ansTerm2.indexOf("^")+1)
+                }
+
+            
+
+
+                ansTerm1=ansTerm1.replace('^','')
+                ansTerm2=ansTerm2.replace('^','')
+
+
+                
+
+            
+
+
                 let algebraQn
                 if(ansTerm2==1){
-                algebraQn={qn:qnTerms1+"/"+qnTerms2,ans:ansTerm1,type:"easy"}
+                algebraQn={qn:qnTerms1+"/"+qnTerms2,ans:ansTerm1,type:"easy",
+            QnNumerator:qnNumerator,QnNumeratorPower:qnNumeratorPower,QnDenominator:qnDenominator,QnDenominatorPower:qnDenominatorPower,
+            fraction:"No",
+            AnsNumerator:ansNumerator,AnsNumeratorPower:ansNumeratorPower,AnsDenominator:ansDenominator,AnsDenominatorPower:ansDenominatorPower
+            }
                 }else{
-                    algebraQn={qn:qnTerms1+"/"+qnTerms2,ans:ansTerm1+"/"+ansTerm2,type:"easy"}  
+                    algebraQn={qn:qnTerms1+"/"+qnTerms2,ans:ansTerm1+"\n"+ansTerm2,type:"easy",
+            QnNumerator:qnNumerator,QnNumeratorPower:qnNumeratorPower,QnDenominator:qnDenominator,QnDenominatorPower:qnDenominatorPower,
+            fraction:"Yes",
+            AnsNumerator:ansNumerator,AnsNumeratorPower:ansNumeratorPower,AnsDenominator:ansDenominator,AnsDenominatorPower:ansDenominatorPower
+                }  
                 }
             
                 questionArray.push(algebraQn)
@@ -1557,11 +1770,41 @@ const algebra={
                 let qnTerms2;
                 let ansTerm1;
                 let ansTerm2;
+
+                let qnNumerator;
+                let qnNumeratorPower;
+
+                let qnDenominator;
+                let qnDenominatorPower;
                 
 
                 if(firstNegativenumber==true&&secondNegativenumber==true){
                     qnTerms1="-"+firstNumber+alphabet+"^"+firstpower;
                     qnTerms2="-"+secondNumber+alphabet+"^"+secondpower;
+
+                    if(firstNumber==1){
+                        qnNumerator="-"+alphabet
+                    }else{
+                    qnNumerator="-"+firstNumber+alphabet
+                    }
+                    if(firstpower==1){
+                        qnNumeratorPower=""
+                    }else{
+                    qnNumeratorPower=firstpower
+                    }
+    
+                    if(secondNumber==1){
+                        qnDenominator="-"+alphabet
+                    }else{
+                    qnDenominator="-"+secondNumber+alphabet
+                    }
+                    if(secondpower==1){
+                        qnDenominatorPower=""
+                    }else{
+                    qnDenominatorPower=secondpower
+                    }
+    
+                  
 
                     ansTerm1=firstNumberans+firstpowerans;
                     ansTerm2=secondNumberans+secondpowerans;
@@ -1571,6 +1814,29 @@ const algebra={
                     qnTerms1=firstNumber+alphabet+"^"+firstpower;
                     qnTerms2=secondNumber+alphabet+"^"+secondpower;
 
+                    if(firstNumber==1){
+                        qnNumerator=alphabet
+                    }else{
+                    qnNumerator=firstNumber+alphabet
+                    }
+                    if(firstpower==1){
+                        qnNumeratorPower=""
+                    }else{
+                    qnNumeratorPower=firstpower
+                    }
+    
+                    if(secondNumber==1){
+                        qnDenominator=alphabet
+                    }else{
+                    qnDenominator=secondNumber+alphabet
+                    }
+                    if(secondpower==1){
+                        qnDenominatorPower=""
+                    }else{
+                    qnDenominatorPower=secondpower
+                    }
+    
+
                     ansTerm1=firstNumberans+firstpowerans;
                     ansTerm2=secondNumberans+secondpowerans;
 
@@ -1578,12 +1844,58 @@ const algebra={
                     qnTerms1="-"+firstNumber+alphabet+"^"+firstpower;
                     qnTerms2=secondNumber+alphabet+"^"+secondpower;
 
+                    
+                    if(firstNumber==1){
+                        qnNumerator="-"+alphabet
+                    }else{
+                    qnNumerator="-"+firstNumber+alphabet
+                    }
+                    if(firstpower==1){
+                        qnNumeratorPower=""
+                    }else{
+                    qnNumeratorPower=firstpower
+                    }
+    
+                    if(secondNumber==1){
+                        qnDenominator=alphabet
+                    }else{
+                    qnDenominator=secondNumber+alphabet
+                    }
+                    if(secondpower==1){
+                        qnDenominatorPower=""
+                    }else{
+                    qnDenominatorPower=secondpower
+                    }
+
                     ansTerm1="-"+firstNumberans+firstpowerans;
                     ansTerm2=secondNumberans+secondpowerans;
 
                 }else if(firstNegativenumber==false&&secondNegativenumber==true){
                     qnTerms1=firstNumber+alphabet+"^"+firstpower;
                     qnTerms2="-"+secondNumber+alphabet+"^"+secondpower;
+
+                    if(firstNumber==1){
+                        qnNumerator=alphabet
+                    }else{
+                    qnNumerator=firstNumber+alphabet
+                    }
+                    if(firstpower==1){
+                        qnNumeratorPower=""
+                    }else{
+                    qnNumeratorPower=firstpower
+                    }
+    
+                    if(secondNumber==1){
+                        qnDenominator="-"+alphabet
+                    }else{
+                    qnDenominator="-"+secondNumber+alphabet
+                    }
+                    if(secondpower==1){
+                        qnDenominatorPower=""
+                    }else{
+                    qnDenominatorPower=secondpower
+                    }
+
 
                     ansTerm1="-"+firstNumberans+firstpowerans;
                     ansTerm2=secondNumberans+secondpowerans;
@@ -1637,11 +1949,49 @@ const algebra={
                 qnTerms2=qnTerms2.replace('1'+alphabet,alphabet)
                 ansTerm1=ansTerm1.replace('1'+alphabet,alphabet)
                 ansTerm2=ansTerm2.replace('1'+alphabet,alphabet)
+
+                
+                let ansNumerator
+                let ansNumeratorPower
+
+                let ansDenominator
+                let ansDenominatorPower
+
+                
+
+                if(ansTerm1.indexOf("^")==-1){
+                    ansNumerator=ansTerm1;
+                    ansNumeratorPower=""
+                }else{
+
+                ansNumerator=ansTerm1.slice(0,ansTerm1.indexOf("^"))
+                ansNumeratorPower=ansTerm1.slice(ansTerm1.indexOf("^")+1)
+                }
+
+                if(ansTerm2.indexOf("^")==-1){
+                    ansDenominator=ansTerm2;
+                    ansDenominatorPower=""
+                }else{
+                ansDenominator=ansTerm2.slice(0,ansTerm2.indexOf("^"))
+                ansDenominatorPower=ansTerm2.slice(ansTerm2.indexOf("^")+1)
+                }
+
+
+                ansTerm1=ansTerm1.replace('^','')
+                ansTerm2=ansTerm2.replace('^','')
                 let algebraQn
                 if(ansTerm2==1){
-                    algebraQn={qn:qnTerms1+"/"+qnTerms2,ans:ansTerm1,type:"medium"}
+                    algebraQn={qn:qnTerms1+"/"+qnTerms2,ans:ansTerm1,type:"medium",
+                    QnNumerator:qnNumerator,QnNumeratorPower:qnNumeratorPower,QnDenominator:qnDenominator,QnDenominatorPower:qnDenominatorPower,
+                    fraction:"No",
+                    AnsNumerator:ansNumerator,AnsNumeratorPower:ansNumeratorPower,AnsDenominator:ansDenominator,AnsDenominatorPower:ansDenominatorPower
+                }
                     }else{
-                        algebraQn={qn:qnTerms1+"/"+qnTerms2,ans:ansTerm1+"/"+ansTerm2,type:"medium"}  
+                        algebraQn={qn:qnTerms1+"/"+qnTerms2,ans:ansTerm1+"\n"+ansTerm2,type:"medium",
+                        QnNumerator:qnNumerator,QnNumeratorPower:qnNumeratorPower,QnDenominator:qnDenominator,QnDenominatorPower:qnDenominatorPower,
+                        fraction:"Yes",
+                        AnsNumerator:ansNumerator,AnsNumeratorPower:ansNumeratorPower,AnsDenominator:ansDenominator,AnsDenominatorPower:ansDenominatorPower
+                    }  
                     }
             
                 questionArray.push(algebraQn)
@@ -1734,7 +2084,44 @@ const algebra={
                 if(firstNegativenumber==true&&secondNegativenumber==true){
                     qnTerms1="-"+firstNumber+alphabet+"^"+firstpower+"."+alphabet2+"^"+thirdpower;
                     qnTerms2="-"+secondNumber+alphabet+"^"+secondpower;
+//frontend qn terms
 
+//Numerator
+                    if(firstNumber==1){
+                        qnNumerator="-"+alphabet
+                        qnNumerator2=alphabet2
+                    }else{
+                    qnNumerator="-"+firstNumber+alphabet
+                    qnNumerator2=alphabet2
+                    }
+                    if(firstpower==1){
+                        qnNumeratorPower=""
+                        if(thirdpower==1){
+                            qnNumeratorPower2=""
+                        }else{
+                        qnNumeratorPower2=thirdpower
+                        }
+                    }else{
+                    qnNumeratorPower=firstpower
+                    if(thirdpower==1){
+                        qnNumeratorPower2=""
+                    }else{
+                    qnNumeratorPower2=thirdpower
+                    }
+                    }
+                   
+    //Denominator
+                    if(secondNumber==1){
+                        qnDenominator="-"+alphabet
+                    }else{
+                    qnDenominator="-"+secondNumber+alphabet
+                    }
+                    if(secondpower==1){
+                        qnDenominatorPower=""
+                    }else{
+                    qnDenominatorPower=secondpower
+                    }
+//end of frontend qn terms
                     if(firstpowerans==""){
                         ansTerm1=firstNumberans+firstpowerans+alphabet2+"^"+thirdpower;
                     }else{
@@ -1749,6 +2136,45 @@ const algebra={
                     qnTerms1=firstNumber+alphabet+"^"+firstpower+"."+alphabet2+"^"+thirdpower;
                     qnTerms2=secondNumber+alphabet+"^"+secondpower;
 
+                    //frontend qn terms
+
+//Numerator
+if(firstNumber==1){
+    qnNumerator=alphabet
+    qnNumerator2=alphabet2
+}else{
+qnNumerator=firstNumber+alphabet
+qnNumerator2=alphabet2
+}
+if(firstpower==1){
+    qnNumeratorPower=""
+    if(thirdpower==1){
+        qnNumeratorPower2=""
+    }else{
+    qnNumeratorPower2=thirdpower
+    }
+}else{
+qnNumeratorPower=firstpower
+if(thirdpower==1){
+    qnNumeratorPower2=""
+}else{
+qnNumeratorPower2=thirdpower
+}
+}
+
+//Denominator
+if(secondNumber==1){
+    qnDenominator=alphabet
+}else{
+qnDenominator=secondNumber+alphabet
+}
+if(secondpower==1){
+    qnDenominatorPower=""
+}else{
+qnDenominatorPower=secondpower
+}
+//end of frontend qn terms
+
                     if(firstpowerans==""){
                         ansTerm1=firstNumberans+firstpowerans+alphabet2+"^"+thirdpower;
                     }else{
@@ -1759,6 +2185,44 @@ const algebra={
                 }else if(firstNegativenumber==true&&secondNegativenumber==false){
                     qnTerms1="-"+firstNumber+alphabet+"^"+firstpower+"."+alphabet2+"^"+thirdpower;
                     qnTerms2=secondNumber+alphabet+"^"+secondpower;
+
+                     //frontend qn terms
+
+//Numerator
+if(firstNumber==1){
+    qnNumerator="-"+alphabet
+    qnNumerator2=alphabet2
+}else{
+qnNumerator="-"+firstNumber+alphabet
+qnNumerator2=alphabet2
+}
+if(firstpower==1){
+    qnNumeratorPower=""
+    if(thirdpower==1){
+        qnNumeratorPower2=""
+    }else{
+    qnNumeratorPower2=thirdpower
+    }
+}else{
+qnNumeratorPower=firstpower
+if(thirdpower==1){
+    qnNumeratorPower2=""
+}else{
+qnNumeratorPower2=thirdpower
+}
+}
+
+//Denominator
+if(secondNumber==1){
+    qnDenominator=alphabet
+}else{
+qnDenominator=secondNumber+alphabet
+}
+if(secondpower==1){
+    qnDenominatorPower=""
+}else{
+qnDenominatorPower=secondpower
+}
 
                     if(firstpowerans==""){
                         ansTerm1="-"+firstNumberans+firstpowerans+alphabet2+"^"+thirdpower;
@@ -1771,6 +2235,44 @@ const algebra={
                 }else if(firstNegativenumber==false&&secondNegativenumber==true){
                     qnTerms1=firstNumber+alphabet+"^"+firstpower+"."+alphabet2+"^"+thirdpower;
                     qnTerms2="-"+secondNumber+alphabet+"^"+secondpower;
+
+                     //frontend qn terms
+
+//Numerator
+if(firstNumber==1){
+    qnNumerator=alphabet
+    qnNumerator2=alphabet2
+}else{
+qnNumerator=firstNumber+alphabet
+qnNumerator2=alphabet2
+}
+if(firstpower==1){
+    qnNumeratorPower=""
+    if(thirdpower==1){
+        qnNumeratorPower2=""
+    }else{
+    qnNumeratorPower2=thirdpower
+    }
+}else{
+qnNumeratorPower=firstpower
+if(thirdpower==1){
+    qnNumeratorPower2=""
+}else{
+qnNumeratorPower2=thirdpower
+}
+}
+
+//Denominator
+if(secondNumber==1){
+    qnDenominator="-"+alphabet
+}else{
+qnDenominator="-"+secondNumber+alphabet
+}
+if(secondpower==1){
+    qnDenominatorPower=""
+}else{
+qnDenominatorPower=secondpower
+}
 
                     if(firstpowerans==""){
                         ansTerm1="-"+firstNumberans+firstpowerans+alphabet2+"^"+thirdpower;
@@ -1829,11 +2331,108 @@ const algebra={
                 qnTerms2=qnTerms2.replace('1'+alphabet,alphabet)
                 ansTerm1=ansTerm1.replace('1'+alphabet,alphabet)
                 ansTerm2=ansTerm2.replace('1'+alphabet,alphabet)
+                ansTerm1=ansTerm1.replace('1'+alphabet,alphabet)
+                ansTerm2=ansTerm2.replace('1'+alphabet,alphabet)
+                ansTerm1=ansTerm1.replace('1'+alphabet,alphabet)
+                ansTerm2=ansTerm2.replace('1'+alphabet,alphabet)
+
+                ansTerm1=ansTerm1.replace('1'+alphabet2,alphabet2)
+                ansTerm2=ansTerm2.replace('1'+alphabet2,alphabet2)
+                ansTerm1=ansTerm1.replace('1'+alphabet2,alphabet2)
+                ansTerm2=ansTerm2.replace('1'+alphabet2,alphabet2)
+                ansTerm1=ansTerm1.replace('1'+alphabet2,alphabet2)
+                ansTerm2=ansTerm2.replace('1'+alphabet2,alphabet2)
+
+
+
+
+                let ansNumerator
+                let ansNumeratorPower
+                let ansNumerator2=""
+                let ansNumeratorPower2=""
+
+                let ansDenominator
+                let ansDenominatorPower
+
+                let firstTerma;
+                let secondTermb
+
+                if(ansTerm1.indexOf(".")!=-1){
+                            //a.b
+                            //a^2.b
+                            //a.b^2
+                            //a^2.b^2
+
+                 //first term(a)
+                 firstTerma=ansTerm1.slice(0,ansTerm1.indexOf("."))
+                 console.log(firstTerma)
+                 if(firstTerma.indexOf("^")==-1){
+                    ansNumerator=firstTerma;
+                    ansNumeratorPower=""
+                 }else{
+                    ansNumerator=firstTerma.slice(0,firstTerma.indexOf("^"))
+                    ansNumeratorPower=firstTerma.slice(firstTerma.indexOf("^")+1)
+                 }
+
+                 //second term(b)
+                 secondTermb=ansTerm1.slice(ansTerm1.indexOf(".")+1)
+                 console.log(secondTermb)
+                 if(secondTermb.indexOf("^")==-1){
+                     ansNumerator2=secondTermb;
+                     ansNumeratorPower2=""
+                 }else{
+                     ansNumerator2=secondTermb.slice(0,secondTermb.indexOf("^"))
+                     ansNumeratorPower2=secondTermb.slice(secondTermb.indexOf("^")+1)
+                     console.log(ansNumerator2)
+                     console.log(ansNumeratorPower2)
+                 }
+                
+               
+            }else{
+                if(ansTerm1.indexOf("^")==-1){
+                    ansNumerator=ansTerm1;
+                    ansNumeratorPower=""
+                }else{
+
+                ansNumerator=ansTerm1.slice(0,ansTerm1.indexOf("^"))
+                ansNumeratorPower=ansTerm1.slice(ansTerm1.indexOf("^")+1)
+                }
+            }
+
+
+
+
+                if(ansTerm2.indexOf("^")==-1){
+                    ansDenominator=ansTerm2;
+                    ansDenominatorPower=""
+                }else{
+                ansDenominator=ansTerm2.slice(0,ansTerm2.indexOf("^"))
+                ansDenominatorPower=ansTerm2.slice(ansTerm2.indexOf("^")+1)
+                }
+
+
+
+                ansTerm1=ansTerm1.replace('^','')
+                ansTerm1=ansTerm1.replace('^','')
+                ansTerm1=ansTerm1.replace('.','')
+                ansTerm2=ansTerm2.replace('^','')
                 let algebraQn
                 if(ansTerm2==1){
-                    algebraQn={qn:qnTerms1+"/"+qnTerms2,ans:ansTerm1,type:"hard"}
+                    algebraQn={qn:qnTerms1+"/"+qnTerms2,ans:ansTerm1,type:"hard",
+                    QnNumerator:qnNumerator,QnNumeratorPower:qnNumeratorPower,QnDenominator:qnDenominator,QnDenominatorPower:qnDenominatorPower,
+                    QnNumerator2:qnNumerator2,QnNumeratorPower2:qnNumeratorPower2,
+                    fraction:"No",
+                    AnsNumerator:ansNumerator,AnsNumeratorPower:ansNumeratorPower,AnsDenominator:ansDenominator,AnsDenominatorPower:ansDenominatorPower,
+                    AnsNumerator2:ansNumerator2,AnsNumeratorPower2:ansNumeratorPower2
+                }
                     }else{
-                        algebraQn={qn:qnTerms1+"/"+qnTerms2,ans:ansTerm1+"/"+ansTerm2,type:"hard"}  
+                        algebraQn={qn:qnTerms1+"/"+qnTerms2,ans:ansTerm1+"\n"+ansTerm2,type:"hard",
+                        QnNumerator:qnNumerator,QnNumeratorPower:qnNumeratorPower,QnDenominator:qnDenominator,QnDenominatorPower:qnDenominatorPower,
+                        QnNumerator2:qnNumerator2,QnNumeratorPower2:qnNumeratorPower2,
+                        fraction:"Yes",
+                    AnsNumerator:ansNumerator,AnsNumeratorPower:ansNumeratorPower,AnsDenominator:ansDenominator,AnsDenominatorPower:ansDenominatorPower,
+                    AnsNumerator2:ansNumerator2,AnsNumeratorPower2:ansNumeratorPower2
+                    }  
                     }
             
                 questionArray.push(algebraQn)
@@ -2221,51 +2820,80 @@ const algebra={
     if(quizData.skill_code=="ALGEBRA_MULTIPLICATION"){
        
         for (let i = 0; i < questionArray.length; i++) {
-            
+            console.log(questionArray[i].type)
             content += `<div class="row col-9 justify-content-center align-items-center text-center m-auto mb-5"><div class="small col-md-4">Question ${i + 1}</div>`;
-
-            content +=`<div class="row col-md-12">Simplify `+questionArray[i].qn+` <br>Please display . between 2 alphabetical terms. For example if your answer is 2xy, display your answer as 2x.y</div><br><br> <div align-items-center>Answer: 
-            
-            
-            <input class="text-center" size = "6" id='input${i}'>
-
+            if(questionArray[i].type=="hardv2"||questionArray[i].type=="hard"){
+                content +=`<div>Simplify `+questionArray[i].qnFirstTerm+`<sup>`+questionArray[i].qnFirstPower+`</sup>`+questionArray[i].qnSecondTerm+`<sup>`+questionArray[i].qnSecondPower+`</sup>`+questionArray[i].qnThirdTerm+`<sup>`+questionArray[i].qnThirdPower+`</sup></div> <div align-items-center>
+                Answer: <span class="math-field" id='input${i}></span>
+                </div>`
+            }else{//easy and medium (two terms)
+            content +=`<div>Simplify `+questionArray[i].qnFirstTerm+`<sup>`+questionArray[i].qnFirstPower+`</sup>`+questionArray[i].qnSecondTerm+`<sup>`+questionArray[i].qnSecondPower+`</sup></div> <div align-items-center>
+            Answer: <span class="math-field" id='input${i}></span>
             </div>`
+            }
     
-            content += `<div class='col-md-2 reviewClass'><span id='review${i}'></span></div></div>`;
+            content += `<div class='col-md-2 reviewClass'></div></div>`;
+            content += `<div class='col-md-12 reviewClass justify-content-center align-items-center text-center'><span id='review${i}'></span></div></div><br><br>`;
 
             
             
         }
-        var mathFieldSpan = document.getElementById('math-field');
-        
-        var MQ = MathQuill.getInterface(2); 
-        MQ.MathField(mathFieldSpan);
 
         
     }
 
     if(quizData.skill_code=="ALGEBRA_DIVISION"){//the test for math input symbol
         for (let i = 0; i < questionArray.length; i++) {
-            content += `<div class="row col-9 justify-content-center align-items-center text-center m-auto mb-5"><div class="small col-md-4">Question ${i + 1}</div>`;
+            content += `<div class="row col-10 justify-content-center align-items-center text-center m-auto mb-5"><div class="small col-md-4">Question ${i + 1}</div>`;
+            if(questionArray[i].type=="hardv2"||questionArray[i].type=="hard"){
+                content +=`<div class="small col-md-5">
+                <table><tr>
+     
+                
+                <td>
+                <div style="float:left;">Simplify <br></div></td>
+                <td> <div style="float:left">
+                            <div style="border-bottom:1px solid;font-size:small;text-align:center;">`+questionArray[i].QnNumerator+`<sup>`+questionArray[i].QnNumeratorPower+`</sup>`+questionArray[i].QnNumerator2+`<sup>`+questionArray[i].QnNumeratorPower2+`</sup></div>
+                            <div style="font-size:small;text-align:center;">`+questionArray[i].QnDenominator+`<sup>`+questionArray[i].QnDenominatorPower+`</sup></div>
+                          </div></td> 
+                </tr>
+                
+                </table>
+              <br></div><br><br> <div>
+                
+                Answer: <span class="math-field" id='input${i}></span>
+    
+                
+                
+                
+                </div>`
+            }
+            else{
+            content +=`<div class="small col-md-5">
+            <table><tr>
+ 
+            
+            <td>
+            <div style="float:left;">Simplify <br></div></td>
+            <td> <div style="float:left">
+                        <div style="border-bottom:1px solid;font-size:small;text-align:center;">`+questionArray[i].QnNumerator+`<sup>`+questionArray[i].QnNumeratorPower+`</sup></div>
+                        <div style="font-size:small;text-align:center;">`+questionArray[i].QnDenominator+`<sup>`+questionArray[i].QnDenominatorPower+`</sup></div>
+                      </div></td> 
+            </tr>
+            
+            </table>
+          <br></div><br><br> <div>
+            
+            Answer: <span class="math-field" id='input${i}></span>
 
-            content +=`<div class="row col-md-12">Simplify `+questionArray[i].qn+` <br>Please display . between 2 alphabetical terms. For example if your answer is 2xy/-1, display your answer as -2x.y</div><br><br> <div align-items-center>Answer: <input class="text-center" size = "6" id='input${i}'>
-            
-            
-            Type math here: <span id="math-field"></span>
-
-            <script>
-            var mathFieldSpan = document.getElementById('math-field');
-            
-            
-            var MQ = MathQuill.getInterface(2); 
-            MQ.MathField(mathFieldSpan);
-            </script>
             
             
             
             </div>`
+            }
     
-            content += `<div class='col-md-2 reviewClass'><span id='review${i}'></span></div></div>`;
+            content += `<div class='col-md-2 reviewClass'></div></div>`;
+            content += `<div class='col-md-12 reviewClass justify-content-center align-items-center text-center'><span id='review${i}'></span></div></div><br><br>`;
         }
 
     }
@@ -2302,10 +2930,53 @@ const algebra={
             let difficulty = 'difficult';
             let isCorrect = false;
             let studentAns = {};
-    
-            let input = ('ans' in questionArray[i]) ? $(`#input${i}`).val() : undefined;
+            
+            //console.log(document.getElementsByClassName("math-field mq-editable-field mq-math-mode")[i].innerText)
            
-    
+            let input
+           
+
+            if(quizData.skill_code=="ALGEBRA_MULTIPLICATION"){
+                 input = ('ans' in questionArray[i]) ? document.getElementsByClassName("math-field mq-editable-field mq-math-mode")[i].innerText : undefined;
+                 input=input.replace("−","-")
+                 input=input.replace("−","-")
+                 input=input.replace("−","-")
+                 input=input.replace("−","-")
+            }else if(quizData.skill_code=="ALGEBRA_DIVISION"){
+                input = ('ans' in questionArray[i]) ? document.getElementsByClassName("math-field mq-editable-field mq-math-mode")[i].innerText : undefined;
+                input=input.replace("−","-")
+                input=input.replace("−","-")
+                input=input.replace("−","-")
+                input=input.replace("−","-")
+                input=input.replace("-\n","-")
+                if((/[a-z0-9]/).test(input.charAt(input.length-1))==false){
+                input = input.slice(0, -1);
+                input = input.slice(0, -1);
+                }
+                
+                
+            }else{
+                 input = ('ans' in questionArray[i]) ? $(`#input${i}`).val() : undefined;
+            }
+        
+           //let input = ('ans' in questionArray[i]) ? $(`#input${i}`).val() : undefined;
+       
+            //let input = ('ans' in questionArray[i]) ? document.getElementsByClassName("math-field mq-editable-field mq-math-mode")[i].innerText : undefined;
+            console.log(document.getElementsByClassName("math-field mq-editable-field mq-math-mode"))
+             console.log(input==questionArray[i].ans)
+             console.log(input)
+             
+            
+             console.log(questionArray[i].ans)
+             
+             console.log((/[a-z0-9]/).test(input.charAt(input.length-1)))
+       
+
+            
+
+            
+
+             
             if (input != undefined) studentAns['ans'] = input;
     
     
@@ -2328,18 +2999,51 @@ const algebra={
             else {
                 review = '<i class="fas fa-times"></i>  Ans: ';
                 if(questionArray[i].type=="hardv2"||questionArray[i].type=="mediumv2"||questionArray[i].type=="easyv2"){
+                    if(quizData.skill_code=="ALGEBRA_MULTIPLICATION"){
+                        if ('ans' in questionArray[i]) review +=  `${questionArray[i].ansFirstTerm}`+'<sup>'+`${questionArray[i].ansFirstPower}`+'</sup>'+`${questionArray[i].ansSecondTerm}`+'<sup>'+`${questionArray[i].ansSecondPower}`+'</sup>'+" or "+ `${questionArray[i].ans2FirstTerm}`+'<sup>'+`${questionArray[i].ans2FirstPower}`+'</sup>'+`${questionArray[i].ans2SecondTerm}`+'<sup>'+`${questionArray[i].ans2SecondPower}`+'</sup>';
+
+                    }else{
                     if ('ans' in questionArray[i]) review += `${questionArray[i].ans}`+" or "+`${questionArray[i].ans2}`;
+                }
                 }else if(questionArray[i].type=="hardv6"){
                     if ('ans' in questionArray[i]) review += `${questionArray[i].ans}`+" or "+`${questionArray[i].ans2}`+" or "+`${questionArray[i].ans3}`+" or "+`${questionArray[i].ans4}`+" or "+`${questionArray[i].ans5}`+" or "+`${questionArray[i].ans6}`;
 
                 }else{
+                    if(quizData.skill_code=="ALGEBRA_MULTIPLICATION"){
+                        if ('ans' in questionArray[i]) review += `${questionArray[i].ansFirstTerm}`+'<sup>'+`${questionArray[i].ansFirstPower}`+'</sup>';
+                    }else if(quizData.skill_code=="ALGEBRA_DIVISION"){
+                        if(questionArray[i].type=="hard"){
 
+                            if(questionArray[i].fraction=="Yes"){
+                                if ('ans' in questionArray[i]) review += 
+                                ' <div style="float:right;padding-right:520px;"><div style="border-bottom:1px solid;font-size:small;">'+`${questionArray[i].AnsNumerator}`+'<sup>'+`${questionArray[i].AnsNumeratorPower}`+'</sup>'+`${questionArray[i].AnsNumerator2}`+'<sup>'+`${questionArray[i].AnsNumeratorPower2}`+'</sup>'+'</div> <div style="font-size:small;text-align:center;">'+`${questionArray[i].AnsDenominator}`+'<sup>'+`${questionArray[i].AnsDenominatorPower}`+'</sup></div> </div>' ;
+                                }else{
+                                    if ('ans' in questionArray[i]) review += `${questionArray[i].AnsNumerator}`+'<sup>'+`${questionArray[i].AnsNumeratorPower}`+'</sup>'+`${questionArray[i].AnsNumerator2}`+'<sup>'+`${questionArray[i].AnsNumeratorPower2}`+'</sup>';
+                                }
+
+                        }else{
+
+                        if(questionArray[i].fraction=="Yes"){
+                        if ('ans' in questionArray[i]) review += 
+                        ' <div style="float:right;padding-right:520px;"><div style="border-bottom:1px solid;font-size:small;">'+`${questionArray[i].AnsNumerator}`+'<sup>'+`${questionArray[i].AnsNumeratorPower}`+'</sup></div> <div style="font-size:small;text-align:center;">'+`${questionArray[i].AnsDenominator}`+'<sup>'+`${questionArray[i].AnsDenominatorPower}`+'</sup></div> </div>' ;
+                        }else{
+                            if ('ans' in questionArray[i]) review += `${questionArray[i].AnsNumerator}`+'<sup>'+`${questionArray[i].AnsNumeratorPower}`+'</sup>';
+                        }
+
+                    }
+
+
+
+                    }else{
                 if ('ans' in questionArray[i]) review += `${questionArray[i].ans}`
+                    }
                 }
     
                
             }
+           
             document.getElementById(`review${i}`).innerHTML = review;
+            //document.getElementsByClassName("math-field mq-editable-field mq-math-mode")[i].innerText-review;
             let correctAnswer=""
             if(questionArray[i].type=="hardv2"||questionArray[i].type=="mediumv2"||questionArray[i].type=="easyv2"){
                 correctAnswer=questionArray[i].ans+" or "+questionArray[i].ans2;

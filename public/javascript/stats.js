@@ -2,7 +2,7 @@ var type = "topic";
 let userId = JSON.parse(localStorage.getItem("userInfo"))._id;
 
 let topicArray=["Decimals","Fractions","Algebra"];
-let topicObj={Decimals:["Rounding off","Addition_Subtraction","Multiplication_Decimals","Division"],Fractions:["Simplify","Addition","Multiplication_Fractions"],Algebra:["Addition_Algebra","Multiplication_Algebra","Division_Algebra"]};
+let topicObj={Decimals:["Rounding off","Addition_Subtraction","Multiplication_Decimals","Division"],Fractions:["Simplify","Addition","Multiplication_Fractions"],Algebra:["Addition_Algebra","Multiplication_Algebra","Division_Algebra","Expansion_Algebra","Linear_Equation_Algebra"]};
 let subtopicArray;
 let count=0;
 
@@ -58,7 +58,7 @@ $(document).on("click", '.select', function () {
 //filter
 $(document).on("click", '.dropdown-item', function () {
     count=0;
-    let topicObj={Decimals:["Rounding off","Addition_Subtraction","Multiplication_Decimals","Division"],Fractions:["Simplify","Addition","Multiplication_Fractions"],Algebra:["Addition_Algebra","Multiplication_Algebra","Division_Algebra"]};
+    let topicObj={Decimals:["Rounding off","Addition_Subtraction","Multiplication_Decimals","Division"],Fractions:["Simplify","Addition","Multiplication_Fractions"],Algebra:["Addition_Algebra","Multiplication_Algebra","Division_Algebra","Expansion_Algebra","Linear_Equation_Algebra"]};
     
     console.log(Object.values(topicObj)[Object.keys(topicObj).indexOf(this.id)])
 

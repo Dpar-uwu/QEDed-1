@@ -1153,7 +1153,7 @@ const algebra={
 
        
 
-        if(quizData.skill_code == 'ALGEBRA_ADDITION'||quizData.skill_code=="ALGEBRA_MULTIPLICATION"||quizData.skill_code=="ALGEBRA_DIVISION"||quizData.skill_code=="ALGEBRA_EXPANSION"){
+        if(quizData.skill_code == 'ALGEBRA_ADDITION'||quizData.skill_code=="ALGEBRA_MULTIPLICATION"||quizData.skill_code=="ALGEBRA_DIVISION"||quizData.skill_code=="ALGEBRA_EXPANSION"||quizData.skill_code=="ALGEBRA_LINEAR_EQUATION"){
             result=question.qn
         }
 
@@ -2801,6 +2801,130 @@ qnDenominatorPower=secondpower
                 let algebraQn={qn:qnTerms,ans:ansTerm,ans2:ans2Term,ans3:ans3Term,ans4:ans4Term,ans5:ans5Term,ans6:ans6Term,type:"hardv6"}
                 questionArray.push(algebraQn)
             }
+        }else if(quizData.skill_code=="ALGEBRA_LINEAR_EQUATION"){
+            for(var i=0;i<numOfEasy;i++){
+                let firstNumber=Math.floor((Math.random() * ((quizData.difficult_values.max*2)+1)) + quizData.difficult_values.min);
+                let secondNumber=Math.floor((Math.random() * ((9*2)+1)) + (-9));
+                if(firstNumber==0){
+                    firstNumber=1;
+                }
+
+                let qnTerm;
+                if(firstNumber>=0){//positive
+                qnTerm="𝑥+"+firstNumber.toString()+"="+secondNumber.toString();
+                }else{
+                qnTerm="𝑥"+firstNumber.toString()+"="+secondNumber.toString();
+                }
+
+
+
+                let algebraQn={qn:qnTerm,ans:(secondNumber-firstNumber).toString(),type:"easy",fraction:"No"}
+                questionArray.push(algebraQn)
+            }
+            for(var i=0;i<numOfMedium;i++){
+                let firstNumber=Math.floor((Math.random() * ((quizData.difficult_values.max*2)+1)) + quizData.difficult_values.min);
+                let secondNumber=Math.floor((Math.random() * ((9*2)+1)) + (-9));
+                if(firstNumber==0){
+                    firstNumber=1;
+                }
+                let qnTerm=firstNumber.toString()+"𝑥="+secondNumber.toString();
+                qnTerm.replace("1𝑥","𝑥")
+                qnTerm.replace("-1𝑥","-𝑥")
+
+                //ans
+                let ansTerm
+                let HCF=algebra.gcd(secondNumber,firstNumber);
+                let isFraction="No"
+                let numeratorAns="NA"
+                let denominatorAns="NA"
+                //check if its whole number
+                if(Math.floor(secondNumber/firstNumber)==secondNumber/firstNumber){
+                    ansTerm=(secondNumber/firstNumber).toString()
+                }else{//fraction---simplify it
+
+                    firstNumberans=(firstNumber/HCF);
+                    secondNumberans=(secondNumber/HCF);
+                    
+                    isFraction="Yes"
+                    ansTerm=secondNumberans+"\n"+firstNumberans
+                    numeratorAns=secondNumberans
+                    denominatorAns=firstNumberans
+
+                    if(firstNumberans<0){//negative
+                        ansTerm="-"+secondNumberans+"\n"+(firstNumberans*-1)
+                        numeratorAns="-"+secondNumberans
+                        denominatorAns=(firstNumberans*-1)
+
+                    }
+
+
+                }
+
+                let algebraQn={qn:qnTerm,ans:ansTerm,type:"medium",fraction:isFraction,numerator:numeratorAns,denominator:denominatorAns}
+                questionArray.push(algebraQn)
+
+
+
+            }
+            for(var i=0;i<numOfHard;i++){
+                let firstNumber=Math.floor((Math.random() * ((9*2)+1)) + (-9));
+                let secondNumber=Math.floor((Math.random() * ((9*2)+1)) + (-9));
+                let thirdNumber=Math.floor((Math.random() * ((quizData.difficult_values.max*2)+1)) + quizData.difficult_values.min);
+                if(firstNumber==0){
+                    firstNumber=1;
+                }
+                if(secondNumber==0){
+                    secondNumber=1
+                }
+
+                if(secondNumber>=0){//positive
+                    qnTerm=firstNumber+"𝑥+"+secondNumber+"="+thirdNumber
+                    }else{
+                    qnTerm=firstNumber+"𝑥"+secondNumber+"="+thirdNumber
+                    }
+
+                    qnTerm.replace("1𝑥","𝑥")
+                    qnTerm.replace("-1𝑥","-𝑥")
+
+                    //ans
+                    secondNumber=thirdNumber-secondNumber
+
+                     //ans
+                let ansTerm
+                let HCF=algebra.gcd(secondNumber,firstNumber);
+                let isFraction="No"
+                let numeratorAns="NA"
+                let denominatorAns="NA"
+                //check if its whole number
+                if(Math.floor(secondNumber/firstNumber)==secondNumber/firstNumber){
+                    ansTerm=(secondNumber/firstNumber).toString()
+                }else{//fraction---simplify it
+
+                    firstNumberans=(firstNumber/HCF);
+                    secondNumberans=(secondNumber/HCF);
+                    
+                    isFraction="Yes"
+                    ansTerm=secondNumberans+"\n"+firstNumberans
+                    numeratorAns=secondNumberans
+                    denominatorAns=firstNumberans
+
+                    if(firstNumberans<0){//negative
+                        ansTerm="-"+secondNumberans+"\n"+(firstNumberans*-1)
+                        numeratorAns="-"+secondNumberans
+                        denominatorAns=(firstNumberans*-1)
+
+                    }
+
+
+                }
+
+                    let algebraQn={qn:qnTerm,ans:ansTerm,type:"hard",fraction:isFraction,numerator:numeratorAns,denominator:denominatorAns}
+                    questionArray.push(algebraQn)
+
+
+
+            }
+
         }
 
     },
@@ -2907,6 +3031,22 @@ qnDenominatorPower=secondpower
             content += `<div class='col-md-2 reviewClass'><span id='review${i}'></span></div></div>`;
         }
     }
+    if(quizData.skill_code=="ALGEBRA_LINEAR_EQUATION"){
+        for (let i = 0; i < questionArray.length; i++) {
+            content += `<div class="row col-9 justify-content-center align-items-center text-center m-auto mb-5"><div class="small col-md-4">Question ${i + 1}</div>`;
+            
+            content +=`<div>Solve for 𝑥 in this equation. `+questionArray[i].qn+`</div> <div align-items-center>
+            Answer: <span class="math-field" id='input${i}></span>
+            </div>`
+            
+    
+            content += `<div class='col-md-2 reviewClass'></div></div>`;
+            content += `<div class='col-md-12 reviewClass justify-content-center align-items-center text-center'><span id='review${i}'></span></div></div><br><br>`;
+
+            
+            
+        }
+    }
 
 
         return content;
@@ -2955,7 +3095,20 @@ qnDenominatorPower=secondpower
                 }
                 
                 
-            }else{
+            }else if(quizData.skill_code=="ALGEBRA_LINEAR_EQUATION"){
+                input = ('ans' in questionArray[i]) ? document.getElementsByClassName("math-field mq-editable-field mq-math-mode")[i].innerText : undefined;
+                input=input.replace("−","-")
+                input=input.replace("−","-")
+                input=input.replace("−","-")
+                input=input.replace("−","-")
+                input=input.replace("-\n","-")
+                if((/[0-9]/).test(input.charAt(input.length-1))==false){
+                    input = input.slice(0, -1);
+                    input = input.slice(0, -1);
+                    }
+
+            }
+            else{
                  input = ('ans' in questionArray[i]) ? $(`#input${i}`).val() : undefined;
             }
         
@@ -2969,7 +3122,7 @@ qnDenominatorPower=secondpower
             
              console.log(questionArray[i].ans)
              
-             console.log((/[a-z0-9]/).test(input.charAt(input.length-1)))
+             //console.log((/[a-z0-9]/).test(input.charAt(input.length-1)))
        
 
             
@@ -3033,6 +3186,15 @@ qnDenominatorPower=secondpower
                     }
 
 
+
+                    }else if(quizData.skill_code=="ALGEBRA_LINEAR_EQUATION"){
+                        if(questionArray[i].fraction=="No"){
+                            if ('ans' in questionArray[i]) review += `${questionArray[i].ans}`
+
+                        }else{
+                            if ('ans' in questionArray[i]) review += 
+                            ' <div style="float:right;padding-right:520px;"><div style="border-bottom:1px solid;font-size:small;">'+`${questionArray[i].numerator}`+'</div> <div style="font-size:small;text-align:center;">'+`${questionArray[i].denominator}`+'</div> </div>' ;
+                        }
 
                     }else{
                 if ('ans' in questionArray[i]) review += `${questionArray[i].ans}`

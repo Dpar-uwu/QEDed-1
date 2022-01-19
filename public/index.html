@@ -237,7 +237,15 @@
                     </div>
                 </div>
                 <div class="row">
-                    <input type="submit" class="submit" value="Submit">
+                    <input onclick="success()" type="submit" class="submit" value="Submit">
+                    <script>
+                        function success() {
+                          document.getElementById("showhere").innerHTML = "Request Sent!";
+                        }
+                        </script>
+                    <div class="col-75">
+                        <p id="showhere"></p>
+                    </div>
                 </div>
             </form>
         </div>
